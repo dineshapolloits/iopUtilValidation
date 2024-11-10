@@ -116,5 +116,17 @@ public class ValidationController {
 			
 			return "GenerateFile";
 	}
+	
+	@GetMapping("/login")
+    public String login(Model model) {
+	//	FileValidationParam fileValidationParam = new FileValidationParam();
+        return "LoginPage";
+    }
+	
+	@GetMapping("/hubList")
+    public String hubList(Model model) {
+	//	FileValidationParam fileValidationParam = new FileValidationParam();
+        return "HubList";
+    }
 
 }

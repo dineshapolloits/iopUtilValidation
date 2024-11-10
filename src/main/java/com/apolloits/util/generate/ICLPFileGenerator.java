@@ -146,6 +146,30 @@ public class ICLPFileGenerator {
 			  validateParam.setResponseMsg("Not able to create file. Please check folder Permisison");
 			  return false;
 		  }
+		  
+		//validate tag start and end tag range based on record count
+			try {
+				agency = ValidationController.cscIdTagAgencyMap.get(validateParam.getFromAgency());
+				long tagSerialNoStart = Long.valueOf(agency.getTagSequenceStart());
+				long tagSerialNoEnd = Long.valueOf(agency.getTagSequenceEnd());
+				long totalTagCount = tagSerialNoEnd - tagSerialNoStart;
+				log.info("## tagSerialNoStart :: " + tagSerialNoStart + "\t tagSerialNoEnd ::" + tagSerialNoEnd);
+				if (totalTagCount < validateParam.getRecordCount()) {
+					log.error("## tagSerialNoStart :: " + tagSerialNoStart + "\t tagSerialNoEnd ::" + tagSerialNoEnd);
+					log.error("This Agency ITAG file generation record count should be less than or equal  ::"
+							+ totalTagCount + "\t  beacuse tag start ::" + agency.getTagSequenceStart()
+							+ "\t End range :: " + agency.getTagSequenceEnd());
+					validateParam.setResponseMsg(
+							"This Agency ITAG file generation record count should be less than or equal  ::"
+									+ totalTagCount + "\t  beacuse tag start ::" + agency.getTagSequenceStart()
+									+ "\t End range :: " + agency.getTagSequenceEnd());
+					return false;
+				}
+			} catch (Exception e) {
+				e.printStackTrace();
+				validateParam.setResponseMsg("Invalid tag rage validation failed. Please cehck log");
+				return false;
+			}
 		return true;
 	}
 

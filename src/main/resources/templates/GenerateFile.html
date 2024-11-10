@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+<meta charset="ISO-8859-1">
+<title>IOP Util Files Generate</title>
+<link rel="stylesheet"
+	href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css"
+	integrity="sha384-MCw98/SFnGE8fJT3GXwEOngsV7Zt27NXFoaoApmYm81iuXoPkFOJwJ8ERdknLPMO"
+	crossorigin="anonymous">
+</head>
+<body>
+	<div class="container">
+		<h1>IOP Util File Generate</h1>
+		<hr>
+		<h2>Generate Parameters</h2>
+
+		<form action="#" th:action="@{/GenerateFile}" th:object="${fileValidationParam}"
+			method="POST">
+			<p>	<b>File Type</b>		<select th:field="*{fileType}" class="form-control mb-4 col-4">
+			    <option th:value="ITAG" th:text="ITAG"></option>
+			    <option th:value="ICLP" th:text="ICLP"></option>
+			</select>
+			</p>
+			<p><b>From Agency Code</b>
+				<input type="text" th:field="*{fromAgency}" placeholder="From agency code" class="form-control mb-4 col-4" minlength="4" maxlength="4">
+			</p>
+			<p><b>File Record Count</b>
+				<input type="number" th:field="*{recordCount}" placeholder="Total Record Count" class="form-control mb-4 col-4"  min="1" max="9999999999">
+			</p>
+			<p><b>File Generation Path</b>
+				<input type="text" th:field="*{inputFilePath}" placeholder="File Generation Path" class="form-control mb-4 col-4">
+			</p>
+			
+			<button type="submit" class="btn btn-info col-2">Generate</button>
+		</form>
+
+		<hr>
+		<!-- <p th:text="|Result :: ${now}!|" /> -->
+		<p><b>Result: </b><label th:text="${result}"></label></p>
+		<a th:href="@{/AgencyList}"> Back to Agency List</a>
+	</div>
+</body>
+</html>

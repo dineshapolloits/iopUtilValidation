@@ -8,7 +8,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.apolloits.util.modal.AgencyEntity;
+import com.apolloits.util.modal.UtilityParamEntity;
 import com.apolloits.util.repository.AgencyRepository;
+import com.apolloits.util.repository.UtilParamRepository;
 
 @Service
 public class DatabaseLogger {
@@ -16,12 +18,19 @@ public class DatabaseLogger {
 	@Autowired
 	AgencyRepository agencyRepo;
 	
-	public void saveAgencyList(List agencyList) {
+	@Autowired
+	UtilParamRepository utilParamRepo;
+	
+	public void saveAgencyList(List<AgencyEntity> agencyList) {
 		agencyRepo.saveAll(agencyList);
 	}
 	public List<AgencyEntity> getAllAgencyList() {
         return agencyRepo.findAll();
     }
+	
+	public void saveUtilParamList(List<UtilityParamEntity> utilParamList) {
+		utilParamRepo.saveAll(utilParamList);
+	}
 	
 	public Map<String, AgencyEntity> getCSCIdbyAgencyMap(String AgencyCode) {
 		List<AgencyEntity> cscIdAgencyList =agencyRepo.findByCSCIDforAgency(AgencyCode);

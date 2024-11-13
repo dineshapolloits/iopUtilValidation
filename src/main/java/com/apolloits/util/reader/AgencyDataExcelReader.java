@@ -1,17 +1,17 @@
 package com.apolloits.util.reader;
 
-import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Set;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 import org.apache.poi.ss.usermodel.Cell;
+import org.apache.poi.ss.usermodel.DataFormatter;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
@@ -19,17 +19,19 @@ import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.stereotype.Component;
-import org.springframework.web.multipart.MultipartFile;
 
 import com.apolloits.util.IopTranslatorException;
 import com.apolloits.util.modal.AgencyEntity;
+import com.apolloits.util.modal.UtilityParamEntity;
 import com.apolloits.util.service.DatabaseLogger;
 
 import jakarta.annotation.PostConstruct;
 import lombok.Getter;
+import lombok.extern.slf4j.Slf4j;
 
 @Component
 @Getter
+@Slf4j
 public class AgencyDataExcelReader {
 	
 	@Autowired
@@ -39,33 +41,44 @@ public class AgencyDataExcelReader {
 	
 	public static HashSet<String> agencyCode;
 	
+	private Map<String,UtilityParamEntity> utilParamMap;
+	
+	
+	
 	 public static String TYPE = "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet";
-     static String[] HEADERs = { "HomeAgency", "AwayAgency", "CSCID", "CSCName", "CSCAgencyShortName","VersionNumber"," HomeAgencyID",
-    		 "TagAgencyID","TagSequenceStart","TagSequenceEnd","ITAG","ICLP","HubName","HubId" };
-     static String SHEET = "UtilityAgencyListing";
-     
-  /*   public static boolean hasExcelFormat(MultipartFile file) {
-         if (!TYPE.equals(file.getContentType())) {
-           return false;
-         }
-         return true;
-       }*/
+     String AgencyListing_SHEET = "UtilityAgencyListing";
+     String UtilityParam_SHEET = "UtilityParam";
+
      //C:\Users\dselvaraj\Workspace\iopValidation\src\main\resources\Utlity Table.xlsx
      @PostConstruct
      public void init() throws IopTranslatorException {
-    	 excelToAgencyList();
-    	 loadagencyCodeList();
+    	 
+			ClassPathResource resource = new ClassPathResource("Utlity Table.xlsx");
+			InputStream inputStream;
+			try {
+				inputStream = resource.getInputStream();
+				Workbook workbook = new XSSFWorkbook(inputStream);
+				System.out.println("Number of sheets: " + workbook.getNumberOfSheets());
+
+				excelToAgencyList(workbook.getSheet(AgencyListing_SHEET));
+				loadagencyCodeList();
+				createUtilityParamtable(workbook.getSheet(UtilityParam_SHEET));
+				//After all sheet read close workbook
+				 workbook.close();
+				} catch (IOException e) {
+					log.error("init exception in excel reader");
+					e.printStackTrace();
+					throw new RuntimeException("fail to parse Excel file: " + e.getMessage());
+
+				}
+			
+    	 
      }
      
-     public void excelToAgencyList() {
-    	 System.out.println("Inside ****************** excelToStuList()");
+     public void excelToAgencyList(Sheet sheet) {
+    	 log.info("Inside ****************** excelToAgencyList()");
          try {
-        	// FileInputStream is = new FileInputStream(new File("C:\\Users\\dselvaraj\\Workspace\\iopValidation\\src\\main\\resources\\Utlity Table.xlsx"));
-        	 ClassPathResource resource = new ClassPathResource("Utlity Table.xlsx");
-        	 InputStream inputStream = resource.getInputStream();
-           Workbook workbook = new XSSFWorkbook(inputStream);
-           System.out.println("Number of sheets: " + workbook.getNumberOfSheets());
-           Sheet sheet = workbook.getSheet(SHEET);
+        	
            Iterator<Row> rows = sheet.iterator();
            List<AgencyEntity> agList = new ArrayList<AgencyEntity>();
            int rowNumber = 0;
@@ -146,22 +159,84 @@ public class AgencyDataExcelReader {
              }
              agList.add(agency);
            }
-           workbook.close();
+          
            if(agList != null && agList.size()>0) {
            dbLog.saveAgencyList(agList);
-           System.out.println("@@@@ Agency List loaded sucessfully:: ********************");
+           log.info("@@@@ Agency List loaded sucessfully:: ********************");
            }else {
         	   throw new IopTranslatorException("Agency data not loaded");
            }
            this.agList = agList;
-           //return agList;
-         } catch (IOException e) {
-           throw new RuntimeException("fail to parse Excel file: " + e.getMessage());
+          
+           
          }catch (Exception e) {
-        	 System.out.println("Exception:: ********************");
+        	log.error("Exception:: ******************** UtilityAgencyListing_SHEET");
 			e.printStackTrace();
 		}
        }
+     /**
+      *  Create table for UtilityParam table from UtilityParam sheet
+      * @param sheet
+      * @return
+      */
+     private void createUtilityParamtable(Sheet sheet) {
+    	 log.info("Inside ****************** createUtilityParamtable()");
+			try {
+				utilParamMap = new HashMap<>();
+				Iterator<Row> rows = sheet.iterator();
+				List<UtilityParamEntity> utilParamList = new ArrayList<UtilityParamEntity>();
+				int rowNumber = 0;
+				while (rows.hasNext()) {
+					Row currentRow = rows.next();
+					// skip header
+					if (rowNumber == 0) {
+						rowNumber++;
+						continue;
+					}
+					Iterator<Cell> cellsInRow = currentRow.iterator();
+					UtilityParamEntity utilParam = new UtilityParamEntity();
+					int cellIdx = 0;
+					DataFormatter formatter = new DataFormatter();
+					//String val = formatter.formatCellValue(
+					while (cellsInRow.hasNext()) {
+						Cell currentCell = cellsInRow.next();
+						switch (cellIdx) {
+						case 0:
+							utilParam.setType(currentCell.getStringCellValue());
+							System.out.println("Type case 0::" + currentCell.getStringCellValue());
+							break;
+						case 1:
+							utilParam.setSubType(formatter.formatCellValue(currentCell));
+							System.out.println("SubType case 1::" +formatter.formatCellValue(currentCell));
+							break;
+						case 2:
+							utilParam.setTypeValue(currentCell.getStringCellValue());
+							System.out.println("value case 2::" + currentCell.getStringCellValue());
+							break;
+						default:
+							// System.out.println("Default:: ********************");
+							break;
+						}
+						cellIdx++;
+					}
+					utilParamList.add(utilParam);
+					utilParamMap.put(utilParam.getType(), utilParam);
+				}
+
+				if (utilParamList != null && utilParamList.size() > 0) {
+					dbLog.saveUtilParamList(utilParamList);
+					log.info("@@@@ utilParam List loaded sucessfully:: ********************");
+				} else {
+					throw new IopTranslatorException("Agency data not loaded");
+				}
+				log.info("utilParamMap ::"+utilParamMap.toString());
+
+			}catch (Exception e) {
+        	log.error("Exception:: ******************** UtilityAgencyListing_SHEET");
+			e.printStackTrace();
+		}
+    	 
+     }
      
     public  void loadagencyCodeList() throws IopTranslatorException{
     	 List<AgencyEntity> agList= dbLog.getAllAgencyList();

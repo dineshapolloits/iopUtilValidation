@@ -10,26 +10,85 @@
 "sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" 
         crossorigin="anonymous">
 </head>
+<style> .jumbotron .btn {
+    color:#FFFFFF; 
+    padding: 5px !important;
+    font-size: 12px !important; 
+    margin-left:20px;
+}
+.jumbotron label {
+    font-size:12px;    
+}
 
+.img-user{
+    height:120px;
+    width:120px;
+margin-right:20px;
+}
+
+.prj-name{
+    font-weight:bold;
+    color:#5bc0de;
+}
+
+.user-item img, .user-item h3 {
+    display:inline-block;    
+}
+ 
+.jumbotron .btn .user-item h3 a{
+    color:#5bc0de; 
+    padding: 5px !important;
+    font-size: 12px !important; 
+}
+</style>
 <body>
-    <h1 class="text-success">
-        GeeksforGeeks
-    </h1>
-    <h2>Bootstrap 5 List Group Links</h2>
-    <div class="list-group">
-        <a href="https://www.geeksforgeeks.org/" 
-        class="list-group-item 
-        list-group-item-action active">
-            Active Link</a>
-        <a href="https://www.geeksforgeeks.org/" 
-        class="list-group-item 
-        list-group-item-action">
-            GeeksforGeeks</a>
-        <a href="https://www.geeksforgeeks.org/" 
-        class="list-group-item 
-        list-group-item-action disabled">
-            Hello</a>
-    </div>
+	<link href="https://getbootstrap.com/examples/jumbotron-narrow/jumbotron-narrow.css" rel="stylesheet">
+	<link rel="stylesheet" type="text/css" href="//netdna.bootstrapcdn.com/font-awesome/4.0.3/css/font-awesome.min.css">
+	<div class="container bootstrap snippets bootdey">
+	  <div class="header">
+	    <h3 class="text-muted prj-name">
+	        <span class="fa fa-users fa-2x"></span>
+	        List of hubs 
+	    </h3>
+	  </div>
+
+	  <div class="jumbotron" style="min-height:400px;height:auto;">
+	    <ul class="list-group">
+	        <li class="list-group-item user-item text-left">
+	            <img class="img-circle img-user img-thumbnail " src="https://www.sourcena.com/wp-content/uploads/2019/11/EZ-Pass-Image-Post-685x514.jpg">
+	            <h3>
+	                <a th:href="@{/AgencyList}">EZIOP</a><br>
+	            </h3>     
+	        </li>
+	        <li class="list-group-item user-item text-left">
+	            <img class="img-circle img-user  img-thumbnail" src="https://bootdey.com/img/Content/avatar/avatar1.png">
+	            <h3>
+	                <a href="#">SEIOP</a><br>
+	            </h3>  
+	        </li>
+	        <li class="list-group-item user-item text-left">
+	            <img class="img-circle img-user  img-thumbnail" src="https://bootdey.com/img/Content/avatar/avatar6.png">
+	            <h3>
+	                <a href="#">CUIOP</a><br>
+	            </h3>  
+	        </li>
+			<li class="list-group-item user-item text-left">
+			    <img class="img-circle img-user img-thumbnail " src="https://bootdey.com/img/Content/avatar/avatar3.png">
+			    <h3>
+			        <a href="#">NIOP</a><br>
+			    </h3>     
+			</li>
+			<li class="list-group-item user-item text-left">
+			    <img class="img-circle img-user  img-thumbnail" src="https://bootdey.com/img/Content/avatar/avatar2.png">
+			    <h3>
+			        <a href="#">CTOC</a><br>
+			    </h3>  
+			</li>
+			
+	    </ul>
+	  </div>
+	  
+	</div>         
 </body>
 
 </html>

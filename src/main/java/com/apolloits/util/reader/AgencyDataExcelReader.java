@@ -22,6 +22,7 @@ import org.springframework.stereotype.Component;
 
 import com.apolloits.util.IopTranslatorException;
 import com.apolloits.util.modal.AgencyEntity;
+import com.apolloits.util.modal.PlateTypeEntity;
 import com.apolloits.util.modal.UtilityParamEntity;
 import com.apolloits.util.service.DatabaseLogger;
 
@@ -43,12 +44,12 @@ public class AgencyDataExcelReader {
 	
 	private Map<String,UtilityParamEntity> utilParamMap;
 	
-	
+	private HashSet<String> plateStateTypeSet;
 	
 	 public static String TYPE = "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet";
      String AgencyListing_SHEET = "UtilityAgencyListing";
      String UtilityParam_SHEET = "UtilityParam";
-
+     String PlateType_SHEET = "AppJ_PlateType_1_60";
      //C:\Users\dselvaraj\Workspace\iopValidation\src\main\resources\Utlity Table.xlsx
      @PostConstruct
      public void init() throws IopTranslatorException {
@@ -63,6 +64,8 @@ public class AgencyDataExcelReader {
 				excelToAgencyList(workbook.getSheet(AgencyListing_SHEET));
 				loadagencyCodeList();
 				createUtilityParamtable(workbook.getSheet(UtilityParam_SHEET));
+				
+				loadPlateTypefromExcel(workbook.getSheet(PlateType_SHEET));
 				//After all sheet read close workbook
 				 workbook.close();
 				} catch (IOException e) {
@@ -202,15 +205,15 @@ public class AgencyDataExcelReader {
 						Cell currentCell = cellsInRow.next();
 						switch (cellIdx) {
 						case 0:
-							utilParam.setType(currentCell.getStringCellValue());
+							utilParam.setType(currentCell.getStringCellValue().trim());
 							System.out.println("Type case 0::" + currentCell.getStringCellValue());
 							break;
 						case 1:
-							utilParam.setSubType(formatter.formatCellValue(currentCell));
+							utilParam.setSubType(formatter.formatCellValue(currentCell).trim());
 							System.out.println("SubType case 1::" +formatter.formatCellValue(currentCell));
 							break;
 						case 2:
-							utilParam.setTypeValue(currentCell.getStringCellValue());
+							utilParam.setTypeValue(currentCell.getStringCellValue().trim());
 							System.out.println("value case 2::" + currentCell.getStringCellValue());
 							break;
 						default:
@@ -235,6 +238,70 @@ public class AgencyDataExcelReader {
         	log.error("Exception:: ******************** UtilityAgencyListing_SHEET");
 			e.printStackTrace();
 		}
+    	 
+     }
+     
+     private void loadPlateTypefromExcel(Sheet sheet) {
+    	 
+
+    	 log.info("Inside ****************** loadPlateTypefromExcel()");
+			try {
+				plateStateTypeSet = new HashSet<>();
+				Iterator<Row> rows = sheet.iterator();
+				List<PlateTypeEntity> plateTypList = new ArrayList<PlateTypeEntity>();
+				int rowNumber = 0;
+				while (rows.hasNext()) {
+					Row currentRow = rows.next();
+					// skip header
+					if (rowNumber == 0) {
+						rowNumber++;
+						continue;
+					}
+					Iterator<Cell> cellsInRow = currentRow.iterator();
+					PlateTypeEntity plateTypeObj = new PlateTypeEntity();
+					int cellIdx = 0;
+					DataFormatter formatter = new DataFormatter();
+					//String val = formatter.formatCellValue(
+					while (cellsInRow.hasNext()) {
+						Cell currentCell = cellsInRow.next();
+						switch (cellIdx) {
+						case 0:
+							plateTypeObj.setLicState(currentCell.getStringCellValue().trim());
+							System.out.println("Lic State case 0::" + currentCell.getStringCellValue());
+							break;
+						case 1:
+							plateTypeObj.setLicType(currentCell.getStringCellValue());
+							System.out.println("setLicType case 1::" +currentCell.getStringCellValue().trim());
+							break;
+						case 2:
+							plateTypeObj.setPlateDesc(currentCell.getStringCellValue());
+							System.out.println("setPlateDesc case 2::" + currentCell.getStringCellValue().trim());
+							break;
+						default:
+							// System.out.println("Default:: ********************");
+							break;
+						}
+						cellIdx++;
+					}
+					plateTypList.add(plateTypeObj);
+					//utilParamMap.put(utilParam.getType(), utilParam);
+					plateStateTypeSet.add(plateTypeObj.getLicState()+plateTypeObj.getLicType());
+				}
+
+				if (plateTypList != null && plateTypList.size() > 0) {
+					dbLog.savePlateTypeList(plateTypList);
+					log.info("@@@@ plateTypList List loaded sucessfully:: ******************** size ::"+plateTypList.size());
+				} else {
+					throw new IopTranslatorException("Plate type sheet  data not loaded");
+				}
+				log.info("plateStateTypeSet size ::"+plateStateTypeSet.size()+"\t plateStateTypeSet ::"+plateStateTypeSet.toString());
+
+			}catch (Exception e) {
+        	log.error("Exception:: ******************** UtilityAgencyListing_SHEET");
+			e.printStackTrace();
+		}
+    	 
+     
     	 
      }
      

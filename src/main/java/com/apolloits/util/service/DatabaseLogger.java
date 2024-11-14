@@ -8,8 +8,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.apolloits.util.modal.AgencyEntity;
+import com.apolloits.util.modal.PlateTypeEntity;
 import com.apolloits.util.modal.UtilityParamEntity;
 import com.apolloits.util.repository.AgencyRepository;
+import com.apolloits.util.repository.PlateTypeRepository;
 import com.apolloits.util.repository.UtilParamRepository;
 
 @Service
@@ -21,6 +23,9 @@ public class DatabaseLogger {
 	@Autowired
 	UtilParamRepository utilParamRepo;
 	
+	@Autowired
+	PlateTypeRepository plateTypeRepo;
+	
 	public void saveAgencyList(List<AgencyEntity> agencyList) {
 		agencyRepo.saveAll(agencyList);
 	}
@@ -30,6 +35,10 @@ public class DatabaseLogger {
 	
 	public void saveUtilParamList(List<UtilityParamEntity> utilParamList) {
 		utilParamRepo.saveAll(utilParamList);
+	}
+	
+	public void savePlateTypeList(List<PlateTypeEntity> plateTypeList) {
+		plateTypeRepo.saveAll(plateTypeList);
 	}
 	
 	public Map<String, AgencyEntity> getCSCIdbyAgencyMap(String AgencyCode) {

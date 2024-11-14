@@ -44,7 +44,9 @@ public class AgencyDataExcelReader {
 	
 	private Map<String,UtilityParamEntity> utilParamMap;
 	
-	private HashSet<String> plateStateTypeSet;
+	private HashSet<String> plateStateTypeSet; //This one will concat  plate state and type 
+	
+	private HashSet<String> plateStateSet; //This one only plate state store
 	
 	 public static String TYPE = "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet";
      String AgencyListing_SHEET = "UtilityAgencyListing";
@@ -247,6 +249,7 @@ public class AgencyDataExcelReader {
     	 log.info("Inside ****************** loadPlateTypefromExcel()");
 			try {
 				plateStateTypeSet = new HashSet<>();
+				plateStateSet = new HashSet<>();
 				Iterator<Row> rows = sheet.iterator();
 				List<PlateTypeEntity> plateTypList = new ArrayList<PlateTypeEntity>();
 				int rowNumber = 0;
@@ -284,7 +287,7 @@ public class AgencyDataExcelReader {
 						cellIdx++;
 					}
 					plateTypList.add(plateTypeObj);
-					//utilParamMap.put(utilParam.getType(), utilParam);
+					plateStateSet.add(plateTypeObj.getLicState());
 					plateStateTypeSet.add(plateTypeObj.getLicState()+plateTypeObj.getLicType());
 				}
 

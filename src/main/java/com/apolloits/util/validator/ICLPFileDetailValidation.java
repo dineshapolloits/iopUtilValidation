@@ -33,6 +33,9 @@ public class ICLPFileDetailValidation {
 	@Autowired
 	private IagAckFileMapper iagAckMapper;
 	
+	@Autowired
+	private AgencyDataExcelReader agDataExcel;
+	
 	public boolean iclpValidation(FileValidationParam validateParam) throws IOException {
 		
 		File inputItagZipFile = new File(validateParam.getInputFilePath());
@@ -207,10 +210,16 @@ public class ICLPFileDetailValidation {
 			System.out.println("licRegDate ::"+licRegDate);
 			licUpdateDate = fileRowData.substring(188, 208);
 			System.out.println("licUpdateDate ::"+licUpdateDate);
-			
+			System.out.println("agDataExcel.getPlateStateSet() ::"+agDataExcel.getPlateStateSet());
+			System.out.println("agDataExcel.getPlateStateSet().contains(licState) ::"+agDataExcel.getPlateStateSet().contains(licState));
 			if (!licState.matches("[A-Z]{2}") ) {
-				log.info("Invalid ICLP detail, invalid state Format - "+licState +" Row ::"+fileRowData);
+				log.info("Invalid ICLP detail, invalid state Format- "+licState +" Row ::"+fileRowData);
 				validateParam.setResponseMsg("Invalid ICLP detail, invalid Lic_state Format - "+licState +" Row ::"+fileRowData);
+				return false;
+			}
+			if (!agDataExcel.getPlateStateSet().contains(licState)) {
+				log.info("Invalid ICLP detail,Please check your State configuration - invalid state - "+licState +" Row ::"+fileRowData);
+				validateParam.setResponseMsg("Invalid ICLP detail,Please check your State configuration - invalid state - "+licState +" Row ::"+fileRowData);
 				return false;
 			}
 			if(!licNumber.matches("^[A-Z \\d-.&]{10}$")) {
@@ -224,8 +233,18 @@ public class ICLPFileDetailValidation {
 				validateParam.setResponseMsg("Invalid ICLP detail, invalid Lic_Type Format - "+licNumber +" Row ::"+fileRowData);
 				return false;
 			}
-			ValidationController.cscIdTagAgencyMap.forEach((tag, agency) -> 
-			System.out.println("validateIclpDetail :: TagAgencyID: " + tag + ", Tag Start: " + agency.getTagSequenceStart() +"\t END ::"+agency.getTagSequenceEnd()));
+			
+			String licStateType =(licState.trim())+(licType.trim());
+			//System.out.println("licStateType :::"+licStateType);
+			log.info("IsPlateType :: "+ agDataExcel.getPlateStateTypeSet().contains(licStateType));
+			//System.out.println("LIC_State and type ::"+agDataExcel.getPlateStateTypeSet().toString()); 
+			if(!licType.matches("[\\*]{30}") &&
+					!agDataExcel.getPlateStateTypeSet().contains(licStateType)) {
+				validateParam.setResponseMsg("Invalid ICLP detail,Please check your State and plateType Configuration - invalid Lic_Type - "+licType +" Row ::"+fileRowData);
+				return false;
+			}
+			//ValidationController.cscIdTagAgencyMap.forEach((tag, agency) -> 
+			//System.out.println("validateIclpDetail :: TagAgencyID: " + tag + ", Tag Start: " + agency.getTagSequenceStart() +"\t END ::"+agency.getTagSequenceEnd()));
 			
 			if (!tagAgencyid.matches("\\d{4}") 
 					|| ValidationController.cscIdTagAgencyMap.get(tagAgencyid) == null) {
@@ -352,11 +371,16 @@ public class ICLPFileDetailValidation {
 		licUpdateDate = fileRowData.substring(188, 208);
 		System.out.println("licUpdateDate ::"+licUpdateDate);
 		licUpdateDate = "********************";
-		if (!licUpdateDate.matches("\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}Z") && !licUpdateDate.matches("\\*{20}")) {
+		 
+		String licStateType = licState.trim()+licType.trim();
+		System.out.println("@@@@@ licStateType ::: "+ licStateType);
+		licType = "***************************** ";
+		if (licType.matches("[\\*]{30}")) {
 			System.out.println("true");
 		}else {
-			System.out.println("False");
+			System.out.println("false");
 		}
+		
 		
 		/*tagSerialNo = "0014641850";
 		long tagSerialNoStart = Long.valueOf("0000030736");;

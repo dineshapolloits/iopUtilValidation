@@ -62,6 +62,10 @@ public class ITAGFileDetailValidation {
 				}
         		 //validate extract ITAG file name 
         		 if(CommonUtil.validateFileName(fileName)) {
+        			 if(validateParam.getValidateType().equals("filename")) {
+        				 validateParam.setResponseMsg("File name validation is sucess");
+        				 return true;
+        			 }
         			 //Start to validate file header and detail  record
         			 long noOfRecords = 0;
 					try (BufferedReader br = new BufferedReader(
@@ -80,6 +84,10 @@ public class ITAGFileDetailValidation {
 									iagAckMapper.mapToIagAckFile(fileName, "01", validateParam.getOutputFilePath()+"\\"+ackFileName, fileName.substring(0, 4));
 									return false;
 								}
+								if(validateParam.getValidateType().equals("header")) {
+						        	 log.info("Only file name and header validation");
+						        	 return true;
+						         }
 							}else {
 								if(!validateItagDetail(fileRowData,validateParam,fileName)) {
 									validateParam.setResponseMsg(validateParam.getResponseMsg() +"\t    Line No::"+noOfRecords);
@@ -216,13 +224,15 @@ public class ITAGFileDetailValidation {
 		}
 		
 		Pattern pattern = Pattern.compile(IAGConstants.ITAG_DTL_TAG_AGENCY_ID);
-        if (!pattern.matcher(tagAgencyId).matches() || !(AgencyDataExcelReader.agencyCode.contains(tagAgencyId))  ) {
+        if (!pattern.matcher(tagAgencyId).matches() || !(AgencyDataExcelReader.tagAgencyCode.contains(tagAgencyId))  ) {
         	validateParam.setResponseMsg("Invalid ITAG detail, invalid tag agency ID - "+tagAgencyId +" Row ::"+fileRowData);
+        	log.error("Invalid ITAG detail, invalid tag agency ID - "+tagAgencyId +" Row ::"+fileRowData);
         	return false;
         }
          pattern = Pattern.compile(IAGConstants.ITAG_DTL_TAG_SERIAL_NO);
         if (!pattern.matcher(tagSerialNo).matches()) { //need to check start and end tag range from DB
         	validateParam.setResponseMsg("Invalid ITAG detail, invalid tag serial number - "+tagSerialNo +" Row ::"+fileRowData);
+        	log.error("Invalid ITAG detail, invalid tag serial number - "+tagSerialNo +" Row ::"+fileRowData);
         	return false;
         }
         

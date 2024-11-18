@@ -41,13 +41,16 @@ public class AgencyDataExcelReader {
 	private List<AgencyEntity> agList;
 	
 	public static HashSet<String> agencyCode;
-	
+	public static HashSet<String> tagAgencyCode;
 	private Map<String,UtilityParamEntity> utilParamMap;
 	
 	private HashSet<String> plateStateTypeSet; //This one will concat  plate state and type 
 	
 	private HashSet<String> plateStateSet; //This one only plate state store
 	
+	public static int tagValid = 0;
+	public static int tagLowBal= 0;
+	public static int tagInvalid = 0;
 	 public static String TYPE = "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet";
      String AgencyListing_SHEET = "UtilityAgencyListing";
      String UtilityParam_SHEET = "UtilityParam";
@@ -226,6 +229,13 @@ public class AgencyDataExcelReader {
 					}
 					utilParamList.add(utilParam);
 					utilParamMap.put(utilParam.getType(), utilParam);
+					if(utilParam.getType().equals("ITAG_Valid")) {
+						tagValid = Integer.parseInt(utilParam.getTypeValue());
+					}else if(utilParam.getType().equals("ITAG_LOW_Bal")) {
+						tagLowBal = Integer.parseInt(utilParam.getTypeValue());
+					}else if(utilParam.getType().equals("ITAG_Invalid")) {
+						tagInvalid = Integer.parseInt(utilParam.getTypeValue());
+					}
 				}
 
 				if (utilParamList != null && utilParamList.size() > 0) {
@@ -312,6 +322,7 @@ public class AgencyDataExcelReader {
     	 List<AgencyEntity> agList= dbLog.getAllAgencyList();
     	 if(agList.size()>0) {
     		 agencyCode = (HashSet<String>) agList.stream().map(ag -> ag.getHomeAgencyID().trim()).collect(Collectors.toSet());
+    		 tagAgencyCode = (HashSet<String>) agList.stream().map(ag -> ag.getTagAgencyID().trim()).collect(Collectors.toSet());
     	 }else {
     		 throw new IopTranslatorException("Fail to load from Data base *********************** ");
     	 }

@@ -1,10 +1,12 @@
 package com.apolloits.util.controller;
 
 import java.io.IOException;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -17,6 +19,7 @@ import com.apolloits.util.generate.ICLPFileGenerator;
 import com.apolloits.util.generate.ITAGFileGenerator;
 import com.apolloits.util.modal.AgencyEntity;
 import com.apolloits.util.modal.FileValidationParam;
+import com.apolloits.util.modal.LoginParam;
 import com.apolloits.util.reader.AgencyDataExcelReader;
 import com.apolloits.util.service.DatabaseLogger;
 import com.apolloits.util.validator.ICLPFileDetailValidation;
@@ -45,6 +48,12 @@ public class ValidationController {
 	@Autowired
 	ICLPFileGenerator iclpGen;
 	
+	@Value("${loginId}")
+	String userName;
+	
+	@Value("${pasword}")
+	String password;
+	
 	@GetMapping("/AgencyList")
 	public String greeting(@RequestParam(name="name", required=false, defaultValue="World") String name, Model model) {
 		model.addAttribute("name", name);
@@ -63,6 +72,9 @@ public class ValidationController {
     public String Validate(Model model) {
 		FileValidationParam fileValidationParam = new FileValidationParam();
         model.addAttribute("fileValidationParam", fileValidationParam);
+        //get Map from DB
+       
+        model.addAttribute("homeAgencyMap", dbLog.getCscAgencyIdandShortNamebymap());
         return "ValidateFile";
     }
 	
@@ -119,9 +131,26 @@ public class ValidationController {
 	
 	@GetMapping("/login")
     public String login(Model model) {
-	//	FileValidationParam fileValidationParam = new FileValidationParam();
+		LoginParam loginParam = new LoginParam();
+        model.addAttribute("loginParam", loginParam);
         return "LoginPage";
     }
+	
+	@PostMapping("/loginValidation")
+	public String loginValidation(@ModelAttribute("loginParam") LoginParam loginParam, Model model) {
+
+		log.info("UserName ::" + loginParam.getUsername() + "\t Password ::" + loginParam.getPassword());
+		log.info("Property file :: userName ::" + userName + "\t Password ::" + password);
+		if (loginParam.getUsername().equals(userName) && loginParam.getPassword().equals(password)) {
+			return "HubList";
+		} else {
+			log.error("Login Failed");
+			loginParam.setErrorMsg("Invalid UserName or Password");
+			model.addAttribute("result", loginParam.getErrorMsg());
+			return "LoginPage";
+		}
+
+	}
 	
 	@GetMapping("/hubList")
     public String hubList(Model model) {

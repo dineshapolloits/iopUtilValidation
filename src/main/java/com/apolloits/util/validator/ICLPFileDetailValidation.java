@@ -67,6 +67,11 @@ public class ICLPFileDetailValidation {
 			}
    		 //validate extract ICLP file name 
    		 if(CommonUtil.validateFileName(fileName)) {
+   			 
+   			if(validateParam.getValidateType().equals("filename")) {
+				 validateParam.setResponseMsg("File name validation is sucess");
+				 return true;
+			 }
 			 //Start to validate file header and detail  record
 			 long noOfRecords = 0;
 			try (BufferedReader br = new BufferedReader(
@@ -85,6 +90,10 @@ public class ICLPFileDetailValidation {
 							iagAckMapper.mapToIagAckFile(fileName, "01", validateParam.getOutputFilePath()+"\\"+ackFileName, fileName.substring(0, 4));
 							return false;
 						}
+						if(validateParam.getValidateType().equals("header")) {
+				        	 log.info("Only file name and header validation");
+				        	 return true;
+				         }
 					}else {
 						if(!validateIclpDetail(fileRowData,validateParam,fileName)) {
 							iagAckMapper.mapToIagAckFile(fileName, "02", validateParam.getOutputFilePath()+"\\"+ackFileName, fileName.substring(0, 4));
@@ -161,6 +170,11 @@ public class ICLPFileDetailValidation {
          if (!fileDate.equals(headerDate.replace("-", "")) || !fileTime.equals(headerTime.replace(":", ""))) {
         	 return false;
          }
+         if(validateParam.getValidateType().equals("header")) {
+        	 log.info("Only file name and header validation");
+        	 return true;
+         }
+         
 		return true;
 	}
 	public boolean validateIclpDetail(String fileRowData, FileValidationParam validateParam, String fileName) {

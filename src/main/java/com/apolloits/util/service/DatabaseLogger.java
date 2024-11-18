@@ -1,7 +1,9 @@
 package com.apolloits.util.service;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collector;
 import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -51,6 +53,15 @@ public class DatabaseLogger {
 	            System.out.println("TagAgencyID: " + tag + ", Tag Start: " + agency.getTagSequenceStart() +"\t END ::"+agency.getTagSequenceEnd()));
 	        
 		return cscIdTagAgencyMap;
+	}
+	
+	public Map<String, String> getCscAgencyIdandShortNamebymap() {
+		List<AgencyEntity> agencyList = agencyRepo.findAll();
+		 Map<String, String> map = new HashMap<>();
+		 for (AgencyEntity agencyEntity : agencyList) {
+			 map.put(agencyEntity.getCSCID(), agencyEntity.getCSCID()+"-"+agencyEntity.getCSCAgencyShortName());
+		}
+		return map;
 	}
 	
 }

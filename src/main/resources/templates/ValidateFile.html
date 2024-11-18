@@ -30,9 +30,13 @@
 			<p><b>From Agency Code</b>
 				<input type="text" th:field="*{fromAgency}" placeholder="From agency code" class="form-control mb-4 col-4" minlength="4" maxlength="4">
 			</p>
-			<p><b>To Agency Code</b>
-				<input type="text" th:field="*{toAgency}" placeholder="To agency code" class="form-control mb-4 col-4">
-			</p>
+		 <!--	<p><b>To Agency Code</b>
+				<select th:field="${homeAgencyMap}" class="form-control mb-4 col-4">
+				     <option value="NONE">----Select----</option>
+				     <option th:each="entry : ${homeAgencyMap.entrySet()}" th:value="${entry.key}" th:text="${entry.value}">
+				     </option>
+				  </select>
+			</p> -->
 			<p><b>File Input Path</b>
 				<input type="text" th:field="*{inputFilePath}" placeholder="input file path" class="form-control mb-4 col-4">
 			</p>

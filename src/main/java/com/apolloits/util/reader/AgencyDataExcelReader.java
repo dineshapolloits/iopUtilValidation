@@ -1,5 +1,6 @@
 package com.apolloits.util.reader;
 
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
@@ -17,6 +18,7 @@ import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.stereotype.Component;
 
@@ -49,22 +51,26 @@ public class AgencyDataExcelReader {
 	private HashSet<String> plateStateSet; //This one only plate state store
 	
 	public static int tagValid = 0;
-	public static int tagLowBal= 0;
+	public static int tagLowBal = 0;
 	public static int tagInvalid = 0;
-	 public static String TYPE = "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet";
-     String AgencyListing_SHEET = "UtilityAgencyListing";
-     String UtilityParam_SHEET = "UtilityParam";
-     String PlateType_SHEET = "AppJ_PlateType_1_60";
-     //C:\Users\dselvaraj\Workspace\iopValidation\src\main\resources\Utlity Table.xlsx
+	public static String TYPE = "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet";
+	String AgencyListing_SHEET = "UtilityAgencyListing";
+	String UtilityParam_SHEET = "UtilityParam";
+	String PlateType_SHEET = "AppJ_PlateType_1_60";
+	
+	@Value("${excel.data}")
+	String dataPath;
+     //C:\Users\dselvaraj\git\iopUtilValidation\src\main\resources\Utlity Table.xlsx
      @PostConstruct
      public void init() throws IopTranslatorException {
-    	 
-			ClassPathResource resource = new ClassPathResource("Utlity Table.xlsx");
+    	 	//ClassPathResource resource = new ClassPathResource("Utlity Table.xlsx");
 			InputStream inputStream;
 			try {
-				inputStream = resource.getInputStream();
-				Workbook workbook = new XSSFWorkbook(inputStream);
-				System.out.println("Number of sheets: " + workbook.getNumberOfSheets());
+				//inputStream = resource.getInputStream();
+				log.info("Excel data path localtion form property file ::"+dataPath);
+				FileInputStream is = new FileInputStream(dataPath);
+				Workbook workbook = new XSSFWorkbook(is);
+				log.info("Number of sheets : " + workbook.getNumberOfSheets());
 
 				excelToAgencyList(workbook.getSheet(AgencyListing_SHEET));
 				loadagencyCodeList();

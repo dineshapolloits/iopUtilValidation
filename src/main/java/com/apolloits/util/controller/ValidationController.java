@@ -1,6 +1,7 @@
 package com.apolloits.util.controller;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -18,6 +19,7 @@ import com.apolloits.util.IAGConstants;
 import com.apolloits.util.generate.ICLPFileGenerator;
 import com.apolloits.util.generate.ITAGFileGenerator;
 import com.apolloits.util.modal.AgencyEntity;
+import com.apolloits.util.modal.ErrorMsgDetail;
 import com.apolloits.util.modal.FileValidationParam;
 import com.apolloits.util.modal.LoginParam;
 import com.apolloits.util.reader.AgencyDataExcelReader;
@@ -25,10 +27,14 @@ import com.apolloits.util.service.DatabaseLogger;
 import com.apolloits.util.validator.ICLPFileDetailValidation;
 import com.apolloits.util.validator.ITAGFileDetailValidation;
 
+import lombok.Getter;
+import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 
 @Controller
 @Slf4j
+@Setter
+@Getter
 public class ValidationController {
 	@Autowired
 	DatabaseLogger dbLog;
@@ -47,6 +53,8 @@ public class ValidationController {
 	
 	@Autowired
 	ICLPFileGenerator iclpGen;
+	
+	List<ErrorMsgDetail> errorMsglist;
 	
 	@Value("${loginId}")
 	String userName;
@@ -80,6 +88,11 @@ public class ValidationController {
 	
 	@PostMapping("/ValidateFile")
     public String ValidateFile(@ModelAttribute("fileValidationParam") FileValidationParam validateParam,Model model) throws IOException {
+		errorMsglist = new ArrayList<>();
+		/*ErrorMsgDetail obj = new ErrorMsgDetail();
+		obj.setErrorMsg("Tested error");
+		obj.setFieldName("Test Field");
+		errorMsglist.add(obj);*/
 		log.info("ValidateFile ::"+validateParam.toString());
 		boolean fileValidation = false ;
 		validateParam.setResponseMsg("Contact Administrator");
@@ -90,9 +103,10 @@ public class ValidationController {
 				fileValidation = iclpValidation.iclpValidation(validateParam);
 			}
 			log.info("getResponseMsg ::"+validateParam.getResponseMsg() +"\t fileValidation ::"+fileValidation);
-			if(!fileValidation)
-				model.addAttribute("result", validateParam.getResponseMsg());
-			else
+			if(!fileValidation) {
+				model.addAttribute("result", "Failed");
+				model.addAttribute("errorMsgList",errorMsglist);
+			}else
 				model.addAttribute("result", "Sucess");
         return "ValidateFile";
     }

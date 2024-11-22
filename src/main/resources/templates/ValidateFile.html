@@ -15,20 +15,23 @@
 		<h2>Validation Parameter</h2>
 
 		<form action="#" th:action="@{/ValidateFile}" th:object="${fileValidationParam}"
-			method="POST">
-			<p>	<b>File Type</b>		<select th:field="*{fileType}" class="form-control mb-4 col-4">
+			method="POST" >
+			<div class="row">
+			<p class="col-md-6">	<b>File Type</b>		<select th:field="*{fileType}" class="form-control">
 			    <option th:value="ITAG" th:text="ITAG"></option>
 			    <option th:value="ICLP" th:text="ICLP"></option>
 			</select>
 			</p>
-			<p>	<b>Validate Type</b>		<select th:field="*{validateType}" class="form-control mb-4 col-4">
+			<p class="col-md-6">	<b>Validate Type</b>		<select th:field="*{validateType}" class="form-control">
 						    <option th:value="all" th:text="All"></option>
 						    <option th:value="filename" th:text="File-Name"></option>
 							<option th:value="header" th:text="Header"></option>
 						</select>
 						</p>
-			<p><b>From Agency Code</b>
-				<input type="text" th:field="*{fromAgency}" placeholder="From agency code" class="form-control mb-4 col-4" minlength="4" maxlength="4">
+						</div>
+		<div class="row">				
+			<p class="col-md-6"><b>From Agency Code</b>
+				<input type="text" th:field="*{fromAgency}" placeholder="From agency code" class="form-control " minlength="4" maxlength="4">
 			</p>
 		 <!--	<p><b>To Agency Code</b>
 				<select th:field="${homeAgencyMap}" class="form-control mb-4 col-4">
@@ -37,19 +40,39 @@
 				     </option>
 				  </select>
 			</p> -->
-			<p><b>File Input Path</b>
-				<input type="text" th:field="*{inputFilePath}" placeholder="input file path" class="form-control mb-4 col-4">
+			<p class="col-md-6"><b>File Input Path</b>
+				<input type="text" th:field="*{inputFilePath}" placeholder="input file path" class="form-control">
 			</p>
-			<p><b>ACK Output Path</b>
-				<input type="text" th:field="*{outputFilePath}" placeholder="Ack output file path" class="form-control mb-4 col-4">
+			</div>
+			<div class="row">
+			<p class="col-md-6"><b>ACK Output Path</b>
+				<input type="text" th:field="*{outputFilePath}" placeholder="Ack output file path" class="form-control">
 			</p>
-
-			<button type="submit" class="btn btn-info col-2">Validate</button>
+			<p class="col-md-6">
+			<button type="submit" class="btn btn-info btn-lg  ">Validate</button>
+			</p>
+			</div>
 		</form>
 
 		<hr>
 		<!-- <p th:text="|Result :: ${now}!|" /> -->
 		<p><b>Result: </b><label th:text="${result}"></label></p>
+		<table class="table table-bordered table-striped border-2 ">
+		    <thead>
+		      <tr>
+		        <th style="width:1px; white-space:nowrap;">#</th>
+		        <th style="width:200px;">Field Name</th>
+		        <th>Error message</th>
+		      </tr>
+		    </thead>
+		    <tbody>
+		      <tr th:each="error, iterStat : ${errorMsgList}">
+		        <td th:text="${iterStat.index+1}"></td>
+		        <td th:text="${error.fieldName}"></td>
+		        <td th:text="${error.errorMsg}"></td>
+		      </tr>
+		    </tbody>
+		  </table>
 		<a th:href="@{/AgencyList}"> Back to Agency List</a>
 	</div>
 </body>

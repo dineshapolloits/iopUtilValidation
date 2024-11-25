@@ -47,8 +47,7 @@ public class IAGConstants {
     public static final String IRXC_FILE_TYPE = "IRXC";
     public static final String ACK_FILE_TYPE = "ACK";
     
-    public static final String TRN_FILE_TYPES = "STRAN,SRECON,SCORR";
-    public static final String NIOP_FILE_TYPES = "STVL,STRAN,SRECON,SCORR";
+
     public static final String IAG_FILE_TYPES = "ITAG,ICLP";
     public static final String TRANSLATOR_STATUS_LOAD_FAILED = "Load Failed";
     public static String CREATED_BY="niop-translator";
@@ -65,28 +64,10 @@ public class IAGConstants {
     public static final String ITAG_DTL_TAG_TYP = "[F,G,H,S,T,V,*]{1}";
     public static final String ITAG_DTL_TAG_MOUNT = "[I,L,R,H,V,*]{1}";
     
-
-    public static String convertNiopToIagAckReturnCode(String niopAckCode) {
-    	String iagAckCode = "";
-    	if(IAGAackReturnCodeMap== null) 
-    	{
-    		IAGAackReturnCodeMap = new HashMap<>();
-    		IAGAackReturnCodeMap.put("00", "00");
-    		IAGAackReturnCodeMap.put("01", "01"); 
-    		IAGAackReturnCodeMap.put("02", "02");
-    		IAGAackReturnCodeMap.put("03", "03");
-    		IAGAackReturnCodeMap.put("04", "04");
-    		IAGAackReturnCodeMap.put("05", "05");
-            IAGAackReturnCodeMap.put("06", "00");
-    		IAGAackReturnCodeMap.put("07", "07");
-    		IAGAackReturnCodeMap.put("10", "00");
-    		IAGAackReturnCodeMap.put("11", "00");
-    		IAGAackReturnCodeMap.put("13", "00");
+    public static final String HEADER_RECORD_TYPE ="Header";
+    public static final String DETAIL_RECORD_TYPE ="Deatil";
+    public static final String FILE_RECORD_TYPE ="File";
     		
-    	}
-    	iagAckCode= IAGAackReturnCodeMap.get(niopAckCode);
-    	
-		return iagAckCode;
-    	
-    }
+    		
+    
 }

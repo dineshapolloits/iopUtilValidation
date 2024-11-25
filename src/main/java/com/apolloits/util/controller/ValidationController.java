@@ -1,11 +1,13 @@
 package com.apolloits.util.controller;
 
+import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.commons.io.FilenameUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Controller;
@@ -26,6 +28,7 @@ import com.apolloits.util.reader.AgencyDataExcelReader;
 import com.apolloits.util.service.DatabaseLogger;
 import com.apolloits.util.validator.ICLPFileDetailValidation;
 import com.apolloits.util.validator.ITAGFileDetailValidation;
+import com.apolloits.util.writer.ExceptionListExcelWriter;
 
 import lombok.Getter;
 import lombok.Setter;
@@ -55,6 +58,9 @@ public class ValidationController {
 	ICLPFileGenerator iclpGen;
 	
 	List<ErrorMsgDetail> errorMsglist;
+	
+	@Autowired
+	ExceptionListExcelWriter exListExcelWriter;
 	
 	@Value("${loginId}")
 	String userName;
@@ -103,11 +109,24 @@ public class ValidationController {
 				fileValidation = iclpValidation.iclpValidation(validateParam);
 			}
 			log.info("getResponseMsg ::"+validateParam.getResponseMsg() +"\t fileValidation ::"+fileValidation);
-			if(!fileValidation) {
-				model.addAttribute("result", "Failed");
+			if(!fileValidation || errorMsglist.size()>0) {
+				model.addAttribute("result", "Failed"+validateParam.getResponseMsg());
 				model.addAttribute("errorMsgList",errorMsglist);
+				File testObj = new File(validateParam.getInputFilePath());
+				String exceptionFileName;
+				String fileNameWithOutExt = FilenameUtils.removeExtension(testObj.getName());
+				try {
+				 exceptionFileName =validateParam.getOutputFilePath()+File.separator+fileNameWithOutExt+"_Exception.xls";
+				}catch (Exception e) {
+					e.printStackTrace();
+					log.info("Exception in exceptionFileName :: file name creation ::");
+					exceptionFileName = validateParam.getOutputFilePath()+File.separator+" ACK_exception_.xls";
+				}
+				exListExcelWriter.createExceptionExcel(errorMsglist, exceptionFileName);
 			}else
 				model.addAttribute("result", "Sucess");
+			
+			// model.addAttribute("homeAgencyMap", dbLog.getCscAgencyIdandShortNamebymap());
         return "ValidateFile";
     }
 	
@@ -170,6 +189,15 @@ public class ValidationController {
     public String hubList(Model model) {
 	//	FileValidationParam fileValidationParam = new FileValidationParam();
         return "HubList";
+    }
+	
+	@GetMapping("/Logout")
+    public String logout(Model model) {
+	//	FileValidationParam fileValidationParam = new FileValidationParam();
+		LoginParam loginParam = new LoginParam();
+		model.addAttribute("loginParam", loginParam);
+		model.addAttribute("result", "Logout successfully.");
+        return "LoginPage";
     }
 
 }

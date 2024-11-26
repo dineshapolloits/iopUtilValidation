@@ -198,6 +198,9 @@ public class ITAGFileGenerator {
 	private String getITAGHeader(FileValidationParam validateParam) {
 		
 		fileCreateDateandTime = getUTCDateandTime();
+		log.info("fileCreateDateandTime ::"+fileCreateDateandTime);
+		fileCreateDateandTime = validateParam.getFileDate()+fileCreateDateandTime.substring(fileCreateDateandTime.indexOf("T"),fileCreateDateandTime.length());
+		log.info("After append fileCreateDateandTime ::"+fileCreateDateandTime);
 		//Set file name to class variable
 		filename =  validateParam.getFromAgency() +"_"+ fileCreateDateandTime.replaceAll("[-T:Z]", "")+IAGConstants.ITAG_FILE_EXTENSION;
 		StringBuilder itagHeader = new StringBuilder();

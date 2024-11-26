@@ -98,17 +98,17 @@ public class ICLPFileGenerator {
 					System.out.println("Tag Valid count ##- "+validCount +"\t lowbalCount ## "+lowbalCount +"\t invalidCount ## "+invalidCount);
 					this.tagSequenceStart = Integer.parseInt(agEntity.getTagSequenceStart());
 					for (int count = 1; count <= validCount; count++) {
-						writer.write(getICLPDetailRecord(validateParam));
+						writer.write(getICLPDetailRecord(validateParam,agEntity));
 						writer.write(System.lineSeparator());
 					}
 					for (int count = 1; count <= lowbalCount; count++) {
-						writer.write(getICLPDetailRecord(validateParam));
+						writer.write(getICLPDetailRecord(validateParam,agEntity));
 						writer.write(System.lineSeparator());
 					}
-					for (int count = 1; count <= invalidCount; count++) {
+					/*for (int count = 1; count <= invalidCount; count++) {
 						writer.write(getICLPDetailRecord(validateParam));
 						writer.write(System.lineSeparator());
-					}
+					}*/
 				}
 				
 			// writer.flush(); // close() should take care of this
@@ -122,12 +122,12 @@ public class ICLPFileGenerator {
 		System.out.println((end - start) / 1000f + " seconds");
 	}
 	
-	private String getICLPDetailRecord(FileValidationParam validateParam) {
+	private String getICLPDetailRecord(FileValidationParam validateParam,AgencyEntity agEntity) {
 		StringBuilder iclpDetail = new StringBuilder();
 		iclpDetail.append("FL");
 		iclpDetail.append(CommonUtil.formatStringRightPad(getPlateRandomNo(6),10,' ')); //Lic No
 		iclpDetail.append(CommonUtil.formatStringRightPad("",30,'*')); //Lic_Type
-		iclpDetail.append(validateParam.getFromAgency()); //TAG_agency_ID
+		iclpDetail.append(agEntity.getTagAgencyID()); //TAG_agency_ID
 		iclpDetail.append(CommonUtil.formatStringLeftPad(String.valueOf(tagSequenceStart),10,'0')); // TAG_SERIAL_NUMBER
 		iclpDetail.append(getUTCDateandTime()); //LIC_EFFECTIVE_FROM
 		iclpDetail.append(CommonUtil.formatStringLeftPad("",20,'*')); //LIC_EFFECTIVE_TO
@@ -208,6 +208,9 @@ public class ICLPFileGenerator {
 private String getICLPHeader(FileValidationParam validateParam) {
 		
 		fileCreateDateandTime = getUTCDateandTime();
+		log.info("fileCreateDateandTime ::"+fileCreateDateandTime);
+		fileCreateDateandTime = validateParam.getFileDate()+fileCreateDateandTime.substring(fileCreateDateandTime.indexOf("T"),fileCreateDateandTime.length());
+		log.info("After append fileCreateDateandTime ::"+fileCreateDateandTime);
 		//Set file name to class variable
 		filename =  validateParam.getFromAgency() +"_"+ fileCreateDateandTime.replaceAll("[-T:Z]", "")+IAGConstants.ICLP_FILE_EXTENSION;
 		StringBuilder itagHeader = new StringBuilder();
@@ -224,7 +227,7 @@ private String getICLPHeader(FileValidationParam validateParam) {
 			int invalidCount = (tagRangeCount * AgencyDataExcelReader.tagInvalid) /100; 
 			System.out.println("tagRangeCount --- "+tagRangeCount);
 			System.out.println("Tag Valid count --- "+validCount +"\t lowbalCount -- "+lowbalCount +"\t invalidCount -- "+invalidCount);
-			recordcount = recordcount + validCount + lowbalCount +invalidCount;
+			recordcount = recordcount + validCount + lowbalCount;// +invalidCount;
 		}
 		log.info("Record count ::" +recordcount);
 		validateParam.setRecordCount(recordcount);

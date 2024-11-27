@@ -64,7 +64,7 @@ public class ICLPFileGenerator {
 			
 			String zipFilename = moveToZipFile(filePath,validateParam);
 			log.info("ITAG Zip file name :: "+zipFilename);
-			validateParam.setResponseMsg("Sucess ITAG file created :::"+zipFilename);
+			validateParam.setResponseMsg("ICLP file created :: \t "+zipFilename);
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			validateParam.setResponseMsg("ITAG file creation issue. Please check logs");

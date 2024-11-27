@@ -151,14 +151,19 @@ public class ValidationController {
 				fileValidation = itagGen.itagGen(validateParam);
 				}else if(validateParam.getFileType().equals(IAGConstants.ICLP_FILE_TYPE)) {
 					fileValidation = iclpGen.iclpGen(validateParam);
+				}else if(validateParam.getFileType().equals("ITAGandICLP")) {
+					fileValidation = itagGen.itagGen(validateParam);
+					String msg= validateParam.getResponseMsg();
+					fileValidation = iclpGen.iclpGen(validateParam);
+					validateParam.setResponseMsg(msg +" \n "+ validateParam.getResponseMsg());
+					log.info("msg + validateParam.getResponseMsg() ::"+msg +"\t "+ validateParam.getResponseMsg());
 				}
 				log.info("getResponseMsg ::"+validateParam.getResponseMsg() +"\t fileValidation ::"+fileValidation);
-			
+				log.info("fileValidation.getFileDate ::"+validateParam.getFileDate());
 			if(!fileValidation)
 				model.addAttribute("result", validateParam.getResponseMsg());
 			else
 				model.addAttribute("result", validateParam.getResponseMsg());
-			
 			return "GenerateFile";
 	}
 	

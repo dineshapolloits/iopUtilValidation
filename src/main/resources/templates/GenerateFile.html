@@ -31,6 +31,7 @@
 			<p>	<b>File Type</b>		<select th:field="*{fileType}" class="form-control mb-4 col-4">
 			    <option th:value="ITAG" th:text="ITAG"></option>
 			    <option th:value="ICLP" th:text="ICLP"></option>
+				<option th:value="ITAGandICLP" th:text="ITAG-ICLP"></option>
 			</select>
 			</p>
 			<p><b>From Agency Code</b>
@@ -41,7 +42,7 @@
 			</p> -->
 			 <p><b>File Date</b>
 				<div id="datepicker" 
-				             class="input-group date  mb-4 col-4" 
+				             class="input-group date " 
 				             data-date-format="mm-dd-yyyy">
 				            <input class="form-control " 
 									th:field="*{fileDate}"

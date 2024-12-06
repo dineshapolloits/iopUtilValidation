@@ -27,6 +27,7 @@ import com.apolloits.util.modal.LoginParam;
 import com.apolloits.util.reader.AgencyDataExcelReader;
 import com.apolloits.util.service.DatabaseLogger;
 import com.apolloits.util.validator.ICLPFileDetailValidation;
+import com.apolloits.util.validator.ICTXFileDetailValidation;
 import com.apolloits.util.validator.ITAGFileDetailValidation;
 import com.apolloits.util.writer.ExceptionListExcelWriter;
 
@@ -50,6 +51,9 @@ public class ValidationController {
 	
 	@Autowired
 	ICLPFileDetailValidation iclpValidation;
+	
+	@Autowired
+	ICTXFileDetailValidation ictxValidation;
 	
 	@Autowired
 	ITAGFileGenerator itagGen;
@@ -107,6 +111,9 @@ public class ValidationController {
 			fileValidation = fdValidation.itagValidation(validateParam);
 			}else if(validateParam.getFileType().equals(IAGConstants.ICLP_FILE_TYPE)) {
 				fileValidation = iclpValidation.iclpValidation(validateParam);
+			}else if (validateParam.getFileType().equals(IAGConstants.ICTX_FILE_TYPE)) {
+				log.info("Inside ICTX validation started");
+				fileValidation = ictxValidation.ictxValidation(validateParam);
 			}
 			log.info("getResponseMsg ::"+validateParam.getResponseMsg() +"\t fileValidation ::"+fileValidation);
 			if(!fileValidation || errorMsglist.size()>0) {

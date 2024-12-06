@@ -1,4 +1,6 @@
-package com.apolloits.util;
+package com.apolloits.util.utility;
+
+import static com.apolloits.util.IAGConstants.FILE_RECORD_TYPE;
 
 import java.io.BufferedWriter;
 import java.io.File;
@@ -39,9 +41,13 @@ import net.lingala.zip4j.ZipFile;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Component;
 import org.springframework.util.FileCopyUtils;
 
+import com.apolloits.util.IAGConstants;
+import com.apolloits.util.controller.ValidationController;
+import com.apolloits.util.modal.ErrorMsgDetail;
 import com.apolloits.util.reader.AgencyDataExcelReader;
 
 
@@ -65,6 +71,9 @@ private static AgencyDataExcelReader appConfig;
 		this.appConfig=appConfig;
     }
 	
+	@Autowired
+	@Lazy
+	ValidationController controller;
 	
 	public static void main1(String args[]) throws IOException {
 	/*	String trim = "      ab           ";
@@ -688,4 +697,95 @@ private static AgencyDataExcelReader appConfig;
 			log.info("Moved Input File:" + file.getName() + " to failedFiles directory: Deleted Indicator::::>>" + duplicateFileDeleter);
 		}
 	}
+	
+	public boolean isTransactionFileFormatValid(String transactionFilename,String fileType ) {
+		boolean isvalid = true;
+		String fileName="File Name";
+		String[] fileParams = transactionFilename.split("[_.]"); //this param need to apply all below if condition
+		System.out.println("File name Array :: "+Arrays.toString(fileParams));
+	    // check if the file name is not empty
+	    if (transactionFilename == null || transactionFilename.isEmpty()) {
+	    	controller.getErrorMsglist().add(new ErrorMsgDetail(FILE_RECORD_TYPE,fileName,"File name inValid ::\t "+transactionFilename));
+	    	isvalid = false;
+	    }
+
+	    // check if the file name has the correct extension
+	    if (!transactionFilename.endsWith("."+fileType)) {
+	    	controller.getErrorMsglist().add(new ErrorMsgDetail(FILE_RECORD_TYPE,fileName,"File extension should be .ICTX :: \t "+ transactionFilename));
+	    	isvalid = false;
+	    }
+	    // check if the file name has the correct format
+	    if (!transactionFilename.matches("\\d{4}_\\d{4}_\\d{14}\\."+fileType)) {
+	    	controller.getErrorMsglist().add(new ErrorMsgDetail(FILE_RECORD_TYPE,fileName,"File format is invalid {FROM_AGENCY_ID}_{TO_AGENCY_ID}_YYYYMMDDHHMMSS.ICTX :: \t "+transactionFilename ));
+	    	isvalid = false;
+	    }
+	    // check if the FROM_AGENCY_ID is a number
+	    if (!transactionFilename.substring(0, 4).matches("\\d{4}")) {
+	    	controller.getErrorMsglist().add(new ErrorMsgDetail(FILE_RECORD_TYPE,fileName,"From agency format is invalid ::\t "+transactionFilename));
+	    	isvalid = false;
+	    }
+	    // check if the TO_AGENCY_ID is a number
+	    if (!transactionFilename.substring(5, 9).matches("\\d{4}")) {
+	    	controller.getErrorMsglist().add(new ErrorMsgDetail(FILE_RECORD_TYPE,fileName,"To agency format is invalid ::\t "+transactionFilename));
+	    	isvalid = false;
+	    }
+	    // check if the date and time part is a valid date and time
+	    if (!isValidDateTime(transactionFilename.substring(10, 24))) {
+	    	controller.getErrorMsglist().add(new ErrorMsgDetail(FILE_RECORD_TYPE,fileName,"File Date is invaid format YYYYMMDDHHMMSS :: \t "+transactionFilename));
+	    	isvalid = false;
+	    }
+	    if(!AgencyDataExcelReader.agencyCode.contains(transactionFilename.substring(0, 4))) {
+	    	controller.getErrorMsglist().add(new ErrorMsgDetail(FILE_RECORD_TYPE,fileName,"From agency  is not configured ::\t "+transactionFilename.substring(0, 4)));
+	    	isvalid = false;
+	    }
+	    	
+	    if(!AgencyDataExcelReader.agencyCode.contains(transactionFilename.substring(5, 9))) {
+	    	controller.getErrorMsglist().add(new ErrorMsgDetail(FILE_RECORD_TYPE,fileName,"To agency  is not configured ::\t "+transactionFilename.substring(5, 9)));
+	    	isvalid = false;
+	    }
+	    return isvalid;
+	}
+
+	public static boolean isValidDateTime(String dateTime) {
+	    // Check if the date and time are valid in the format YYYYMMDDHHMMSS
+	    try {
+	        LocalDateTime.parse(dateTime, java.time.format.DateTimeFormatter.ofPattern("yyyyMMddHHmmss"));
+	    } catch (DateTimeParseException e) {
+	        return false;
+	    }
+	    return true;
+	}
+	
+	public boolean isValidDateTimeInDetail(String dateTime) {
+        // Check if the date and time are valid in the format YYYY-MM-DDThh:mm:ssZ
+        try {
+            LocalDateTime.parse(dateTime, java.time.format.DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss'Z'"));
+        } catch (DateTimeParseException e){
+            return false;
+        }
+        return true;
+    }
+	
+	public boolean isValidEtcPlaza(String plaza,String plazaType) {
+		if(plazaType!= null && plazaType.equals("entry")) {
+			if (!plaza.equals("***************") && !plaza.matches(IAGConstants.PLAZA_FORMAT)){
+				return false;
+			}
+		}else if(!plaza.matches(IAGConstants.PLAZA_FORMAT)) {
+			return false;
+		}
+		return true;
+	}
+	
+	public boolean isValidEtcLane(String lane,String plazaType) {
+		if(plazaType!= null && plazaType.equals("entry")) {
+			if (!lane.equals("***") && !lane.matches(IAGConstants.PLAZA_LANE_FORMAT)){
+				return false;
+			}
+		}else if(!lane.matches(IAGConstants.PLAZA_LANE_FORMAT)) {
+			return false;
+		}
+		return true;
+	}
+	
 }

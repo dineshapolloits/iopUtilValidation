@@ -17,12 +17,12 @@ import org.joda.time.DateTimeZone;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import com.apolloits.util.CommonUtil;
 import com.apolloits.util.IAGConstants;
 import com.apolloits.util.controller.ValidationController;
 import com.apolloits.util.modal.AgencyEntity;
 import com.apolloits.util.modal.FileValidationParam;
 import com.apolloits.util.reader.AgencyDataExcelReader;
+import com.apolloits.util.utility.CommonUtil;
 
 import lombok.extern.slf4j.Slf4j;
 import net.lingala.zip4j.ZipFile;

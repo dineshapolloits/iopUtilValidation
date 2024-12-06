@@ -54,7 +54,20 @@ public class IAGConstants {
 	public static String MODIFIED_BY="niop-translator";
     public static Map<String, String> IAGAackReturnCodeMap =null; 
     
-    public static final String ITAG_HEADER_VERSION = "[0-9]{2}\\.[0-9]{2}\\.[0-9]{2}";
+    public static final String FILE_DATE_TIME_FORMAT = "\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}Z";
+    public static final String AGENCY_ID_FORMAT ="\\d{4}";
+    public static final String IAG_HEADER_VERSION_FORMAT = "[0-9]{2}\\.[0-9]{2}\\.[0-9]{2}";
+    public static final String TRAN_RECORD_COUNT_FORMAT = "\\d{8}";
+    public static final String ICTX_FILE_NUM_FORMAT = "\\d{12}";
+    public static final String ETC_TRX_SERIAL_NUM_FORMAT = "\\d{20}";
+    public static final String ETC_TAG_SERIAL_NUMBER_FORMAT = "\\d{10}";
+    public static final String PLAZA_FORMAT = "[A-Z 0-9]{1,15}";
+    public static final String PLAZA_LANE_FORMAT = "[A-Z 0-9]{1,3}";
+    public static final String LIC_STATE_FORMAT = "[A-Z0-9]{2}";
+    public static final String LIC_NUMBER_FORMAT = "[A-Z0-9]{1,10}";
+    public static final String LIC_TYPE_FORMAT =  "[A-Z0-9]{1,30}";
+    public static final String ETC_DEBIT_CREDIT_FORMAT = "[+ -]";
+    public static final String ETC_TOLL_AMOUNT_FORMAT = "\\d{9}";
     public static final String ITAG_DTL_TAG_AGENCY_ID = "[0-9]{4}";
     public static final String ITAG_DTL_TAG_SERIAL_NO = "[0-9]{10}";
     public static final String ITAG_DTL_TAG_STATUS = "[1-3]{1}";

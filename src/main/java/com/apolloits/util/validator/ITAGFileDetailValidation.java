@@ -11,7 +11,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Component;
 
-import com.apolloits.util.CommonUtil;
 import com.apolloits.util.IAGConstants;
 import com.apolloits.util.IagAckFileMapper;
 import com.apolloits.util.controller.ValidationController;
@@ -19,6 +18,7 @@ import com.apolloits.util.modal.AgencyEntity;
 import com.apolloits.util.modal.ErrorMsgDetail;
 import com.apolloits.util.modal.FileValidationParam;
 import com.apolloits.util.reader.AgencyDataExcelReader;
+import com.apolloits.util.utility.CommonUtil;
 
 import lombok.extern.slf4j.Slf4j;
 import net.lingala.zip4j.ZipFile;
@@ -188,7 +188,7 @@ public class ITAGFileDetailValidation {
         	 addErrorMsg(HEADER_RECORD_TYPE,"File Type", "Header record file type is invalid - " + headerFileType);
         	 //return false;
          }
-         final Pattern pattern = Pattern.compile(IAGConstants.ITAG_HEADER_VERSION);
+         final Pattern pattern = Pattern.compile(IAGConstants.IAG_HEADER_VERSION_FORMAT);
          if (!pattern.matcher(headerVersion).matches() || 
         		 !headerVersion.equals(ValidationController.cscIdTagAgencyMap.get(fromAgencyId).getVersionNumber())) {
         	 log.error("FAILED Reason:: Invalid header, version format is incorrect - " + headerVersion + "\t excepted version ::"+ValidationController.cscIdTagAgencyMap.get(fromAgencyId).getVersionNumber());

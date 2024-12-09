@@ -19,6 +19,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 
 import com.apolloits.util.IAGConstants;
 import com.apolloits.util.generate.ICLPFileGenerator;
+import com.apolloits.util.generate.ICTXFileGenerator;
 import com.apolloits.util.generate.ITAGFileGenerator;
 import com.apolloits.util.modal.AgencyEntity;
 import com.apolloits.util.modal.ErrorMsgDetail;
@@ -26,6 +27,7 @@ import com.apolloits.util.modal.FileValidationParam;
 import com.apolloits.util.modal.LoginParam;
 import com.apolloits.util.reader.AgencyDataExcelReader;
 import com.apolloits.util.service.DatabaseLogger;
+import com.apolloits.util.utility.CommonUtil;
 import com.apolloits.util.validator.ICLPFileDetailValidation;
 import com.apolloits.util.validator.ICTXFileDetailValidation;
 import com.apolloits.util.validator.ITAGFileDetailValidation;
@@ -60,6 +62,9 @@ public class ValidationController {
 	
 	@Autowired
 	ICLPFileGenerator iclpGen;
+	
+	@Autowired
+	ICTXFileGenerator ictxGen;
 	
 	List<ErrorMsgDetail> errorMsglist;
 	
@@ -99,10 +104,6 @@ public class ValidationController {
 	@PostMapping("/ValidateFile")
     public String ValidateFile(@ModelAttribute("fileValidationParam") FileValidationParam validateParam,Model model) throws IOException {
 		errorMsglist = new ArrayList<>();
-		/*ErrorMsgDetail obj = new ErrorMsgDetail();
-		obj.setErrorMsg("Tested error");
-		obj.setFieldName("Test Field");
-		errorMsglist.add(obj);*/
 		log.info("ValidateFile ::"+validateParam.toString());
 		boolean fileValidation = false ;
 		validateParam.setResponseMsg("Contact Administrator");
@@ -140,6 +141,7 @@ public class ValidationController {
 	@GetMapping("/Generate")
     public String Generate(Model model) {
 		FileValidationParam fileValidationParam = new FileValidationParam();
+		fileValidationParam.setFileDate(CommonUtil.getCurrentDateAndTime());
         model.addAttribute("fileValidationParam", fileValidationParam);
         return "GenerateFile";
     }
@@ -154,17 +156,19 @@ public class ValidationController {
 				model.addAttribute("result", "Invalid From Agency Code. Please refer agency list");
 				return "GenerateFile";
 			}
-			if(validateParam.getFileType().equals(IAGConstants.ITAG_FILE_TYPE)) {
+			if (validateParam.getFileType().equals(IAGConstants.ITAG_FILE_TYPE)) {
 				fileValidation = itagGen.itagGen(validateParam);
-				}else if(validateParam.getFileType().equals(IAGConstants.ICLP_FILE_TYPE)) {
-					fileValidation = iclpGen.iclpGen(validateParam);
-				}else if(validateParam.getFileType().equals("ITAGandICLP")) {
-					fileValidation = itagGen.itagGen(validateParam);
-					String msg= validateParam.getResponseMsg();
-					fileValidation = iclpGen.iclpGen(validateParam);
-					validateParam.setResponseMsg(msg +" \n "+ validateParam.getResponseMsg());
-					log.info("msg + validateParam.getResponseMsg() ::"+msg +"\t "+ validateParam.getResponseMsg());
-				}
+			} else if (validateParam.getFileType().equals(IAGConstants.ICLP_FILE_TYPE)) {
+				fileValidation = iclpGen.iclpGen(validateParam);
+			} else if (validateParam.getFileType().equals("ITAGandICLP")) {
+				fileValidation = itagGen.itagGen(validateParam);
+				String msg = validateParam.getResponseMsg();
+				fileValidation = iclpGen.iclpGen(validateParam);
+				validateParam.setResponseMsg(msg + " \n " + validateParam.getResponseMsg());
+				log.info("msg + validateParam.getResponseMsg() ::" + msg + "\t " + validateParam.getResponseMsg());
+			}else if(validateParam.getFileType().equals(IAGConstants.ICTX_FILE_TYPE)) {
+				fileValidation = ictxGen.ictxGen(validateParam);
+			}
 				log.info("getResponseMsg ::"+validateParam.getResponseMsg() +"\t fileValidation ::"+fileValidation);
 				log.info("fileValidation.getFileDate ::"+validateParam.getFileDate());
 			if(!fileValidation)

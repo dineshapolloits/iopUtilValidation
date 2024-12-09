@@ -57,7 +57,7 @@ public class ICLPFileGenerator {
 
 		FileWriter writer;
 		try {
-			String filePath = validateParam.getInputFilePath() + File.separator + filename;
+			String filePath = validateParam.getOutputFilePath() + File.separator + filename;
 			writer = new FileWriter(filePath, true);
 			System.out.print("Writing record raw... ");
 			writeDetails(validateParam, Header, writer);
@@ -165,14 +165,14 @@ public class ICLPFileGenerator {
 	
 	private boolean validateParameter(FileValidationParam validateParam) {
 		//Validate file location
-		File isfolder = new File(validateParam.getInputFilePath());
+		File isfolder = new File(validateParam.getOutputFilePath());
 
 		  if(!isfolder.exists()) {
 			  log.error("Folder not persent. Please check your path");
 			  validateParam.setResponseMsg("Folder not persent. Please check your path");
 			  return false;
 		  }
-		  Path path = Path.of(validateParam.getInputFilePath());
+		  Path path = Path.of(validateParam.getOutputFilePath());
 		  if(!Files.isWritable(path)) {
 			  log.error("Not able to create file. Please check folder Permisison");
 			  validateParam.setResponseMsg("Not able to create file. Please check folder Permisison");

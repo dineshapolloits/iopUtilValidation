@@ -19,6 +19,7 @@ public class IAGConstants {
     public static final String ITAG_FILE_EXTENSION = ".ITAG";
     public static final String ICLP_FILE_EXTENSION = ".ICLP";
     public static final String ACK_FILE_EXTENSION = ".ACK";
+    public static final String ICTX_FILE_EXTENSION= ".ICTX";
 
     public static final String BTVL_HOME_AGENCY_ID = "0041";
     public static final String XFER_STATUS_SUCCESS = "S";

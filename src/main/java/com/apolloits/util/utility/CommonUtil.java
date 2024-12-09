@@ -37,9 +37,15 @@ import javax.xml.datatype.XMLGregorianCalendar;
 
 import lombok.extern.slf4j.Slf4j;
 import net.lingala.zip4j.ZipFile;
+import net.lingala.zip4j.exception.ZipException;
+import net.lingala.zip4j.model.ZipParameters;
+import net.lingala.zip4j.model.enums.CompressionLevel;
+import net.lingala.zip4j.model.enums.CompressionMethod;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.joda.time.DateTime;
+import org.joda.time.DateTimeZone;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Component;
@@ -48,6 +54,7 @@ import org.springframework.util.FileCopyUtils;
 import com.apolloits.util.IAGConstants;
 import com.apolloits.util.controller.ValidationController;
 import com.apolloits.util.modal.ErrorMsgDetail;
+import com.apolloits.util.modal.FileValidationParam;
 import com.apolloits.util.reader.AgencyDataExcelReader;
 
 
@@ -511,52 +518,6 @@ private static AgencyDataExcelReader appConfig;
 
 	}
 	
-	public static void generateNIOPAck(String fileName, String returnCode, 
-			 String fromAgencyID, String fromAgencyId, String toAgencyName, String toInterAgencyCode, Long xferControlId, Long atpFileId, String targetDirectory,
-			 Long fileSeqNumber,String fileDate) {
-		String ACK="ACK";
-		String STVL="STVL";
-		//String ackDate=CommonUtil.getSSIOPDateFormate(new Date());
-		String agency="9002";
-		Date currentDate = new Date();
-		String currentTime = CommonUtil.getFormatedDate(currentDate, "HHMMSS_FORMAT");
-		
-		
-		GregorianCalendar gCalendar = new GregorianCalendar();
-		gCalendar.setTime(currentDate);
-		XMLGregorianCalendar xmlCalendar = null;
-		xmlCalendar = CommonUtil.getXMLGregCalenByDate(gCalendar.getTime()); //FLCSS_24737
-		
-		StringBuilder acknowledgementBuilder = new StringBuilder();
-		acknowledgementBuilder.append( "<?xml version=\"1.0\" encoding=\"UTF-8\"?> \n");// FILE_TYPE
-		acknowledgementBuilder.append("\t <Acknowledgement> \n");// FROM_AGENCY_ID
-		acknowledgementBuilder.append("\t\t <SubmissionType>"+ACK+"</SubmissionType> \n");
-		acknowledgementBuilder.append("\t\t <OrigSubmissionType>"+STVL+"</OrigSubmissionType> \n");
-		acknowledgementBuilder.append("\t\t <OrigSubmissionDateTime>"+fileDate+"</OrigSubmissionDateTime> \n");
-		acknowledgementBuilder.append("\t\t <SSIOPHubID>"+9001+"</SSIOPHubID> \n");
-		acknowledgementBuilder.append("\t\t <FromAgencyID>"+fromAgencyID+"</FromAgencyID> \n");
-		acknowledgementBuilder.append("\t\t <ToAgencyID>"+agency+"</ToAgencyID> \n");
-		acknowledgementBuilder.append("\t\t <AckDateTime>"+xmlCalendar+"</AckDateTime> \n");
-		acknowledgementBuilder.append("\t\t <AckReturnCode>"+returnCode+"</AckReturnCode> \n");
-		acknowledgementBuilder.append("\t </Acknowledgement>");
-		System.out.println("From CommonUtil generateNIOPAck() :: acknowledgementBuilder==>" +acknowledgementBuilder );
-		
-		
-        String [] file = fileName.split("\\.");
-        String [] names= fileName.split("_");
-        String ackFileName="9001_9001_"+file[0]+"_"+returnCode+"_"+file[1]+"."+"ACK";
-        File targetDirectoryFile = new File(targetDirectory);
-
-        if (!targetDirectoryFile.exists()) {
-                targetDirectoryFile.mkdirs();
-        }
-		File ackFile = new File(targetDirectory + "/"+ ackFileName);
-		CommonUtil.writeStringToFile(ackFile, acknowledgementBuilder.toString());
-		if (returnCode != null && !(returnCode.equals("00") || returnCode.equals("10"))) {
-			
-		}
-	}
-	
 	public static void writeStringToFile(File file, String string) {
 		BufferedWriter bufferedWriter = null;
 		try {
@@ -786,6 +747,47 @@ private static AgencyDataExcelReader appConfig;
 			return false;
 		}
 		return true;
+	}
+	
+	public String getCurrentUTCDateandTime() {
+		try {
+			DateTime dateTime = new DateTime().withZone(DateTimeZone.UTC);
+			return dateTime.toString("yyyy-MM-dd'T'HH:mm:ss'Z'");
+		} catch (DateTimeParseException e) {
+			e.printStackTrace();
+			return null;
+		}
+	}
+	
+	public String moveToZipFile(String filePath,FileValidationParam validateParam) {
+		System.out.println("filePath ::"+filePath);
+		File file = new File(filePath);
+		ZipParameters parameters = new ZipParameters();
+		parameters.setCompressionMethod(CompressionMethod.DEFLATE);
+		parameters.setCompressionLevel(CompressionLevel.ULTRA);
+
+		String zipFileName = file.getName().replace(".", "_") + ".ZIP";
+		String zipFilePath = file.getParent() + "/" + zipFileName;
+		System.out.println("zipFileName ::"+zipFileName +"\n zipFilePath ::"+zipFilePath);
+		ZipFile zipFile = new ZipFile(zipFilePath);
+		try {
+			zipFile.addFile(file, parameters);
+		} catch (ZipException e) {
+			validateParam.setResponseMsg("Exception in ZIP file creation");
+			log.error("Exception in ZIP file creation");
+			e.printStackTrace();
+		}
+		file.delete();
+		return zipFileName;
+		
+	}
+	
+	public static String getCurrentDateAndTime() {
+		LocalDateTime now = LocalDateTime.now();
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+        String strDate = now.format(formatter);
+        System.out.println("Converted Date to String: " + strDate);
+        return now.format(formatter);
 	}
 	
 }

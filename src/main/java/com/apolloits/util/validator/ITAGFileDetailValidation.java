@@ -117,7 +117,7 @@ public class ITAGFileDetailValidation {
 								if(!validateItagDetail(fileRowData,validateParam,fileName,noOfRecords)) {
 									validateParam.setResponseMsg(validateParam.getResponseMsg() +"\t    Line No::"+noOfRecords);
 									iagAckMapper.mapToIagAckFile(fileName, "02", validateParam.getOutputFilePath()+"\\"+ackFileName, fileName.substring(0, 4),validateParam.getToAgency());
-									return false;
+									//return false;
 								}
 							}
 							noOfRecords++;

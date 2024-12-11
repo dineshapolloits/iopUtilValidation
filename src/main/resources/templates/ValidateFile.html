@@ -18,6 +18,9 @@
 <body>
 	<div class="container">
 		<h1>IOP Util Validate Files</h1>
+		<div align="right">
+				<a th:href="@{/Logout}" class="btn btn-primary link-danger">Logout</a>
+				</div>
 		<hr>
 		<h2>Validation Parameter</h2>
 
@@ -28,6 +31,7 @@
 			    <option th:value="ITAG" th:text="ITAG"></option>
 			    <option th:value="ICLP" th:text="ICLP"></option>
 				<option th:value="ICTX" th:text="ICTX"></option>
+				<option th:value="ICRX" th:text="ICRX"></option>
 			</select>
 			</p>
 			<p class="col-md-6">	<b>Validate Type</b>		<select th:field="*{validateType}" class="form-control">
@@ -42,16 +46,16 @@
 				<input type="text" th:field="*{fromAgency}" placeholder="From agency code" class="form-control " minlength="4" maxlength="4">
 			</p>
 			
-			<p class="col-md-6"><b>To Agency Code</b>
+			<!--<p class="col-md-6"><b>To Agency Code</b>
 							<input type="text" th:field="*{toAgency}" placeholder="From agency code" class="form-control " minlength="4" maxlength="4">
-						</p> 
-		 <!--	<p><b>To Agency Code</b>
+						</p>  -->
+		 	<p class="col-md-6"><b>To Agency Code</b>
 				<select th:field="*{toAgency}" class="form-control">
-				     <option value="NONE">----Select----</option>
+				     <option value="NONE">----Select Agency Code----</option>
 				     <option th:each="entry : ${homeAgencyMap.entrySet()}" th:value="${entry.key}" th:text="${entry.value}">
 				     </option>
 				  </select>
-			</p> -->
+			</p> 
 			
 			</div>
 			<div class="row">

@@ -19,6 +19,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 
 import com.apolloits.util.IAGConstants;
 import com.apolloits.util.generate.ICLPFileGenerator;
+import com.apolloits.util.generate.ICRXFileGenerator;
 import com.apolloits.util.generate.ICTXFileGenerator;
 import com.apolloits.util.generate.ITAGFileGenerator;
 import com.apolloits.util.modal.AgencyEntity;
@@ -29,6 +30,7 @@ import com.apolloits.util.reader.AgencyDataExcelReader;
 import com.apolloits.util.service.DatabaseLogger;
 import com.apolloits.util.utility.CommonUtil;
 import com.apolloits.util.validator.ICLPFileDetailValidation;
+import com.apolloits.util.validator.ICRXFileDetailValidation;
 import com.apolloits.util.validator.ICTXFileDetailValidation;
 import com.apolloits.util.validator.ITAGFileDetailValidation;
 import com.apolloits.util.writer.ExceptionListExcelWriter;
@@ -58,6 +60,9 @@ public class ValidationController {
 	ICTXFileDetailValidation ictxValidation;
 	
 	@Autowired
+	ICRXFileDetailValidation icrxValidation;
+	
+	@Autowired
 	ITAGFileGenerator itagGen;
 	
 	@Autowired
@@ -65,6 +70,9 @@ public class ValidationController {
 	
 	@Autowired
 	ICTXFileGenerator ictxGen;
+	
+	@Autowired
+	ICRXFileGenerator icrxGen;
 	
 	List<ErrorMsgDetail> errorMsglist;
 	
@@ -115,6 +123,9 @@ public class ValidationController {
 			}else if (validateParam.getFileType().equals(IAGConstants.ICTX_FILE_TYPE)) {
 				log.info("Inside ICTX validation started");
 				fileValidation = ictxValidation.ictxValidation(validateParam);
+			}else if (validateParam.getFileType().equals(IAGConstants.ICRX_FILE_TYPE)) {
+				log.info("Inside ICRX validation started");
+				fileValidation = icrxValidation.icrxValidation(validateParam);
 			}
 			log.info("getResponseMsg ::"+validateParam.getResponseMsg() +"\t fileValidation ::"+fileValidation);
 			if(!fileValidation || errorMsglist.size()>0) {
@@ -134,7 +145,7 @@ public class ValidationController {
 			}else
 				model.addAttribute("result", "Sucess");
 			
-			// model.addAttribute("homeAgencyMap", dbLog.getCscAgencyIdandShortNamebymap());
+			 model.addAttribute("homeAgencyMap", dbLog.getCscAgencyIdandShortNamebymap());
         return "ValidateFile";
     }
 	
@@ -143,6 +154,7 @@ public class ValidationController {
 		FileValidationParam fileValidationParam = new FileValidationParam();
 		fileValidationParam.setFileDate(CommonUtil.getCurrentDateAndTime());
         model.addAttribute("fileValidationParam", fileValidationParam);
+        model.addAttribute("homeAgencyMap", dbLog.getCscAgencyIdandShortNamebymap());
         return "GenerateFile";
     }
 	
@@ -151,9 +163,13 @@ public class ValidationController {
 		log.info("GenerateFile ::"+validateParam.toString());
 		boolean fileValidation = false ;
 		validateParam.setResponseMsg("Contact Administrator");
+		 	model.addAttribute("homeAgencyMap", dbLog.getCscAgencyIdandShortNamebymap());
 			cscIdTagAgencyMap =  dbLog.getCSCIdbyAgencyMap(validateParam.getFromAgency());
 			if(cscIdTagAgencyMap == null) {
 				model.addAttribute("result", "Invalid From Agency Code. Please refer agency list");
+				return "GenerateFile";
+			}
+			if(!validateFileParam(validateParam,model)) {
 				return "GenerateFile";
 			}
 			if (validateParam.getFileType().equals(IAGConstants.ITAG_FILE_TYPE)) {
@@ -168,6 +184,8 @@ public class ValidationController {
 				log.info("msg + validateParam.getResponseMsg() ::" + msg + "\t " + validateParam.getResponseMsg());
 			}else if(validateParam.getFileType().equals(IAGConstants.ICTX_FILE_TYPE)) {
 				fileValidation = ictxGen.ictxGen(validateParam);
+			}else if(validateParam.getFileType().equals(IAGConstants.ICRX_FILE_TYPE)) {
+				fileValidation = icrxGen.icrxGen(validateParam,IAGConstants.ICRX_FILE_TYPE);
 			}
 				log.info("getResponseMsg ::"+validateParam.getResponseMsg() +"\t fileValidation ::"+fileValidation);
 				log.info("fileValidation.getFileDate ::"+validateParam.getFileDate());
@@ -175,9 +193,21 @@ public class ValidationController {
 				model.addAttribute("result", validateParam.getResponseMsg());
 			else
 				model.addAttribute("result", validateParam.getResponseMsg());
+			
 			return "GenerateFile";
 	}
 	
+	private boolean validateFileParam(FileValidationParam validateParam,Model model) {
+		//validate generate fiel date
+		if (!CommonUtil.isDate(validateParam.getFileDate(), "yyyy-MM-dd")) {
+			validateParam.setResponseMsg("Invalid File Date");
+			model.addAttribute("result", "Invalid File Date.\t  Please select valid date ");
+			return false;
+		}
+
+		return true;
+	}
+
 	@GetMapping("/login")
     public String login(Model model) {
 		LoginParam loginParam = new LoginParam();

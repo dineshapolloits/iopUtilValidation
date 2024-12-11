@@ -1,7 +1,5 @@
 package com.apolloits.util;
 
-import java.util.HashMap;
-import java.util.Map;
 
 import org.springframework.stereotype.Component;
 
@@ -20,6 +18,7 @@ public class IAGConstants {
     public static final String ICLP_FILE_EXTENSION = ".ICLP";
     public static final String ACK_FILE_EXTENSION = ".ACK";
     public static final String ICTX_FILE_EXTENSION= ".ICTX";
+    public static final String ICRX_FILE_EXTENSION= ".ICRX";
 
     public static final String BTVL_HOME_AGENCY_ID = "0041";
     public static final String XFER_STATUS_SUCCESS = "S";
@@ -51,9 +50,6 @@ public class IAGConstants {
 
     public static final String IAG_FILE_TYPES = "ITAG,ICLP";
     public static final String TRANSLATOR_STATUS_LOAD_FAILED = "Load Failed";
-    public static String CREATED_BY="niop-translator";
-	public static String MODIFIED_BY="niop-translator";
-    public static Map<String, String> IAGAackReturnCodeMap =null; 
     
     public static final String FILE_DATE_TIME_FORMAT = "\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}Z";
     public static final String AGENCY_ID_FORMAT ="\\d{4}";

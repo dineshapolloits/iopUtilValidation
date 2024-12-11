@@ -7,6 +7,7 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.Writer;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.text.DateFormat;
@@ -44,6 +45,7 @@ import net.lingala.zip4j.model.enums.CompressionMethod;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.poi.ss.usermodel.Cell;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -789,5 +791,125 @@ private static AgencyDataExcelReader appConfig;
         System.out.println("Converted Date to String: " + strDate);
         return now.format(formatter);
 	}
+	public static boolean isDate(String date,String format) {
+		try {
+			LocalDateTime now = LocalDateTime.now();
+	        DateTimeFormatter formatter = DateTimeFormatter.ofPattern(format);
+	         now.format(formatter);
+		}catch (Exception e) {
+			return false;
+		}
+		return true;
+	}
+	public boolean validateTransactionZIPFileName(String zipFileName,String fileType) {
+		
+		if (zipFileName != null && zipFileName.length() == 33) {
+			String[] fileParams = zipFileName.split("[_.]");
+			System.out.println("zipFileName ::"+Arrays.toString(fileParams));
+			if ((fileParams.length == 5 && fileParams[3].equals(fileType)
+					&& "zip".equalsIgnoreCase(fileParams[4])) && AgencyDataExcelReader.agencyCode.contains(fileParams[0])
+							&& AgencyDataExcelReader.agencyCode.contains(fileParams[1])
+					) {
+
+				SimpleDateFormat dateFormat = new SimpleDateFormat(IAGConstants.YYYY_MM_DD_HH_MM_SS);
+				dateFormat.setLenient(false);
+				try {
+					dateFormat.parse(fileParams[2].trim());
+					return true;
+				} catch (ParseException pe) {
+					controller.getErrorMsglist().add(new ErrorMsgDetail(FILE_RECORD_TYPE,"File","Zip file Name Date and time invalid :: YYYYMMDDHHMMSS \t ::"+zipFileName));
+					return false;
+					
+				}
+
+			}
+			controller.getErrorMsglist().add(new ErrorMsgDetail(FILE_RECORD_TYPE,"File","Zip file Name Validation Failed :: {FROM_AGENCY_ID}_{TO_AGENCY_ID}_YYYYMMDDHHMMSS.ICTX \t ::"+zipFileName));
+		}else {
+		controller.getErrorMsglist().add(new ErrorMsgDetail(FILE_RECORD_TYPE,"File","Zip file Name invalid length :: file lenght should be 33 \t ::"+zipFileName));
+		}
+			return false;
+	}
+	
+	public boolean validateParameter(FileValidationParam validateParam) {
+		//Validate file location
+		File isfolder = new File(validateParam.getOutputFilePath());
+
+		  if(!isfolder.exists()) {
+			  log.error("Folder not persent. Please check your path");
+			  validateParam.setResponseMsg("Folder not persent. Please check your generate path");
+			  return false;
+		  }
+		  Path path = Path.of(validateParam.getOutputFilePath());
+		  if(!Files.isWritable(path)) {
+			  log.error("Not able to create file. Please check generate folder Permisison");
+			  validateParam.setResponseMsg("Not able to create file. Please check generate folder Permisison");
+			  return false;
+		  }
+		  
+		  isfolder = new File(validateParam.getInputFilePath());
+		  if(!isfolder.exists()) {
+			  log.error("Folder not persent. Please check your input path");
+			  validateParam.setResponseMsg("Folder not persent. Please check your input path");
+			  return false;
+		  }
+		  
+		  if(!Files.isReadable(path)) {
+			  log.error("Not able to Read file. Please check input file Permisison");
+			  validateParam.setResponseMsg("Not able to Read file. Please check input file  Permisison");
+			  return false;
+		  }
+		  //from agency and to agency value should be there
+			if (validateParam.getFromAgency() == null || validateParam.getFromAgency().isEmpty()
+					|| validateParam.getFromAgency().length() != 4) {
+				 log.error("From Agency code validation failed ");
+				  validateParam.setResponseMsg("From agency code should be 4 digit");
+				  return false;
+			}else {
+				if(!AgencyDataExcelReader.agencyCode.contains(validateParam.getFromAgency())) {
+	        		 log.error("From Agency code not available. Please check agency Configuration");
+	        		 validateParam.setResponseMsg("From Agency code not available. Please check agency Configuration");
+	        		 return false;
+	        	 }
+				
+			}
+			
+			if (validateParam.getToAgency() == null || validateParam.getToAgency().isEmpty()
+					|| validateParam.getToAgency().length() != 4) {
+				 log.error("To Agency code validation failed ");
+				  validateParam.setResponseMsg("To agency code should be 4 digit");
+				  return false;
+			}else {
+				if(!AgencyDataExcelReader.agencyCode.contains(validateParam.getToAgency())) {
+	        		 log.error("To Agency code not available. Please check agency Configuration");
+	        		 validateParam.setResponseMsg("To Agency code not available. Please check agency Configuration");
+	        		 return false;
+	        	 }
+			}
+		 
+		return true;
+	}
+	
+	public String getStringFormatCell(Cell cell) {
+		log.info("cell type ::"+cell.getCellType());
+		String value ="";
+		switch (cell.getCellType())               
+		{  
+		case STRING:    //field that represents string cell type  
+		log.debug("String :: "+cell.getStringCellValue()); 
+		value = cell.getStringCellValue();
+		break;  
+		case NUMERIC:    //field that represents number cell type  
+			log.debug("Number :: "+cell.getNumericCellValue());
+		value = String.valueOf((int)cell.getNumericCellValue());
+		break; 
+		case BLANK:    //field that represents number cell type  
+			log.debug("Blank ");  
+			break;
+		default:  
+		}  
+		log.info("return Value :: "+value);
+		return value;
+	}
+	
 	
 }

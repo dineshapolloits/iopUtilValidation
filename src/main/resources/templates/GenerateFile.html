@@ -20,6 +20,9 @@
 <body>
 	<div class="container">
 		<h1>IOP Util File Generate</h1>
+		<div align="right">
+		<a th:href="@{/Logout}" class="btn btn-primary link-danger">Logout</a>
+		</div>
 		<hr>
 		<h2>Generate Parameters</h2>
 
@@ -32,9 +35,17 @@
 				<option th:value="ICTX" th:text="ICTX"></option>
 			</select>
 			</p>
-			<p><b>From Agency Code</b>
+			<!-- <p><b>From Agency Code</b>
 				<input type="text" th:field="*{fromAgency}" placeholder="From agency code" class="form-control mb-4 col-4" minlength="4" maxlength="4">
-			</p>
+			</p> -->
+			
+			<p><b>From Agency Code</b>
+							<select th:field="*{fromAgency}" class="form-control mb-4 col-4">
+							     <option value="NONE">----Select Agency Code----</option>
+							     <option th:each="entry : ${homeAgencyMap.entrySet()}" th:value="${entry.key}" th:text="${entry.value}">
+							     </option>
+							  </select>
+						</p> 
 			<div id="toAgencyCode">
 			<p><b>To Agency Code</b>
 							<input type="text" th:field="*{toAgency}" placeholder="From agency code" class="form-control mb-4 col-4" minlength="4" maxlength="4">
@@ -88,8 +99,11 @@
 				const inputFilePathDiv = $('#inputFilePath');
 
 		        // hide the div initially
+				if(advertTypeSelect.val() != 'ICTX'){
+					console.log("advertTypeSelect.val :: ",advertTypeSelect.val());
 		        toAgencyCodeDiv.hide();
 				inputFilePathDiv.hide();
+				}
 		        // add change event listener to the advertType dropdown
 		        advertTypeSelect.change(function() {
 		            if ($(this).val() === 'ICTX') {

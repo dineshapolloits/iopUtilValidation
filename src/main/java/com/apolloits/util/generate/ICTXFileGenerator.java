@@ -55,7 +55,7 @@ public class ICTXFileGenerator {
 	
 	public boolean ictxGen(FileValidationParam validateParam) throws IOException {
 		
-		if (!validateParameter(validateParam)) {
+		if (!commonUtil.validateParameter(validateParam)) {
 			return false;
 		}
 		
@@ -326,65 +326,6 @@ public class ICTXFileGenerator {
 		return header.toString();
 	}
 
-	private boolean validateParameter(FileValidationParam validateParam) {
-		//Validate file location
-		File isfolder = new File(validateParam.getOutputFilePath());
-
-		  if(!isfolder.exists()) {
-			  log.error("Folder not persent. Please check your path");
-			  validateParam.setResponseMsg("Folder not persent. Please check your generate path");
-			  return false;
-		  }
-		  Path path = Path.of(validateParam.getOutputFilePath());
-		  if(!Files.isWritable(path)) {
-			  log.error("Not able to create file. Please check generate folder Permisison");
-			  validateParam.setResponseMsg("Not able to create file. Please check generate folder Permisison");
-			  return false;
-		  }
-		  
-		  isfolder = new File(validateParam.getInputFilePath());
-		  if(!isfolder.exists()) {
-			  log.error("Folder not persent. Please check your input path");
-			  validateParam.setResponseMsg("Folder not persent. Please check your input path");
-			  return false;
-		  }
-		  
-		  if(!Files.isReadable(path)) {
-			  log.error("Not able to Read file. Please check input file Permisison");
-			  validateParam.setResponseMsg("Not able to Read file. Please check input file  Permisison");
-			  return false;
-		  }
-		  //from agency and to agency value should be there
-			if (validateParam.getFromAgency() == null || validateParam.getFromAgency().isEmpty()
-					|| validateParam.getFromAgency().length() != 4) {
-				 log.error("From Agency code validation failed ");
-				  validateParam.setResponseMsg("From agency code should be 4 digit");
-				  return false;
-			}else {
-				if(!AgencyDataExcelReader.agencyCode.contains(validateParam.getFromAgency())) {
-	        		 log.error("From Agency code not available. Please check agency Configuration");
-	        		 validateParam.setResponseMsg("From Agency code not available. Please check agency Configuration");
-	        		 return false;
-	        	 }
-				
-			}
-			
-			if (validateParam.getToAgency() == null || validateParam.getToAgency().isEmpty()
-					|| validateParam.getToAgency().length() != 4) {
-				 log.error("To Agency code validation failed ");
-				  validateParam.setResponseMsg("To agency code should be 4 digit");
-				  return false;
-			}else {
-				if(!AgencyDataExcelReader.agencyCode.contains(validateParam.getToAgency())) {
-	        		 log.error("To Agency code not available. Please check agency Configuration");
-	        		 validateParam.setResponseMsg("To Agency code not available. Please check agency Configuration");
-	        		 return false;
-	        	 }
-			}
-		 
-		return true;
-	}
-	
 	
 
 }

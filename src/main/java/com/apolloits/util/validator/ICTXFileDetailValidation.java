@@ -1,6 +1,8 @@
 package com.apolloits.util.validator;
 
+import static com.apolloits.util.IAGConstants.DETAIL_RECORD_TYPE;
 import static com.apolloits.util.IAGConstants.FILE_RECORD_TYPE;
+import static com.apolloits.util.IAGConstants.HEADER_RECORD_TYPE;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -8,9 +10,9 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.time.LocalDateTime;
-import java.time.format.DateTimeParseException;
 import java.util.Arrays;
+import java.util.LinkedList;
+import java.util.List;
 
 import org.apache.commons.io.FilenameUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,16 +24,14 @@ import com.apolloits.util.IagAckFileMapper;
 import com.apolloits.util.controller.ValidationController;
 import com.apolloits.util.modal.ErrorMsgDetail;
 import com.apolloits.util.modal.FileValidationParam;
+import com.apolloits.util.modal.ICTXTemplate;
 import com.apolloits.util.reader.AgencyDataExcelReader;
 import com.apolloits.util.utility.CommonUtil;
+import com.apolloits.util.writer.ICTXTemplateValidationExcelWriter;
 
 import lombok.extern.slf4j.Slf4j;
 import net.lingala.zip4j.ZipFile;
 import net.lingala.zip4j.exception.ZipException;
-
-import static com.apolloits.util.IAGConstants.HEADER_RECORD_TYPE;
-import static com.apolloits.util.IAGConstants.DETAIL_RECORD_TYPE;
-import static com.apolloits.util.IAGConstants.FILE_RECORD_TYPE;
 
 @Slf4j
 @Component
@@ -50,6 +50,11 @@ public class ICTXFileDetailValidation {
 	
 	@Autowired
 	private CommonUtil commonUtil;
+	
+	@Autowired
+	ICTXTemplateValidationExcelWriter ictxtempExcel;
+	
+	List<ICTXTemplate> ictxTempList;
 	
 public boolean ictxValidation(FileValidationParam validateParam) throws IOException {
 		
@@ -113,6 +118,7 @@ public boolean ictxValidation(FileValidationParam validateParam) throws IOExcept
 					String fileRowData;
 					long headerCount =0l;
 					String ackCode="00";
+					String ictxFileNum="";
 					while ((fileRowData = br.readLine()) != null) {
 						log.info(noOfRecords + " :: " + fileRowData);
 						if(noOfRecords == 0) {
@@ -125,17 +131,21 @@ public boolean ictxValidation(FileValidationParam validateParam) throws IOExcept
 								ackCode = "01";
 								//return false;
 							}
+							
 							iagAckMapper.mapToIagAckFile(fileName, ackCode, validateParam.getOutputFilePath()+"\\"+ackFileName, fileName.substring(0, 4),validateParam.getToAgency());
 							if(validateParam.getValidateType().equals("header")) {
 					        	 log.info("Only file name and header validation");
 					        	 return true;
 					         }
+							ictxFileNum = fileRowData.substring(48, 60); //ICTX file sequence no for ictxTemplate excel creation
+							ictxTempList = new LinkedList<ICTXTemplate>();
 						}else {
 							if(!validateIctxDetail(fileRowData,validateParam,fileName,noOfRecords)) {
 								//validateParam.setResponseMsg(validateParam.getResponseMsg() +"\t    Line No::"+noOfRecords);
 								iagAckMapper.mapToIagAckFile(fileName, "02", validateParam.getOutputFilePath()+"\\"+ackFileName, fileName.substring(0, 4),validateParam.getToAgency());
 								return false;
 							}
+							addICTXTemplate(fileRowData,ictxFileNum); //This method add ICTXtemplate value in list
 						}
 						noOfRecords++;
 					}
@@ -147,6 +157,13 @@ public boolean ictxValidation(FileValidationParam validateParam) throws IOExcept
 					if(controller.getErrorMsglist().size()>0) {
 						validateParam.setResponseMsg("\t \t ACK file name ::"+ackFileName);
 						iagAckMapper.mapToIagAckFile(fileName, "02", validateParam.getOutputFilePath()+"\\"+ackFileName, fileName.substring(0, 4),validateParam.getToAgency());
+					} else {
+						// generate ICTXTemplate format excel file.
+						log.info("ictxTempList size ::" + ictxTempList.size());
+						if (controller.getErrorMsglist().size() == 0) {
+							String ictxTempExcelFileName =validateParam.getOutputFilePath()+File.separator+FilenameUtils.removeExtension(fileName)+"_ICTXTemplate.xls";
+							ictxtempExcel.createIctxTemplateExcel(ictxTempList, ictxTempExcelFileName, validateParam);
+						}
 					}
 				} catch (IOException e) {
 					e.printStackTrace();
@@ -164,17 +181,51 @@ public boolean ictxValidation(FileValidationParam validateParam) throws IOExcept
 		 return true;
 }
 
+/**
+ * @author DK
+ * @param fileRowData
+ * @param ictxFileNum
+ * This method add only good record value in ictxTempList
+ */
+private void addICTXTemplate(String fileRowData, String ictxFileNum) {
+	if (controller.getErrorMsglist().size() == 0) {
+		ICTXTemplate ictxTem = new ICTXTemplate();
+		ictxTem.setIctxFileNum(ictxFileNum);
+		ictxTem.setEtcTrxSerialNo(fileRowData.substring(0, 20));
+		ictxTem.setEtcRevenueDate(fileRowData.substring(20, 28));
+		ictxTem.setEtcTagAgency(fileRowData.substring(76, 80));
+		ictxTem.setEtcTagSerialNumber(fileRowData.substring(80, 90));
+		ictxTem.setEtcValidationStatus(fileRowData.substring(96, 97));
+		ictxTem.setEtcLicState(fileRowData.substring(97, 99));
+		ictxTem.setEtcLicNumber(fileRowData.substring(99, 109));
+		ictxTem.setEtcClassCharged(fileRowData.substring(139, 142));
+		ictxTem.setEtcExitDateTime(fileRowData.substring(148, 173));
+		ictxTem.setEtcExitPlaza(fileRowData.substring(173, 188));
+		ictxTem.setEtcExitLane(fileRowData.substring(188, 191));
+		ictxTem.setEtcTrxType(fileRowData.substring(32, 33));
+		ictxTem.setEtcEntryDateTime(fileRowData.substring(33, 58));
+		ictxTem.setEtcEntryPlaza(fileRowData.substring(58, 73));
+		ictxTem.setEtcEntryLane(fileRowData.substring(73, 76));
+		ictxTem.setEtcReadPerformance(fileRowData.substring(90, 92));
+		ictxTem.setEtcWritePerf(fileRowData.substring(92, 94));
+		ictxTem.setEtcTagPgmStatus(fileRowData.substring(94, 95));
+		ictxTem.setEtcLaneMode(fileRowData.substring(95, 96));
+		ictxTem.setEtcOverSpeed(fileRowData.substring(147, 148));
+		ictxTem.setEtcDebitCredit(fileRowData.substring(191, 192));
+		ictxTem.setEtcTollAmount(fileRowData.substring(192, 201));
+		ictxTempList.add(ictxTem);
+	}
+}
+
 private boolean validateIctxDetail(String fileRowData, FileValidationParam validateParam, String fileName,
 		long rowNo) {
 	
 	String lineNo = "\t Row ::"+fileRowData +"\t Line No::"+rowNo;
-	
 	// If detail record length is not matched. not validating other fields 
     if (fileRowData == null || fileRowData.length() != 201) {
         addErrorMsg(DETAIL_RECORD_TYPE,"Detail Length","Record length is not match with ICTX length 201 ::\t "+lineNo);
         return false;
     }
-    
     // ETC_TRX_SERIAL_NUM CHAR(20) Values: 00000000000000000000 – 99999999999999999999
     if (!fileRowData.substring(0, 20).matches(IAGConstants.ETC_TRX_SERIAL_NUM_FORMAT)) {
         addErrorMsg(DETAIL_RECORD_TYPE,"ETC_TRX_SERIAL_NUM","Format not matched Values: 00000000000000000000 – 99999999999999999999 ::\t "+fileRowData.substring(0, 20)+"\t "+lineNo);

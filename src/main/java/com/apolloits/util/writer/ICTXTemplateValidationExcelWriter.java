@@ -11,9 +11,14 @@ import org.apache.poi.hssf.usermodel.HSSFFont;
 import org.apache.poi.hssf.usermodel.HSSFRow;
 import org.apache.poi.hssf.usermodel.HSSFSheet;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
+import org.apache.poi.xssf.usermodel.XSSFCellStyle;
+import org.apache.poi.xssf.usermodel.XSSFDataFormat;
+import org.apache.poi.xssf.usermodel.XSSFFont;
+import org.apache.poi.xssf.usermodel.XSSFRow;
+import org.apache.poi.xssf.usermodel.XSSFSheet;
+import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.springframework.stereotype.Component;
 
-import com.apolloits.util.modal.ErrorMsgDetail;
 import com.apolloits.util.modal.FileValidationParam;
 import com.apolloits.util.modal.ICTXTemplate;
 
@@ -26,12 +31,13 @@ public class ICTXTemplateValidationExcelWriter {
 	public void createIctxTemplateExcel(List<ICTXTemplate> ictxTempList,String fileName,FileValidationParam validateParam) throws FileNotFoundException, IOException {
 		
 		log.info("Inside createIctxTemplateExcel() :: ictxTempList size ::"+ictxTempList.size() +"\t FileName ::"+fileName);
-		HSSFWorkbook workbook = new HSSFWorkbook();
-	    HSSFSheet sheet = workbook.createSheet("ICRX");
-	    HSSFRow row = sheet.createRow(0);
+		
+		XSSFWorkbook workbook = new XSSFWorkbook();
+		XSSFSheet sheet = workbook.createSheet("ICRX");
+		XSSFRow row = sheet.createRow(0);
 
-	    HSSFCellStyle style= workbook.createCellStyle();
-	    HSSFFont defaultFont= workbook.createFont();
+	    XSSFCellStyle style= workbook.createCellStyle();
+	    XSSFFont defaultFont= workbook.createFont();
 	    defaultFont.setBold(true);
 	    style.setFont(defaultFont);
 	   
@@ -97,13 +103,13 @@ public class ICTXTemplateValidationExcelWriter {
 	    row.createCell(27).setCellValue("ETC_DUP_SERIAL_NUM");
 	    row.getCell(27).setCellStyle(style);
 	    
-	    HSSFCellStyle dateCellStyle = workbook.createCellStyle();
-	    HSSFDataFormat dateFormat = workbook.createDataFormat();
+	   // XSSFCellStyle dateCellStyle = workbook.createCellStyle();
+	    //XSSFDataFormat dateFormat = workbook.createDataFormat();
 	    
 	    int dataRowIndex = 1;
 	    
 	    for (ICTXTemplate ictxTemp : ictxTempList) {
-	        HSSFRow dataRow = sheet.createRow(dataRowIndex);
+	    	XSSFRow dataRow = sheet.createRow(dataRowIndex);
 	       // dataRow.createCell(0).setCellValue(dataRowIndex);
 	        dataRow.createCell(0).setCellValue(ictxTemp.getIctxFileNum());
 	        dataRow.createCell(1).setCellValue(ictxTemp.getEtcTrxSerialNo());
@@ -128,6 +134,8 @@ public class ICTXTemplateValidationExcelWriter {
 	        dataRow.createCell(20).setCellValue(ictxTemp.getEtcOverSpeed());
 	        dataRow.createCell(21).setCellValue(ictxTemp.getEtcDebitCredit());
 	        dataRow.createCell(22).setCellValue(ictxTemp.getEtcTollAmount());
+	        
+	        //ICRX cells
 	        
 	        dataRowIndex++;
 	    }

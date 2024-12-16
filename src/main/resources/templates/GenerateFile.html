@@ -33,6 +33,7 @@
 			    <option th:value="ICLP" th:text="ICLP"></option>
 				<option th:value="ITAGandICLP" th:text="ITAG-ICLP"></option>
 				<option th:value="ICTX" th:text="ICTX"></option>
+				<option th:value="ICRX" th:text="ICRX"></option>
 			</select>
 			</p>
 			<!-- <p><b>From Agency Code</b>
@@ -97,17 +98,17 @@
 		        // select the div with id "station"
 		        const toAgencyCodeDiv = $('#toAgencyCode');
 				const inputFilePathDiv = $('#inputFilePath');
-
+				console.log("advertTypeSelect.val onload :: ",advertTypeSelect.val());
 		        // hide the div initially
-				if(advertTypeSelect.val() != 'ICTX'){
+				if((advertTypeSelect.val() !== 'ICTX') && (advertTypeSelect.val() !== 'ICRX')){
 					console.log("advertTypeSelect.val :: ",advertTypeSelect.val());
 		        toAgencyCodeDiv.hide();
 				inputFilePathDiv.hide();
 				}
 		        // add change event listener to the advertType dropdown
 		        advertTypeSelect.change(function() {
-		            if ($(this).val() === 'ICTX') {
-		                // show the div if ONAIR is selected
+		            if ($(this).val() === 'ICTX' || $(this).val() === 'ICRX' ) {
+		                // show the div if ONAIR is selected $(this).val() === 'ICTX'
 		                toAgencyCodeDiv.show();
 						inputFilePathDiv.show();
 		            } else {

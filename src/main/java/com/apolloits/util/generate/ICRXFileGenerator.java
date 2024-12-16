@@ -10,6 +10,7 @@ import java.util.List;
 
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.Row;
+import org.apache.poi.ss.usermodel.Row.MissingCellPolicy;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
@@ -80,7 +81,7 @@ public class ICRXFileGenerator {
 				writer.write(setICRXDetailValues(icrxTemplate,validateParam));
 				writer.write(System.lineSeparator());
 			}
-			writer.flush();
+			//writer.flush();
 			writer.close();
 		}catch (Exception e) {
 			validateParam.setResponseMsg("ICRX File not generated Please check log");
@@ -95,7 +96,7 @@ public class ICRXFileGenerator {
 		
 		icrx.setEtcTrxSerialNum(CommonUtil.formatStringLeftPad(icrxTemplate.getEtcTrxSerialNo(),20,'0'));
 		icrx.setEtcPostStatus(CommonUtil.formatStringLeftPad(icrxTemplate.getEtcPostStatus(),4,' '));
-		icrx.setEtcPostPlan(CommonUtil.formatStringLeftPad(null,5,' '));
+		icrx.setEtcPostPlan(CommonUtil.formatStringLeftPad(icrxTemplate.getEtcPostPlan(),5,' '));
 		icrx.setEtcDebitCredit(CommonUtil.formatStringLeftPad(icrxTemplate.getEtcDebitCredit(),1,' '));
 		icrx.setEtcOwedAmount(CommonUtil.formatStringLeftPad(icrxTemplate.getEtcTollAmount(),9,'0'));
 		icrx.setEtcDupSerialNum(CommonUtil.formatStringLeftPad(null,20,'0'));
@@ -109,11 +110,12 @@ public class ICRXFileGenerator {
 		try {
 			log.info("ICRX Excel data path localtion form getInputFilePath ::"+validateParam.getInputFilePath());
 			FileInputStream is = new FileInputStream(validateParam.getInputFilePath());
-			Workbook workbook = new XSSFWorkbook(is);
-			log.info("Number of sheets : " + workbook.getNumberOfSheets());
-
-			icrxTemplateList = excelToICRXList(workbook.getSheet(ICRX_SHEET));
-
+			try (Workbook workbook = new XSSFWorkbook(is)) {
+				log.info("Number of sheets : " + workbook.getNumberOfSheets());
+				workbook.setMissingCellPolicy(MissingCellPolicy.CREATE_NULL_AS_BLANK);
+				icrxTemplateList = excelToICRXList(workbook.getSheet(ICRX_SHEET));
+			}
+			log.info("icrxTemplateList :::::::::::::"+icrxTemplateList.size());
 		} catch (Exception e) {
 			validateParam.setResponseMsg("ICRX File not generated Please check input excel data");
 			e.printStackTrace();
@@ -137,26 +139,51 @@ public class ICRXFileGenerator {
 	              continue;
 	            }
 	            Iterator<Cell> cellsInRow = currentRow.iterator();
+	            Cell cell = currentRow.getCell(24,MissingCellPolicy.CREATE_NULL_AS_BLANK);
+	            if(cell  == null ) {
+	            	log.info("Null ***************");
+	            }else {
+	            	log.info("Else ::"+commonUtil.getStringFormatCell(cell));
+	            }
 	            ICRXTemplate icrxTemp = new ICRXTemplate();
-	            int cellIdx = 0;
+	            icrxTemp.setIctxFileNum(commonUtil.getStringFormatCell(currentRow.getCell(0,MissingCellPolicy.CREATE_NULL_AS_BLANK)));
+	            icrxTemp.setEtcTrxSerialNo(commonUtil.getStringFormatCell(currentRow.getCell(1,MissingCellPolicy.CREATE_NULL_AS_BLANK)));
+	            icrxTemp.setEtcPostStatus(commonUtil.getStringFormatCell(currentRow.getCell(23,MissingCellPolicy.CREATE_NULL_AS_BLANK)));
+	            icrxTemp.setEtcPostPlan(commonUtil.getStringFormatCell(currentRow.getCell(24,MissingCellPolicy.CREATE_NULL_AS_BLANK)));
+	            icrxTemp.setEtcDebitCredit(commonUtil.getStringFormatCell(currentRow.getCell(25,MissingCellPolicy.CREATE_NULL_AS_BLANK)));
+	            icrxTemp.setEtcTollAmount(commonUtil.getStringFormatCell(currentRow.getCell(26,MissingCellPolicy.CREATE_NULL_AS_BLANK)));
+	            icrxTemp.setEtcDupSerialNum(commonUtil.getStringFormatCell(currentRow.getCell(27,MissingCellPolicy.CREATE_NULL_AS_BLANK)));
+	            /* int cellIdx = 0;
 	            while (cellsInRow.hasNext()) {
 	              Cell currentCell = cellsInRow.next();
 	              switch (cellIdx) {
 	              case 0:
-	            	icrxTemp.setIctxFileNum(String.valueOf(commonUtil.getStringFormatCell(currentCell)));
+	            	icrxTemp.setIctxFileNum(commonUtil.getStringFormatCell(currentCell));
 	           	   System.out.println("case 0::"+icrxTemp.getIctxFileNum());
 	                break;
 	              case 1:
-	            	  icrxTemp.setEtcTrxSerialNo(String.valueOf(commonUtil.getStringFormatCell(currentCell)));
+	            	  icrxTemp.setEtcTrxSerialNo(commonUtil.getStringFormatCell(currentCell));
 	                  System.out.println("case 1::"+icrxTemp.getEtcTrxSerialNo());
 	                break;
-	              case 2:
-	            	  icrxTemp.setEtcDebitCredit(commonUtil.getStringFormatCell(currentCell));
-	                  System.out.println("case 2::"+icrxTemp.getEtcDebitCredit());
+	              case 23:
+	            	  icrxTemp.setEtcPostStatus(commonUtil.getStringFormatCell(currentCell));
+	                  System.out.println("case 23 getEtcPostStatus::"+icrxTemp.getEtcPostStatus());
 	                break;
-	              case 3:
+	              case 24:
+	            	  icrxTemp.setEtcPostPlan(commonUtil.getStringFormatCell(currentCell));
+	                  System.out.println("case 24 getEtcPostPlan::"+icrxTemp.getEtcPostPlan());
+	                break;
+	              case 25:
+	            	  icrxTemp.setEtcDebitCredit(commonUtil.getStringFormatCell(currentCell));
+	                  System.out.println("case 25 getEtcDebitCredit::"+icrxTemp.getEtcDebitCredit());
+	                break;
+	              case 26:
 	            	  icrxTemp.setEtcTollAmount(commonUtil.getStringFormatCell(currentCell));
-	                System.out.println("case 3::"+icrxTemp.getEtcTollAmount());
+	                System.out.println("case 26 getEtcTollAmount::"+icrxTemp.getEtcTollAmount());
+	                break;
+	              case 27:
+	            	  icrxTemp.setEtcDupSerialNum(commonUtil.getStringFormatCell(currentCell));
+	                System.out.println("case 27 getEtcDupSerialNum::"+icrxTemp.getEtcDupSerialNum());
 	                break;
 	              default:
 	           	 //  System.out.println("Default:: ********************");
@@ -164,7 +191,7 @@ public class ICRXFileGenerator {
 	              }
 	              cellIdx++;
 	             
-	            }
+	            } */
 	            icrxTemplateList.add(icrxTemp);
 	          }
 	         

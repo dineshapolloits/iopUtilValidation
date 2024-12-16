@@ -4,22 +4,16 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.Writer;
-import java.nio.file.Files;
-import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
 import org.apache.poi.ss.usermodel.Cell;
-import org.apache.poi.ss.usermodel.CellType;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Component;
 
@@ -31,7 +25,6 @@ import com.apolloits.util.modal.FileValidationParam;
 import com.apolloits.util.modal.Header;
 import com.apolloits.util.modal.ICTX;
 import com.apolloits.util.modal.ICTXTemplate;
-import com.apolloits.util.reader.AgencyDataExcelReader;
 import com.apolloits.util.utility.CommonUtil;
 
 import lombok.extern.slf4j.Slf4j;
@@ -142,6 +135,7 @@ public class ICTXFileGenerator {
 		} catch (Exception e) {
 			validateParam.setResponseMsg("File not generated Please check input excel data");
 			e.printStackTrace();
+			return ictxTemplateList = new ArrayList<>();
 		}
 
 		return ictxTemplateList;

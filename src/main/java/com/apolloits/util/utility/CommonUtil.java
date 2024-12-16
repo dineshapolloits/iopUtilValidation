@@ -903,7 +903,7 @@ private static AgencyDataExcelReader appConfig;
 		value = String.valueOf((int)cell.getNumericCellValue());
 		break; 
 		case BLANK:    //field that represents number cell type  
-			log.debug("Blank ");  
+			log.info("Blank ");  
 			break;
 		default:  
 		}  

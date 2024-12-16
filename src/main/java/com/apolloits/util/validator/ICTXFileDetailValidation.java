@@ -161,7 +161,7 @@ public boolean ictxValidation(FileValidationParam validateParam) throws IOExcept
 						// generate ICTXTemplate format excel file.
 						log.info("ictxTempList size ::" + ictxTempList.size());
 						if (controller.getErrorMsglist().size() == 0) {
-							String ictxTempExcelFileName =validateParam.getOutputFilePath()+File.separator+FilenameUtils.removeExtension(fileName)+"_ICTXTemplate.xls";
+							String ictxTempExcelFileName =validateParam.getOutputFilePath()+File.separator+FilenameUtils.removeExtension(fileName)+"_ICTXTemplate.xlsx";
 							ictxtempExcel.createIctxTemplateExcel(ictxTempList, ictxTempExcelFileName, validateParam);
 						}
 					}

@@ -7,7 +7,9 @@ public class ICRXTemplate {
 
 	private String ictxFileNum;
 	private String etcTrxSerialNo;
+	private String etcPostPlan;
 	private String etcPostStatus;
 	private String etcDebitCredit;
 	private String etcTollAmount;
+	private String etcDupSerialNum;
 }

@@ -41,34 +41,41 @@
 			</p> -->
 			
 			<p><b>From Agency Code</b>
-							<select th:field="*{fromAgency}" class="form-control mb-4 col-4">
-							     <option value="NONE">----Select Agency Code----</option>
+							<select th:field="*{fromAgency}" class="form-control mb-4 col-4" id ="fromAgencyCode">
+							     <option value="NONE">----Select From Agency Code----</option>
 							     <option th:each="entry : ${homeAgencyMap.entrySet()}" th:value="${entry.key}" th:text="${entry.value}">
 							     </option>
 							  </select>
-						</p> 
-			<div id="toAgencyCode">
+						</p>
+						<p><b>From Agency Code</b>
+													<select th:field="*{toAgency}" class="form-control mb-4 col-4" id ="toAgencyCode">
+													     <option value="NONE">----Select To Agency Code----</option>
+													     <option th:each="entry : ${homeAgencyMap.entrySet()}" th:value="${entry.key}" th:text="${entry.value}">
+													     </option>
+													  </select>
+												</p>  
+		<!--	<div id="toAgencyCode">
 			<p><b>To Agency Code</b>
 							<input type="text" th:field="*{toAgency}" placeholder="From agency code" class="form-control mb-4 col-4" minlength="4" maxlength="4">
 						</p>
-						</div>			
+						</div>	-->		
 			<!-- <p><b>File Record Count</b>
 				<input type="number" th:field="*{recordCount}" placeholder="Total Record Count" class="form-control mb-4 col-4"  min="1" max="9999999999">
 			</p> -->
 			 <p><b>File Date</b>
 							 <div class='input-group date mb-4 col-4' id='datepicker' >
-							           <input type='text' class="form-control " th:field="*{fileDate}" />
+							           <input type='text' class="form-control " th:field="*{fileDate}" id="fileDate" required/>
 							           <span class="input-group-addon">
 							             <span class="glyphicon glyphicon-calendar"></span>
 							           </span>
 							         </div>
 						</p> 
 			<p><b>File Generation Path</b>
-				<input type="text" th:field="*{outputFilePath}" placeholder="File Generation Path" class="form-control mb-4 col-4">
+				<input type="text" th:field="*{outputFilePath}" id="fileGenPath" placeholder="File Generation Path" class="form-control mb-4 col-4" required>
 			</p>
 			<div id="inputFilePath">
 			<p><b>Input File Path</b>
-							<input type="text" th:field="*{inputFilePath}" placeholder="Input data file Path" class="form-control mb-4 col-4">
+							<input type="text" th:field="*{inputFilePath}" id="inputFilePathTxt" placeholder="Input data file Path" class="form-control mb-4 col-4">
 						</p>
 			</div>		
 			<button type="submit" class="btn btn-info col-2">Generate</button>
@@ -76,7 +83,7 @@
 
 		<hr>
 		<!-- <p th:text="|Result :: ${now}!|" /> -->
-		<p><b>Result: </b><label th:text="${result}"></label></p>
+		<p><b>Result: </b><label th:text="${result}" id="resultlbl"></label></p>
 		<a th:href="@{/AgencyList}"> Back to Agency Configuration</a>
 	</div>
 	
@@ -116,8 +123,19 @@
 		                toAgencyCodeDiv.hide();
 						inputFilePathDiv.hide();
 		            }
+					customReset();
 		        });
 		    });
+			
+			function customReset()
+			{
+			    document.getElementById("fromAgencyCode").value = "NONE";
+			    document.getElementById("toAgencyCode").value = "NONE";
+				document.getElementById("fileGenPath").value = "";
+				document.getElementById("inputFilePathTxt").value = "";
+				document.getElementById("fileDate").value = new Date().toISOString().slice(0, 10);
+				document.getElementById("resultlbl").innerHTML="";
+			}
 		</script>
 </body>
 </html>

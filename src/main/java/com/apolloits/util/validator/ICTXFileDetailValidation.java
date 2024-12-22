@@ -140,7 +140,7 @@ public boolean ictxValidation(FileValidationParam validateParam) throws IOExcept
 							ictxFileNum = fileRowData.substring(48, 60); //ICTX file sequence no for ictxTemplate excel creation
 							ictxTempList = new LinkedList<ICTXTemplate>();
 						}else {
-							if(!validateIctxDetail(fileRowData,validateParam,fileName,noOfRecords)) {
+							if(!validateIctxDetail(fileRowData,validateParam,noOfRecords)) {
 								//validateParam.setResponseMsg(validateParam.getResponseMsg() +"\t    Line No::"+noOfRecords);
 								iagAckMapper.mapToIagAckFile(fileName, "02", validateParam.getOutputFilePath()+"\\"+ackFileName, fileName.substring(0, 4),validateParam.getToAgency());
 								return false;
@@ -217,8 +217,7 @@ private void addICTXTemplate(String fileRowData, String ictxFileNum) {
 	}
 }
 
-private boolean validateIctxDetail(String fileRowData, FileValidationParam validateParam, String fileName,
-		long rowNo) {
+public boolean validateIctxDetail(String fileRowData, FileValidationParam validateParam, long rowNo) {
 	
 	String lineNo = "\t Row ::"+fileRowData +"\t Line No::"+rowNo;
 	// If detail record length is not matched. not validating other fields 

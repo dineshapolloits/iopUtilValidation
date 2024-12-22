@@ -19,6 +19,7 @@ public class IAGConstants {
     public static final String ACK_FILE_EXTENSION = ".ACK";
     public static final String ICTX_FILE_EXTENSION= ".ICTX";
     public static final String ICRX_FILE_EXTENSION= ".ICRX";
+    public static final String ITXC_FILE_EXTENSION = ".ITXC";
 
     public static final String BTVL_HOME_AGENCY_ID = "0041";
     public static final String XFER_STATUS_SUCCESS = "S";
@@ -77,7 +78,5 @@ public class IAGConstants {
     public static final String HEADER_RECORD_TYPE ="Header";
     public static final String DETAIL_RECORD_TYPE ="Deatil";
     public static final String FILE_RECORD_TYPE ="File";
-    		
-    		
     
 }

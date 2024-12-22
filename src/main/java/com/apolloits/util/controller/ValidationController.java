@@ -22,6 +22,7 @@ import com.apolloits.util.generate.ICLPFileGenerator;
 import com.apolloits.util.generate.ICRXFileGenerator;
 import com.apolloits.util.generate.ICTXFileGenerator;
 import com.apolloits.util.generate.ITAGFileGenerator;
+import com.apolloits.util.generate.ITXCFileGenerator;
 import com.apolloits.util.modal.AgencyEntity;
 import com.apolloits.util.modal.ErrorMsgDetail;
 import com.apolloits.util.modal.FileValidationParam;
@@ -33,6 +34,7 @@ import com.apolloits.util.validator.ICLPFileDetailValidation;
 import com.apolloits.util.validator.ICRXFileDetailValidation;
 import com.apolloits.util.validator.ICTXFileDetailValidation;
 import com.apolloits.util.validator.ITAGFileDetailValidation;
+import com.apolloits.util.validator.ITXCFileDetailValidation;
 import com.apolloits.util.writer.ExceptionListExcelWriter;
 
 import lombok.Getter;
@@ -63,6 +65,9 @@ public class ValidationController {
 	ICRXFileDetailValidation icrxValidation;
 	
 	@Autowired
+	ITXCFileDetailValidation itxcValidation;
+	
+	@Autowired
 	ITAGFileGenerator itagGen;
 	
 	@Autowired
@@ -73,6 +78,9 @@ public class ValidationController {
 	
 	@Autowired
 	ICRXFileGenerator icrxGen;
+	
+	@Autowired
+	ITXCFileGenerator itxcGen;
 	
 	List<ErrorMsgDetail> errorMsglist;
 	
@@ -114,7 +122,7 @@ public class ValidationController {
 		errorMsglist = new ArrayList<>();
 		log.info("ValidateFile ::"+validateParam.toString());
 		boolean fileValidation = false ;
-		validateParam.setResponseMsg("Contact Administrator");
+		validateParam.setResponseMsg("\t Contact Administrator");
 			cscIdTagAgencyMap =  dbLog.getCSCIdbyAgencyMap(validateParam.getFromAgency());
 			if(validateParam.getFileType().equals(IAGConstants.ITAG_FILE_TYPE)) {
 			fileValidation = fdValidation.itagValidation(validateParam);
@@ -126,6 +134,9 @@ public class ValidationController {
 			}else if (validateParam.getFileType().equals(IAGConstants.ICRX_FILE_TYPE)) {
 				log.info("Inside ICRX validation started");
 				fileValidation = icrxValidation.icrxValidation(validateParam);
+			}else if (validateParam.getFileType().equals(IAGConstants.ITXC_FILE_TYPE)) {
+				log.info("Inside ITXC validation started");
+				fileValidation = itxcValidation.itxcValidation(validateParam);
 			}
 			log.info("getResponseMsg ::"+validateParam.getResponseMsg() +"\t fileValidation ::"+fileValidation);
 			if(!fileValidation || errorMsglist.size()>0) {
@@ -186,6 +197,9 @@ public class ValidationController {
 				fileValidation = ictxGen.ictxGen(validateParam);
 			}else if(validateParam.getFileType().equals(IAGConstants.ICRX_FILE_TYPE)) {
 				fileValidation = icrxGen.icrxGen(validateParam,IAGConstants.ICRX_FILE_TYPE);
+			}else if(validateParam.getFileType().equals(IAGConstants.ITXC_FILE_TYPE)) {
+				log.info("ITXC Generation started");
+				fileValidation = itxcGen.itxcGen(validateParam,IAGConstants.ITXC_FILE_TYPE);
 			}
 				log.info("getResponseMsg ::"+validateParam.getResponseMsg() +"\t fileValidation ::"+fileValidation);
 				log.info("fileValidation.getFileDate ::"+validateParam.getFileDate());

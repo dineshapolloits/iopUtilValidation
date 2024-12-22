@@ -138,13 +138,6 @@ public class ICRXFileGenerator {
 	              rowNumber++;
 	              continue;
 	            }
-	            Iterator<Cell> cellsInRow = currentRow.iterator();
-	            Cell cell = currentRow.getCell(24,MissingCellPolicy.CREATE_NULL_AS_BLANK);
-	            if(cell  == null ) {
-	            	log.info("Null ***************");
-	            }else {
-	            	log.info("Else ::"+commonUtil.getStringFormatCell(cell));
-	            }
 	            ICRXTemplate icrxTemp = new ICRXTemplate();
 	            icrxTemp.setIctxFileNum(commonUtil.getStringFormatCell(currentRow.getCell(0,MissingCellPolicy.CREATE_NULL_AS_BLANK)));
 	            icrxTemp.setEtcTrxSerialNo(commonUtil.getStringFormatCell(currentRow.getCell(1,MissingCellPolicy.CREATE_NULL_AS_BLANK)));

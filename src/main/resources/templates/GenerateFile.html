@@ -34,6 +34,7 @@
 				<option th:value="ITAGandICLP" th:text="ITAG-ICLP"></option>
 				<option th:value="ICTX" th:text="ICTX"></option>
 				<option th:value="ICRX" th:text="ICRX"></option>
+				<option th:value="ITXC" th:text="ITXC"></option>
 			</select>
 			</p>
 			<!-- <p><b>From Agency Code</b>
@@ -107,14 +108,16 @@
 				const inputFilePathDiv = $('#inputFilePath');
 				console.log("advertTypeSelect.val onload :: ",advertTypeSelect.val());
 		        // hide the div initially
-				if((advertTypeSelect.val() !== 'ICTX') && (advertTypeSelect.val() !== 'ICRX')){
+				if((advertTypeSelect.val() !== 'ICTX') && (advertTypeSelect.val() !== 'ICRX')
+				 && (advertTypeSelect.val() !== 'ITXC')){
 					console.log("advertTypeSelect.val :: ",advertTypeSelect.val());
 		        toAgencyCodeDiv.hide();
 				inputFilePathDiv.hide();
 				}
 		        // add change event listener to the advertType dropdown
 		        advertTypeSelect.change(function() {
-		            if ($(this).val() === 'ICTX' || $(this).val() === 'ICRX' ) {
+		            if ($(this).val() === 'ICTX' || $(this).val() === 'ICRX' 
+					|| $(this).val() === 'ITXC') {
 		                // show the div if ONAIR is selected $(this).val() === 'ICTX'
 		                toAgencyCodeDiv.show();
 						inputFilePathDiv.show();

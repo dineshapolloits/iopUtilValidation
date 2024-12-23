@@ -37,6 +37,8 @@ import com.apolloits.util.validator.ITAGFileDetailValidation;
 import com.apolloits.util.validator.ITXCFileDetailValidation;
 import com.apolloits.util.writer.ExceptionListExcelWriter;
 
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpSession;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
@@ -94,7 +96,11 @@ public class ValidationController {
 	String password;
 	
 	@GetMapping("/AgencyList")
-	public String greeting(@RequestParam(name="name", required=false, defaultValue="World") String name, Model model) {
+	public String greeting(@RequestParam(name="name", required=false, defaultValue="World") String name, Model model,HttpSession session) {
+		
+		if(session.getAttribute("MySession") == null) {
+			return "redirect:/Logout";
+		}
 		model.addAttribute("name", name);
 		log.info("Welcome to ValidationController name:: "+name);
 		//List<AgencyEntity> agList= AgencyDataExcelReader.excelToStuList();
@@ -108,7 +114,12 @@ public class ValidationController {
 	}
 	
 	@GetMapping("/Validate")
-    public String Validate(Model model) {
+    public String Validate(Model model,HttpSession session) {
+		
+		if(session.getAttribute("MySession") == null) {
+			return "redirect:/Logout";
+		}
+		
 		FileValidationParam fileValidationParam = new FileValidationParam();
         model.addAttribute("fileValidationParam", fileValidationParam);
         //get Map from DB
@@ -161,7 +172,12 @@ public class ValidationController {
     }
 	
 	@GetMapping("/Generate")
-    public String Generate(Model model) {
+    public String Generate(Model model,HttpSession session) {
+		
+		if(session.getAttribute("MySession") == null) {
+			return "redirect:/Logout";
+		}
+		
 		FileValidationParam fileValidationParam = new FileValidationParam();
 		fileValidationParam.setFileDate(CommonUtil.getCurrentDateAndTime());
         model.addAttribute("fileValidationParam", fileValidationParam);
@@ -230,11 +246,12 @@ public class ValidationController {
     }
 	
 	@PostMapping("/loginValidation")
-	public String loginValidation(@ModelAttribute("loginParam") LoginParam loginParam, Model model) {
+	public String loginValidation(@ModelAttribute("loginParam") LoginParam loginParam, Model model,HttpServletRequest request) {
 
 		log.info("UserName ::" + loginParam.getUsername() + "\t Password ::" + loginParam.getPassword());
 		log.info("Property file :: userName ::" + userName + "\t Password ::" + password);
 		if (loginParam.getUsername().equals(userName) && loginParam.getPassword().equals(password)) {
+			request.getSession().setAttribute("MySession"," valid");
 			return "HubList";
 		} else {
 			log.error("Login Failed");
@@ -246,17 +263,21 @@ public class ValidationController {
 	}
 	
 	@GetMapping("/hubList")
-    public String hubList(Model model) {
+    public String hubList(Model model,HttpSession session) {
+		if(session.getAttribute("MySession") == null) {
+			return "redirect:/Logout";
+		}
 	//	FileValidationParam fileValidationParam = new FileValidationParam();
         return "HubList";
     }
 	
 	@GetMapping("/Logout")
-    public String logout(Model model) {
+    public String logout(Model model,HttpServletRequest request) {
 	//	FileValidationParam fileValidationParam = new FileValidationParam();
 		LoginParam loginParam = new LoginParam();
 		model.addAttribute("loginParam", loginParam);
 		model.addAttribute("result", "Logout successfully.");
+		request.getSession().invalidate(); 
         return "LoginPage";
     }
 

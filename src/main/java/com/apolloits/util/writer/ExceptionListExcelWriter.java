@@ -56,7 +56,7 @@ public class ExceptionListExcelWriter {
 	        dataRow.createCell(0).setCellValue(dataRowIndex);
 	        dataRow.createCell(1).setCellValue(errmsg.getFileType());
 	        dataRow.createCell(2).setCellValue(errmsg.getFieldName());
-	        dataRow.createCell(3).setCellValue(errmsg.getErrorMsg());
+	        dataRow.createCell(3).setCellValue(errmsg.getErrorMsg().replaceAll("(<b>|</b>)", ""));
 	        dataRowIndex++;
 	    }
 

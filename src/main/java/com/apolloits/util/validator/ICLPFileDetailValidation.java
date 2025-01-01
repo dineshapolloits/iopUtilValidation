@@ -227,7 +227,7 @@ public class ICLPFileDetailValidation {
 		String licGuaranteed ="";
 		String licRegDate="";
 		String licUpdateDate = "";
-		String lineNo = "\t Line No::"+rowNo;
+		String lineNo = "\t <b>Line No::</b> \t "+rowNo;
 		if(fileRowData == null ||  fileRowData.length() != 208) {
 			log.error("Detail record invalid length ::"+fileRowData);
 			controller.getErrorMsglist().add(new ErrorMsgDetail(DETAIL_RECORD_TYPE,"Invalid Length","Detail record invalid length ::"+fileRowData +lineNo));

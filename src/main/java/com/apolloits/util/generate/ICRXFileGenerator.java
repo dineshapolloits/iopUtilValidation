@@ -8,7 +8,6 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
-import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Row.MissingCellPolicy;
 import org.apache.poi.ss.usermodel.Sheet;
@@ -18,7 +17,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Component;
 
-import com.apolloits.util.IAGConstants;
 import com.apolloits.util.IopTranslatorException;
 import com.apolloits.util.controller.ValidationController;
 import com.apolloits.util.modal.AgencyEntity;
@@ -26,8 +24,6 @@ import com.apolloits.util.modal.FileValidationParam;
 import com.apolloits.util.modal.Header;
 import com.apolloits.util.modal.ICRX;
 import com.apolloits.util.modal.ICRXTemplate;
-import com.apolloits.util.modal.ICTX;
-import com.apolloits.util.modal.ICTXTemplate;
 import com.apolloits.util.utility.CommonUtil;
 
 import lombok.extern.slf4j.Slf4j;
@@ -56,7 +52,7 @@ public class ICRXFileGenerator {
 		
 		icrxTemplateList = getICRXTemplateExcel(validateParam);
 		String Header = getICRXHeader(validateParam,icrxTemplateList);
-		log.info("ICTX Header :: " + Header);
+		log.info("ICRX Header :: " + Header);
 		
 		writeDetails(validateParam,Header,icrxTemplateList);
 		String filePath = validateParam.getOutputFilePath() + File.separator + filename;
@@ -64,7 +60,7 @@ public class ICRXFileGenerator {
 		log.info("ICRX ZIP file name :: "+zipFilename);
 		validateParam.setResponseMsg("ICRX File created ::\t "+zipFilename);
 		
-		return false;
+		return true;
 	}
 	
 	private void writeDetails(FileValidationParam validateParam, String header,List<ICRXTemplate> icrxTempList)

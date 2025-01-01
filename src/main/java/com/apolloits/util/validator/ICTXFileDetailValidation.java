@@ -219,7 +219,7 @@ private void addICTXTemplate(String fileRowData, String ictxFileNum) {
 
 public boolean validateIctxDetail(String fileRowData, FileValidationParam validateParam, long rowNo) {
 	
-	String lineNo = "\t Row ::"+fileRowData +"\t Line No::"+rowNo;
+	String lineNo = "\t <b>Row ::</b>"+fileRowData +"\t <b>Line No::</b>"+rowNo;
 	// If detail record length is not matched. not validating other fields 
     if (fileRowData == null || fileRowData.length() != 201) {
         addErrorMsg(DETAIL_RECORD_TYPE,"Detail Length","Record length is not match with ICTX length 201 ::\t "+lineNo);

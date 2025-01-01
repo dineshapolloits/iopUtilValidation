@@ -33,6 +33,8 @@
 				<option th:value="ICTX" th:text="ICTX"></option>
 				<option th:value="ICRX" th:text="ICRX"></option>
 				<option th:value="ITXC" th:text="ITXC"></option>
+				<option th:value="IRXC" th:text="IRXC"></option>
+				<option th:value="ACK" th:text="ACK"></option>
 			</select>
 			</p>
 			<p class="col-md-6">	<b>Validate Type</b>		<select th:field="*{validateType}" class="form-control">
@@ -42,12 +44,19 @@
 						</select>
 						</p>
 						</div>
-		<div class="row">				
+		<div class="row">	
 			<p class="col-md-6"><b>From Agency Code</b>
+							<select th:field="*{fromAgency}" class="form-control">
+							     <option value="NONE">----Select Agency Code----</option>
+							     <option th:each="entry : ${homeAgencyMap.entrySet()}" th:value="${entry.key}" th:text="${entry.value}">
+							     </option>
+							  </select>
+						</p> 			
+		<!--	<p class="col-md-6"><b>From Agency Code</b>
 				<input type="text" th:field="*{fromAgency}" placeholder="From agency code" class="form-control " minlength="4" maxlength="4">
 			</p>
 			
-			<!--<p class="col-md-6"><b>To Agency Code</b>
+			<p class="col-md-6"><b>To Agency Code</b>
 							<input type="text" th:field="*{toAgency}" placeholder="From agency code" class="form-control " minlength="4" maxlength="4">
 						</p>  -->
 		 	<p class="col-md-6"><b>To Agency Code</b>
@@ -91,7 +100,7 @@
 		        <td th:text="${iterStat.index+1}"></td>
 				<td th:text="${error.fileType}"></td>
 		        <td th:text="${error.fieldName}"></td>
-		        <td th:text="${error.errorMsg}"></td>
+		        <td th:utext="${error.errorMsg}"></td>
 		      </tr>
 		    </tbody>
 		  </table>

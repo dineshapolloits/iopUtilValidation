@@ -823,7 +823,7 @@ private static AgencyDataExcelReader appConfig;
 				}
 
 			}
-			controller.getErrorMsglist().add(new ErrorMsgDetail(FILE_RECORD_TYPE,"File","Zip file Name Validation Failed :: {FROM_AGENCY_ID}_{TO_AGENCY_ID}_YYYYMMDDHHMMSS.ICTX \t ::"+zipFileName));
+			controller.getErrorMsglist().add(new ErrorMsgDetail(FILE_RECORD_TYPE,"File","Zip file Name Validation Failed :: {FROM_AGENCY_ID}_{TO_AGENCY_ID}_YYYYMMDDHHMMSS."+fileType+" \t ::"+zipFileName));
 		}else {
 		controller.getErrorMsglist().add(new ErrorMsgDetail(FILE_RECORD_TYPE,"File","Zip file Name invalid length :: file lenght should be 33 \t ::"+zipFileName));
 		}

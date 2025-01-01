@@ -217,7 +217,7 @@ private void addITXCTemplate(String fileRowData, String ictxFileNum,String corrR
 
 private boolean validateItxcDetail(String fileRowData, FileValidationParam validateParam,
 		long rowNo) {
-	String lineNo = "\t Row ::"+fileRowData +"\t Line No::"+rowNo;
+	String lineNo = "\t <b> Row ::</b>"+fileRowData +"\t <b>Line No::<b> \t"+rowNo;
 	
 	// Record count 204
     if (fileRowData == null || fileRowData.length() != 203) {

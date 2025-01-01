@@ -229,7 +229,7 @@ public class ITAGFileDetailValidation {
 		String tagType="";
 		String tagMount="";
 		String tagClass ="";
-		String lineNo = "\t Line No::"+rowNo;
+		String lineNo = "\t <b>Line No::</b>"+rowNo;
 		
 		if(fileRowData == null ||  fileRowData.length() != 85) {
 			log.info("Detail record invalid length ::"+fileRowData);

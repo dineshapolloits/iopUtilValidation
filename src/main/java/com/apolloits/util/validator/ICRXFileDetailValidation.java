@@ -173,10 +173,10 @@ public class ICRXFileDetailValidation {
 
 private boolean validateIcrxDetail(String fileRowData, FileValidationParam validateParam, String fileName,
 		long rowNo) {
-	String lineNo = "\t Row ::"+fileRowData +"\t Line No::"+rowNo;
+	String lineNo = "\t <b>Row ::"+fileRowData +"\t Line No::</b>"+rowNo;
 	
 	if (fileRowData == null || fileRowData.length() != 59) {
-		 addErrorMsg(DETAIL_RECORD_TYPE,"Detail Length","Record length is not match with ICTX length 201 ::\t "+lineNo);
+		 addErrorMsg(DETAIL_RECORD_TYPE,"Detail Length","Record length is not match with ICRX length 201 ::\t "+lineNo);
 	        return false;
     }
 	

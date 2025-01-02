@@ -4,6 +4,8 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.regex.Pattern;
 
 import org.apache.commons.io.FilenameUtils;
@@ -39,8 +41,11 @@ public class ITAGFileDetailValidation {
 	@Lazy
 	ValidationController controller;
 	
+	int invalidRecordCount = 0;
+	
 	public boolean itagValidation(FileValidationParam validateParam) throws IOException {
 		//iagAckMapper = new IagAckFileMapper();
+		invalidRecordCount = 0;
 		 File inputItagZipFile = new File(validateParam.getInputFilePath());
 		 String ackFileName = null;
 		 if (!inputItagZipFile.exists()) {
@@ -127,16 +132,18 @@ public class ITAGFileDetailValidation {
 							iagAckMapper.mapToIagAckFile(fileName, "01", validateParam.getOutputFilePath()+"\\"+ackFileName, fileName.substring(0, 4),validateParam.getToAgency());
 							return false;
 						}
+						
+						 //validate Duplicate serial no
+							validateDuplicateTagSerialNo(zipFile.getFile().getParent()+"\\"+fileName,validateParam);
 						if(controller.getErrorMsglist().size()>0) {
-							validateParam.setResponseMsg("\t \t ACK file name ::"+ackFileName);
+							validateParam.setResponseMsg("\t \t <b>ACK file name ::</b> \t "+ackFileName +"\t <b> Invalid record count ::</b> \t "+invalidRecordCount);
 							iagAckMapper.mapToIagAckFile(fileName, "02", validateParam.getOutputFilePath()+"\\"+ackFileName, fileName.substring(0, 4),validateParam.getToAgency());
 						}
 					} catch (IOException e) {
 						e.printStackTrace();
-						// Display pop up message if exceptionn occurs
-						System.out.println("Error while reading a file.");
+						// Display pop up message if exception occurs
+						log.error("Error while reading a file.");
 					}
-        	            
         			 
         		 }else {
         			 iagAckMapper.mapToIagAckFile(fileName, "07", validateParam.getOutputFilePath()+"\\"+ackFileName, fileName.substring(0, 4),validateParam.getToAgency());
@@ -156,6 +163,44 @@ public class ITAGFileDetailValidation {
          }
 	}
 	
+	private void validateDuplicateTagSerialNo(String filePath, FileValidationParam validateParam) {
+
+		HashSet<String> tagSet=new HashSet<>();
+		HashMap<String, Integer> duplicateTagMap= new HashMap<>();
+		long noOfRecords = 0;
+		try (BufferedReader br = new BufferedReader(
+				new FileReader(filePath))) {
+
+			String fileRowData;
+			
+			while ((fileRowData = br.readLine()) != null) {
+				if (noOfRecords != 0) {
+
+					String tagAgencyCodeSerial = fileRowData.substring(0, 14);
+					if (!tagSet.add(tagAgencyCodeSerial)) {
+						if (duplicateTagMap.containsKey(tagAgencyCodeSerial)) {
+							duplicateTagMap.put(tagAgencyCodeSerial,
+									duplicateTagMap.get(tagAgencyCodeSerial).intValue() + 1);
+						} else {
+							duplicateTagMap.put(tagAgencyCodeSerial, 1);
+						}
+						invalidRecordCount++;
+					}
+				}
+				noOfRecords++;
+			}
+			log.info("Duplicate tag Serial No Map ::"+duplicateTagMap);
+			log.info("set size :::"+tagSet.size());
+			log.info("Invalid record count ::"+invalidRecordCount);
+			if(duplicateTagMap.size()>0) {
+			 addErrorMsg(DETAIL_RECORD_TYPE,"Duplicate Tag","<b>tag Serial No :: </b>"+duplicateTagMap);
+			}
+		}catch (Exception e) {
+			log.error("Duplicate serial no logic error ::"+e.getMessage());
+			e.printStackTrace();
+		}
+	}
+
 	public boolean validateItagHeader(String headervalue,FileValidationParam validateParam,String fileName) {
 		log.info("headervalue :: "+headervalue);
 		 String fileDate = fileName.substring(5, 13);
@@ -230,12 +275,13 @@ public class ITAGFileDetailValidation {
 		String tagMount="";
 		String tagClass ="";
 		String lineNo = "\t <b>Line No::</b>"+rowNo;
-		
+		boolean invalidRecord = false;
 		if(fileRowData == null ||  fileRowData.length() != 85) {
 			log.info("Detail record invalid length ::"+fileRowData);
 			//validateParam.setResponseMsg("Detail record invalid length ::"+fileRowData);
 			addErrorMsg(DETAIL_RECORD_TYPE,"DetailRecord","Invalid length ::"+fileRowData +lineNo);
 			//return false;
+			invalidRecord=true;
 		}else {
 		
 		try {
@@ -273,14 +319,14 @@ public class ITAGFileDetailValidation {
         	//validateParam.setResponseMsg("Invalid ITAG detail, invalid tag agency ID - "+tagAgencyId +" Row ::"+fileRowData);
         	log.error("Invalid ITAG detail, invalid tag agency ID - "+tagAgencyId +" Row ::"+fileRowData);
         	addErrorMsg(DETAIL_RECORD_TYPE,"Tag agency ID","Invalid tag agency ID - "+tagAgencyId +" Row ::"+fileRowData +lineNo);
-        	//return false;
+        	invalidRecord=true;
         }
          pattern = Pattern.compile(IAGConstants.ITAG_DTL_TAG_SERIAL_NO);
         if (!pattern.matcher(tagSerialNo).matches()) { //need to check start and end tag range from DB
         	validateParam.setResponseMsg("Invalid ITAG detail, invalid tag serial number - "+tagSerialNo +" Row ::"+fileRowData);
         	log.error("Invalid ITAG detail, invalid tag serial number - "+tagSerialNo +" Row ::"+fileRowData);
         	addErrorMsg(DETAIL_RECORD_TYPE,"Tag serial number","Invalid Tag serial number format-"+tagSerialNo +" Row ::"+fileRowData +lineNo);
-        	//return false;
+        	invalidRecord=true;
         }
         
 		try {
@@ -297,13 +343,13 @@ public class ITAGFileDetailValidation {
 			//	validateParam.setResponseMsg("Invalid TAG_SERIAL_NUMBER range   - " + tagSerialNo +" Row ::"+fileRowData);
 				log.error("Invalid TAG_SERIAL_NUMBER range   - " + tagSerialNo +" Row ::"+fileRowData);
 				addErrorMsg(DETAIL_RECORD_TYPE,"TAG_SERIAL_NUMBER", "Invalid TAG_SERIAL_NUMBER range   - " + tagSerialNo +" Row ::"+fileRowData+lineNo);
-				//return false;
+				invalidRecord=true;
 			}
 		} catch (Exception e) {
 			e.printStackTrace();
 			addErrorMsg(DETAIL_RECORD_TYPE,"TAG_SERIAL_NUMBER","Invalid Tag Agency ID for TAG_SERIAL_NUMBER  from excel or file  - " + fileRowData +"\t Line No::"+rowNo);
 			//validateParam.setResponseMsg("Invalid TAG_SERIAL_NUMBER format from excel or file  - " + fileRowData);
-			//return false;
+			invalidRecord=true;
 		}
 
          pattern = Pattern.compile(IAGConstants.ITAG_DTL_TAG_STATUS);
@@ -311,7 +357,7 @@ public class ITAGFileDetailValidation {
         	log.error("Invalid ITAG detail, invalid tag status - "+tagStatus +" Row ::"+fileRowData);
         	//validateParam.setResponseMsg("Invalid ITAG detail, invalid tag status - "+tagStatus +" Row ::"+fileRowData);
         	addErrorMsg(DETAIL_RECORD_TYPE,"tag status", "Invalid  status - "+ tagStatus +" Row ::"+fileRowData+lineNo);
-        	//return false;
+        	invalidRecord=true;
         }
 
          pattern = Pattern.compile(IAGConstants.ITAG_DTL_TAG_TYP);
@@ -319,7 +365,7 @@ public class ITAGFileDetailValidation {
         	log.error("Invalid ITAG detail, invalid tag type - "+tagAcTypeInd+" Row ::"+fileRowData);
         	addErrorMsg(DETAIL_RECORD_TYPE,"Tag Type", "invalid tag type - "+tagAcTypeInd+" Row ::"+fileRowData+lineNo);
         	//validateParam.setResponseMsg("Invalid ITAG detail, invalid tag type - "+tagAcTypeInd+" Row ::"+fileRowData);
-        	//return false;
+        	invalidRecord=true;
         }
 
          pattern = Pattern.compile(IAGConstants.ITAG_DTL_TAG_MOUNT);
@@ -327,9 +373,12 @@ public class ITAGFileDetailValidation {
         	log.error("Invalid ITAG detail, invalid tag mount - "+tagMount +" Row ::"+fileRowData);
         	addErrorMsg(DETAIL_RECORD_TYPE,"Tag Mount", "Invalid tag mount - "+tagMount +" Row ::"+fileRowData+lineNo);
         	//validateParam.setResponseMsg("Invalid ITAG detail, invalid tag mount - "+tagMount +" Row ::"+fileRowData);
-            //return false;
+        	invalidRecord=true;
         }
 	}
+		if(invalidRecord) {
+			invalidRecordCount++;
+		}
 		return true;
 	}
 	

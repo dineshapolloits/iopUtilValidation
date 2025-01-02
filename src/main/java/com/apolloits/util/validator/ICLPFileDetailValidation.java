@@ -46,8 +46,10 @@ public class ICLPFileDetailValidation {
 	@Lazy
 	ValidationController controller;
 	
+	int invalidRecordCount = 0;
+	
 	public boolean iclpValidation(FileValidationParam validateParam) throws IOException {
-		
+		invalidRecordCount = 0;
 		File inputItagZipFile = new File(validateParam.getInputFilePath());
 		 String ackFileName = null;
 		 if (!inputItagZipFile.exists()) {
@@ -125,7 +127,7 @@ public class ICLPFileDetailValidation {
 					return false;
 				}
 				if(controller.getErrorMsglist().size()>0) {
-					validateParam.setResponseMsg("\t \t ACK file name ::"+ackFileName);
+					validateParam.setResponseMsg(" \t <b>ACK file name ::</b> \t"+ackFileName +"\t <b> Invalid record count ::</b> \t "+invalidRecordCount);
 					iagAckMapper.mapToIagAckFile(fileName, "02", validateParam.getOutputFilePath()+"\\"+ackFileName, fileName.substring(0, 4),validateParam.getToAgency());
 				}
 			} catch (IOException e) {
@@ -213,7 +215,7 @@ public class ICLPFileDetailValidation {
 		return true;
 	}
 	public boolean validateIclpDetail(String fileRowData, FileValidationParam validateParam, String fileName,long rowNo) {
-
+		boolean invalidRecord = false;
 		String licState="";
 		String licNumber="";
 		String licType="";
@@ -232,6 +234,7 @@ public class ICLPFileDetailValidation {
 			log.error("Detail record invalid length ::"+fileRowData);
 			controller.getErrorMsglist().add(new ErrorMsgDetail(DETAIL_RECORD_TYPE,"Invalid Length","Detail record invalid length ::"+fileRowData +lineNo));
 			validateParam.setResponseMsg("Detail record invalid length ::"+fileRowData);
+			invalidRecord = true;
 			return false;
 		}
 		try {
@@ -267,26 +270,26 @@ public class ICLPFileDetailValidation {
 				log.info("Invalid ICLP detail, invalid state Format- "+licState +" Row ::"+fileRowData + lineNo);
 				//validateParam.setResponseMsg("Invalid ICLP detail, invalid Lic_state Format - "+licState +" Row ::"+fileRowData);
 				controller.getErrorMsglist().add(new ErrorMsgDetail(DETAIL_RECORD_TYPE,"Lic State","Invalid Lic_state Format - "+licState +" Row ::"+fileRowData+ lineNo));
-				//return false;
+				invalidRecord = true;
 			}
 			if (!agDataExcel.getPlateStateSet().contains(licState)) {
 				log.info("Invalid ICLP detail,Please check your State configuration - invalid state - "+licState +" Row ::"+fileRowData +lineNo);
 				//validateParam.setResponseMsg("Invalid ICLP detail,Please check your State configuration - invalid state - "+licState +" Row ::"+fileRowData +lineNo);
 				controller.getErrorMsglist().add(new ErrorMsgDetail(DETAIL_RECORD_TYPE,"Lic State","Invalid Lic_state  - "+licState +" Row ::"+fileRowData+ lineNo));
-				//return false;
+				invalidRecord = true;;
 			}
 			if(!licNumber.matches("^[A-Z \\d-.&]{10}$")) {
 				log.info("Invalid ICLP detail, invalid Lic_Number Format - "+licNumber +" Row ::"+fileRowData);
 				controller.getErrorMsglist().add(new ErrorMsgDetail(DETAIL_RECORD_TYPE,"Lic Number","Invalid Lic_Number Format - "+licNumber +" Row ::"+fileRowData+ lineNo));
 				//validateParam.setResponseMsg("Invalid ICLP detail, invalid Lic_Number Format - "+licNumber +" Row ::"+fileRowData);
-				//return false;
+				invalidRecord = true;
 			}
 			
 			if (!licType.matches("[A-Z \\d*]{30}")) {
 				log.info("Invalid ICLP detail, invalid Lic_Type Format - "+licNumber +" Row ::"+fileRowData);
 				//validateParam.setResponseMsg("Invalid ICLP detail, invalid Lic_Type Format - "+licNumber +" Row ::"+fileRowData);
 				controller.getErrorMsglist().add(new ErrorMsgDetail(DETAIL_RECORD_TYPE,"Lic Type","Invalid Lic_Type Format - "+licNumber +" Row ::"+fileRowData+ lineNo));
-				//return false;
+				invalidRecord = true;
 			}
 			
 			String licStateType =(licState.trim())+(licType.trim());
@@ -298,7 +301,7 @@ public class ICLPFileDetailValidation {
 				log.error("Invalid ICLP detail,Please check your State and plateType Configuration - invalid Lic_Type - "+licType +" Row ::"+fileRowData+ lineNo);
 				//validateParam.setResponseMsg("Invalid ICLP detail,Please check your State and plateType Configuration - invalid Lic_Type - "+licType +" Row ::"+fileRowData+ lineNo);
 				controller.getErrorMsglist().add(new ErrorMsgDetail(DETAIL_RECORD_TYPE,"LicStateType","Please check your State and plateType Configuration - invalid Lic_Type - "+licType +" Row ::"+fileRowData+ lineNo));
-				//return false;
+				invalidRecord = true;
 			}
 			//ValidationController.cscIdTagAgencyMap.forEach((tag, agency) -> 
 			//System.out.println("validateIclpDetail :: TagAgencyID: " + tag + ", Tag Start: " + agency.getTagSequenceStart() +"\t END ::"+agency.getTagSequenceEnd()));
@@ -308,14 +311,14 @@ public class ICLPFileDetailValidation {
 				log.info("Invalid ICLP detail, invalid TAG_AGENCY_ID - "+tagAgencyid +" Row ::"+fileRowData+ lineNo);
 				//validateParam.setResponseMsg("Invalid ICLP detail, invalid TAG_AGENCY_ID - "+tagAgencyid +" Row ::"+fileRowData);
 				controller.getErrorMsglist().add(new ErrorMsgDetail(DETAIL_RECORD_TYPE,"Tag Agency ID","Invalid TAG_AGENCY_ID - "+tagAgencyid +" Row ::"+fileRowData+ lineNo));
-				//return false;
+				invalidRecord = true;
 			}
 			
 			if (!tagSerialNo.matches("\\d{10}") ) { //we can move this if condition to below if
 				log.info("Invalid ICLP detail, invalid TAG_SERIAL_NUMBER Format - "+tagSerialNo +" Row ::"+fileRowData+lineNo);
 				//validateParam.setResponseMsg("Invalid ICLP detail, invalid TAG_SERIAL_NUMBER Format - "+tagSerialNo +" Row ::"+fileRowData);
 				controller.getErrorMsglist().add(new ErrorMsgDetail(DETAIL_RECORD_TYPE,"Tag Serial No","Invalid TAG_SERIAL_NUMBER Format - "+tagSerialNo +" Row ::"+fileRowData+ lineNo));
-				//return false;
+				invalidRecord = true;
 			}
 			
 		/*	try {
@@ -340,51 +343,53 @@ public class ICLPFileDetailValidation {
 				log.error("Invalid LIC_EFFECTIVE_FROM format   - " + licEffectiveFrom+" ROW ::" + fileRowData + lineNo);
 				controller.getErrorMsglist().add(new ErrorMsgDetail(DETAIL_RECORD_TYPE,"Lic Effective From","Invalid LIC_EFFECTIVE_FROM format   - " + licEffectiveFrom+" ROW ::" + fileRowData + lineNo));
 				//validateParam.setResponseMsg("Invalid TAG_SERIAL_NUMBER   - " + licEffectiveFrom+" ROW ::" + fileRowData);
-				//return false;
+				invalidRecord = true;
 			}
 			if(!isValidLicEffective(licEffectiveTo)) {
 				log.error("Invalid LIC_EFFECTIVE_TO format from excel or file  - " + licEffectiveTo+" ROW ::" + fileRowData+lineNo);
 				controller.getErrorMsglist().add(new ErrorMsgDetail(DETAIL_RECORD_TYPE,"Lic Effective To","Invalid LIC_EFFECTIVE_To format   - " + licEffectiveTo+" ROW ::" + fileRowData + lineNo));
 				//validateParam.setResponseMsg("Invalid LIC_EFFECTIVE_TO format  - " + licEffectiveTo+" ROW ::" + fileRowData);
-				//return false;
+				invalidRecord = true;
 			}
 			if (!licHomeAgency.matches("\\d{4}") || !AgencyDataExcelReader.agencyCode.contains(licHomeAgency)) {
 				log.error("Invalid LIC_HOME_AGENCY   - " + licHomeAgency+" ROW ::" + fileRowData+lineNo);
 				controller.getErrorMsglist().add(new ErrorMsgDetail(DETAIL_RECORD_TYPE,"Lic Home Agency ID","Invalid LIC_HOME_AGENCY   - " + licHomeAgency+" ROW ::" + fileRowData+lineNo));
 				//validateParam.setResponseMsg("Invalid LIC_HOME_AGENCY  - " + licHomeAgency+" ROW ::" + fileRowData);
-				//return false;
+				invalidRecord = true;
 			}
 			if (!licAccountNo.matches("[A-Z \\d*]{50}")) {
 				log.error("Invalid LIC_ACCOUNT_NO   - " + licAccountNo+" ROW ::" + fileRowData+lineNo);
 				controller.getErrorMsglist().add(new ErrorMsgDetail(DETAIL_RECORD_TYPE,"LIC_ACCOUNT_NO","Invalid LIC_ACCOUNT_NO   - " + licAccountNo+" ROW ::" + fileRowData+lineNo));
 				//validateParam.setResponseMsg("Invalid LIC_HOME_AGENCY  - " + licAccountNo+" ROW ::" + fileRowData);
-				//return false;
+				invalidRecord = true;
 			}
 			if (!LicVin.matches("[A-Z \\d*]{17}")) {
 				log.error("Invalid LIC_VIN   - " + LicVin+" ROW ::" + fileRowData+lineNo);
 				controller.getErrorMsglist().add(new ErrorMsgDetail(DETAIL_RECORD_TYPE,"LIC_VIN","Invalid LIC_VIN   - " + LicVin+" ROW ::" + fileRowData+lineNo));
 				//validateParam.setResponseMsg("Invalid LIC_VIN  - " + LicVin+" ROW ::" + fileRowData);
-				//return false;
+				invalidRecord = true;
 			}
 			if (!licGuaranteed.matches("[YN*]")) {
 				log.error("Invalid LIC_GUARANTEED   - " + licGuaranteed+" ROW ::" + fileRowData+lineNo);
 				controller.getErrorMsglist().add(new ErrorMsgDetail(DETAIL_RECORD_TYPE,"LIC_GUARANTEED","Invalid LIC_GUARANTEED   - " + licGuaranteed+" ROW ::" + fileRowData+lineNo));
 				//validateParam.setResponseMsg("Invalid LIC_GUARANTEED  - " + licGuaranteed+" ROW ::" + fileRowData);
-				//return false;
+				invalidRecord = true;
 			}
 			if (!licRegDate.matches("\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}Z") && !licRegDate.matches("\\*{20}")) {
 				log.error("Invalid LIC_REGISTRATION_DATE   - " +licRegDate +"\t Row ::" + fileRowData+lineNo);
 				controller.getErrorMsglist().add(new ErrorMsgDetail(DETAIL_RECORD_TYPE,"LIC_REGISTRATION_DATE","Invalid LIC_REGISTRATION_DATE   - " +licRegDate +"\t Row ::" + fileRowData+lineNo));
 				//validateParam.setResponseMsg("Invalid LIC_REGISTRATION_DATE  - "+licRegDate+" ROW ::" + fileRowData);
-				//return false;
+				invalidRecord = true;
 			}
 			if (!licUpdateDate.matches("\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}Z") && !licUpdateDate.matches("\\*{20}")) {
 				log.error("Invalid LIC_UPDATE_DATE   - " +licUpdateDate +"\t Row ::"+ fileRowData+lineNo);
 				controller.getErrorMsglist().add(new ErrorMsgDetail(DETAIL_RECORD_TYPE,"LIC_UPDATE_DATE","Invalid LIC_UPDATE_DATE   - " +licUpdateDate +"\t Row ::"+ fileRowData+lineNo));
 				//validateParam.setResponseMsg("Invalid LIC_UPDATE_DATE  - "+licUpdateDate+" ROW ::" + fileRowData);
-				//return false;
+				invalidRecord = true;
 			}
-	            
+	            if(invalidRecord) {
+	            	invalidRecordCount++;
+	            }
 			
 		}catch (Exception e) {
 			e.printStackTrace();

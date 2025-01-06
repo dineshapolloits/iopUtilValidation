@@ -69,7 +69,7 @@ public class ITAGFileDetailValidation {
         	 if(!AgencyDataExcelReader.agencyCode.contains(validateParam.getToAgency())) {
         		 log.error("To Agency code not match with file Name");
         		 //validateParam.setResponseMsg("From Agency code "+validateParam.getFromAgency()+" not match with file Name ::"+inputItagZipFile.getName());
-        		 controller.getErrorMsglist().add(new ErrorMsgDetail(FILE_RECORD_TYPE,"To Agency","To Agency code "+validateParam.getToAgency()+" not match with Configuration ::"));
+        		 controller.getErrorMsglist().add(new ErrorMsgDetail(FILE_RECORD_TYPE,"To Agency","To Agency code "+validateParam.getToAgency()+" not match with Configuration Tabel. Please check Agency Configuration"));
         		 return false;
         	 }
         	 
@@ -138,6 +138,9 @@ public class ITAGFileDetailValidation {
 						if(controller.getErrorMsglist().size()>0) {
 							validateParam.setResponseMsg("\t \t <b>ACK file name ::</b> \t "+ackFileName +"\t <b> Invalid record count ::</b> \t "+invalidRecordCount);
 							iagAckMapper.mapToIagAckFile(fileName, "02", validateParam.getOutputFilePath()+"\\"+ackFileName, fileName.substring(0, 4),validateParam.getToAgency());
+						}else {
+							log.info("Sucess ACK created");
+							iagAckMapper.mapToIagAckFile(fileName, "00", validateParam.getOutputFilePath()+"\\"+ackFileName, fileName.substring(0, 4),validateParam.getToAgency());
 						}
 					} catch (IOException e) {
 						e.printStackTrace();

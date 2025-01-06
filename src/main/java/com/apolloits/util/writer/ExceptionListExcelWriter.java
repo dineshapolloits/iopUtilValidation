@@ -1,5 +1,8 @@
 package com.apolloits.util.writer;
 
+import static com.apolloits.util.IAGConstants.FILE_RECORD_TYPE;
+
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.List;
@@ -11,8 +14,11 @@ import org.apache.poi.hssf.usermodel.HSSFRow;
 import org.apache.poi.hssf.usermodel.HSSFSheet;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.apache.poi.xssf.usermodel.XSSFFont;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Component;
 
+import com.apolloits.util.controller.ValidationController;
 import com.apolloits.util.modal.ErrorMsgDetail;
 
 import lombok.extern.slf4j.Slf4j;
@@ -21,6 +27,9 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public class ExceptionListExcelWriter {
 
+	@Autowired
+	@Lazy
+	ValidationController controller;
 	
 	public void createExceptionExcel(List<ErrorMsgDetail> errorMsglist,String outputFilePath) throws IOException {
 		
@@ -67,7 +76,11 @@ public class ExceptionListExcelWriter {
 	    //ServletOutputStream ops = response.getOutputStream();
 	    try (FileOutputStream outputStream = new FileOutputStream(outputFilePath)) {
 	        workbook.write(outputStream);
-	    }
+	    }catch (FileNotFoundException e) {
+	    	controller.getErrorMsglist().add(new ErrorMsgDetail(FILE_RECORD_TYPE,"ACK","ACK Output Path don't have write access"));
+			e.printStackTrace();
+			
+		}
 	   // workbook.write(ops);
 	    workbook.close();
 	    log.info("Exception list file generated ::"+outputFilePath);

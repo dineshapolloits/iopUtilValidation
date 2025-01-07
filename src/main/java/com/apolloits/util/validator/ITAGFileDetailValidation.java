@@ -129,7 +129,7 @@ public class ITAGFileDetailValidation {
 							noOfRecords++;
 						}
 						if((noOfRecords-1) != headerCount ) {
-							validateParam.setResponseMsg("FAILED Reason:: Header count("+headerCount+") and detail count not matching ::"+noOfRecords);
+							validateParam.setResponseMsg("\t Header count("+headerCount+") and detail count not matching ::"+noOfRecords +"\t <b> Invalid record count ::</b> \t "+invalidRecordCount);
 							iagAckMapper.mapToIagAckFile(fileName, "01", validateParam.getOutputFilePath()+File.separator+ackFileName, fileName.substring(0, 4),validateParam.getToAgency());
 							return false;
 						}
@@ -284,12 +284,12 @@ public class ITAGFileDetailValidation {
 		String tagType="";
 		String tagMount="";
 		String tagClass ="";
-		String lineNo = "\t <b>Line No::</b>"+rowNo;
+		String lineNo = "\t <b>Row ::</b>"+fileRowData +"\t <b>Line No::</b>"+rowNo;
 		boolean invalidRecord = false;
 		if(fileRowData == null ||  fileRowData.length() != 85) {
 			log.info("Detail record invalid length ::"+fileRowData);
 			//validateParam.setResponseMsg("Detail record invalid length ::"+fileRowData);
-			addErrorMsg(DETAIL_RECORD_TYPE,"DetailRecord","Invalid length ::"+fileRowData +lineNo);
+			addErrorMsg(DETAIL_RECORD_TYPE,"DetailRecord","Invalid length ::"+lineNo);
 			//return false;
 			invalidRecord=true;
 		}else {
@@ -319,7 +319,7 @@ public class ITAGFileDetailValidation {
 			//System.out.println("tagClass ::"+tagClass);
 		} catch (Exception e) {
 			e.printStackTrace();
-			addErrorMsg(DETAIL_RECORD_TYPE,"DetailRecord","Invalid Row detail ::"+fileRowData +lineNo);
+			addErrorMsg(DETAIL_RECORD_TYPE,"DetailRecord","Invalid Row detail ::"+lineNo);
 			//validateParam.setResponseMsg("Invalid Row detail  - "+fileRowData);
         	return false;
 		}
@@ -328,14 +328,14 @@ public class ITAGFileDetailValidation {
         if (!pattern.matcher(tagAgencyId).matches() || !(AgencyDataExcelReader.tagAgencyCode.contains(tagAgencyId))  ) {
         	//validateParam.setResponseMsg("Invalid ITAG detail, invalid tag agency ID - "+tagAgencyId +" Row ::"+fileRowData);
         	log.error("Invalid ITAG detail, invalid tag agency ID - "+tagAgencyId +" Row ::"+fileRowData);
-        	addErrorMsg(DETAIL_RECORD_TYPE,"Tag agency ID","Invalid tag agency ID - "+tagAgencyId +" Row ::"+fileRowData +lineNo);
+        	addErrorMsg(DETAIL_RECORD_TYPE,"Tag agency ID","Invalid tag agency ID - "+tagAgencyId +lineNo);
         	invalidRecord=true;
         }
          pattern = Pattern.compile(IAGConstants.ITAG_DTL_TAG_SERIAL_NO);
         if (!pattern.matcher(tagSerialNo).matches()) { //need to check start and end tag range from DB
-        	validateParam.setResponseMsg("Invalid ITAG detail, invalid tag serial number - "+tagSerialNo +" Row ::"+fileRowData);
-        	log.error("Invalid ITAG detail, invalid tag serial number - "+tagSerialNo +" Row ::"+fileRowData);
-        	addErrorMsg(DETAIL_RECORD_TYPE,"Tag serial number","Invalid Tag serial number format-"+tagSerialNo +" Row ::"+fileRowData +lineNo);
+        	validateParam.setResponseMsg("Invalid ITAG detail, invalid tag serial number - "+tagSerialNo +lineNo);
+        	log.error("Invalid ITAG detail, invalid tag serial number - "+tagSerialNo +" Row ::"+lineNo);
+        	addErrorMsg(DETAIL_RECORD_TYPE,"Tag serial number","Invalid Tag serial number format-"+tagSerialNo +lineNo);
         	invalidRecord=true;
         }
         
@@ -351,37 +351,37 @@ public class ITAGFileDetailValidation {
 				log.error("## tagSerialNoLong ::" + tagSerialNoLong + "\t tagSerialNoStart :: " + tagSerialNoStart
 						+ "\t tagSerialNoEnd ::" + tagSerialNoEnd);
 			//	validateParam.setResponseMsg("Invalid TAG_SERIAL_NUMBER range   - " + tagSerialNo +" Row ::"+fileRowData);
-				log.error("Invalid TAG_SERIAL_NUMBER range   - " + tagSerialNo +" Row ::"+fileRowData);
-				addErrorMsg(DETAIL_RECORD_TYPE,"TAG_SERIAL_NUMBER", "Invalid TAG_SERIAL_NUMBER range   - " + tagSerialNo +" Row ::"+fileRowData+lineNo);
+				log.error("Invalid TAG_SERIAL_NUMBER range   - " + tagSerialNo +" Row ::"+lineNo);
+				addErrorMsg(DETAIL_RECORD_TYPE,"TAG_SERIAL_NUMBER", "Invalid TAG_SERIAL_NUMBER range   - " + tagSerialNo +lineNo);
 				invalidRecord=true;
 			}
 		} catch (Exception e) {
 			e.printStackTrace();
-			addErrorMsg(DETAIL_RECORD_TYPE,"TAG_SERIAL_NUMBER","Invalid Tag Agency ID for TAG_SERIAL_NUMBER  from excel or file  - " + fileRowData +"\t Line No::"+rowNo);
+			addErrorMsg(DETAIL_RECORD_TYPE,"TAG_SERIAL_NUMBER","Invalid Tag Agency ID for TAG_SERIAL_NUMBER  from excel or file  - " + lineNo);
 			//validateParam.setResponseMsg("Invalid TAG_SERIAL_NUMBER format from excel or file  - " + fileRowData);
 			invalidRecord=true;
 		}
 
          pattern = Pattern.compile(IAGConstants.ITAG_DTL_TAG_STATUS);
         if (!pattern.matcher(tagStatus).matches()) {
-        	log.error("Invalid ITAG detail, invalid tag status - "+tagStatus +" Row ::"+fileRowData);
+        	log.error("Invalid ITAG detail, invalid tag status - "+tagStatus +lineNo);
         	//validateParam.setResponseMsg("Invalid ITAG detail, invalid tag status - "+tagStatus +" Row ::"+fileRowData);
-        	addErrorMsg(DETAIL_RECORD_TYPE,"tag status", "Invalid  status - "+ tagStatus +" Row ::"+fileRowData+lineNo);
+        	addErrorMsg(DETAIL_RECORD_TYPE,"tag status", "Invalid  status - "+ tagStatus +lineNo);
         	invalidRecord=true;
         }
 
-         pattern = Pattern.compile(IAGConstants.ITAG_DTL_TAG_TYP);
+         pattern = Pattern.compile(IAGConstants.ITAG_DTL_TAG_AC_TYP_IND);
         if (!pattern.matcher(tagAcTypeInd).matches()) {
-        	log.error("Invalid ITAG detail, invalid tag type - "+tagAcTypeInd+" Row ::"+fileRowData);
-        	addErrorMsg(DETAIL_RECORD_TYPE,"Tag Type", "invalid tag type - "+tagAcTypeInd+" Row ::"+fileRowData+lineNo);
+        	log.error("Invalid ITAG detail, TAG_AC_TYPE_IND invalid tag type - "+tagAcTypeInd+lineNo);
+        	addErrorMsg(DETAIL_RECORD_TYPE,"TAG_AC_TYPE_IND", "Invalid tag AC type - "+tagAcTypeInd+lineNo);
         	//validateParam.setResponseMsg("Invalid ITAG detail, invalid tag type - "+tagAcTypeInd+" Row ::"+fileRowData);
         	invalidRecord=true;
         }
 
          pattern = Pattern.compile(IAGConstants.ITAG_DTL_TAG_MOUNT);
         if (!pattern.matcher(tagMount).matches()) {
-        	log.error("Invalid ITAG detail, invalid tag mount - "+tagMount +" Row ::"+fileRowData);
-        	addErrorMsg(DETAIL_RECORD_TYPE,"Tag Mount", "Invalid tag mount - "+tagMount +" Row ::"+fileRowData+lineNo);
+        	log.error("Invalid ITAG detail, invalid tag mount - "+tagMount +lineNo);
+        	addErrorMsg(DETAIL_RECORD_TYPE,"Tag Mount", "Invalid tag mount - "+tagMount +lineNo);
         	//validateParam.setResponseMsg("Invalid ITAG detail, invalid tag mount - "+tagMount +" Row ::"+fileRowData);
         	invalidRecord=true;
         }

@@ -76,7 +76,7 @@ public class IAGConstants {
     public static final String ITAG_DTL_TAG_MOUNT = "[I,L,R,H,V,*]{1}";
     
     public static final String HEADER_RECORD_TYPE ="Header";
-    public static final String DETAIL_RECORD_TYPE ="Deatil";
+    public static final String DETAIL_RECORD_TYPE ="Detail";
     public static final String FILE_RECORD_TYPE ="File";
     
 }

@@ -2,6 +2,7 @@ package com.apolloits.util.validator;
 
 import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.HashMap;
@@ -99,7 +100,7 @@ public class ITAGFileDetailValidation {
         			 //Start to validate file header and detail  record
         			 long noOfRecords = 0;
 					try (BufferedReader br = new BufferedReader(
-							new FileReader(zipFile.getFile().getParent()+"\\"+fileName))) {
+							new FileReader(zipFile.getFile().getParent()+File.separator+fileName))) {
 
 						String fileRowData;
 						long headerCount =0l;
@@ -111,7 +112,7 @@ public class ITAGFileDetailValidation {
 								if(!validateItagHeader(fileRowData,validateParam,fileName)) {
 									//create ACK file 
 									 //String ackFileName = IAGConstants.SRTA_HOME_AGENCY_ID + "_" + fileName.replace(".", "_") + IAGConstants.ACK_FILE_EXTENSION;
-									iagAckMapper.mapToIagAckFile(fileName, "01", validateParam.getOutputFilePath()+"\\"+ackFileName, fileName.substring(0, 4),validateParam.getToAgency());
+									iagAckMapper.mapToIagAckFile(fileName, "01", validateParam.getOutputFilePath()+File.separator+ackFileName, fileName.substring(0, 4),validateParam.getToAgency());
 									return false;
 								}
 								if(validateParam.getValidateType().equals("header")) {
@@ -121,7 +122,7 @@ public class ITAGFileDetailValidation {
 							}else {
 								if(!validateItagDetail(fileRowData,validateParam,fileName,noOfRecords)) {
 									validateParam.setResponseMsg(validateParam.getResponseMsg() +"\t    Line No::"+noOfRecords);
-									iagAckMapper.mapToIagAckFile(fileName, "02", validateParam.getOutputFilePath()+"\\"+ackFileName, fileName.substring(0, 4),validateParam.getToAgency());
+									iagAckMapper.mapToIagAckFile(fileName, "02", validateParam.getOutputFilePath()+File.separator+ackFileName, fileName.substring(0, 4),validateParam.getToAgency());
 									//return false;
 								}
 							}
@@ -129,27 +130,33 @@ public class ITAGFileDetailValidation {
 						}
 						if((noOfRecords-1) != headerCount ) {
 							validateParam.setResponseMsg("FAILED Reason:: Header count("+headerCount+") and detail count not matching ::"+noOfRecords);
-							iagAckMapper.mapToIagAckFile(fileName, "01", validateParam.getOutputFilePath()+"\\"+ackFileName, fileName.substring(0, 4),validateParam.getToAgency());
+							iagAckMapper.mapToIagAckFile(fileName, "01", validateParam.getOutputFilePath()+File.separator+ackFileName, fileName.substring(0, 4),validateParam.getToAgency());
 							return false;
 						}
 						
 						 //validate Duplicate serial no
-							validateDuplicateTagSerialNo(zipFile.getFile().getParent()+"\\"+fileName,validateParam);
+							validateDuplicateTagSerialNo(zipFile.getFile().getParent()+File.separator+fileName,validateParam);
 						if(controller.getErrorMsglist().size()>0) {
 							validateParam.setResponseMsg("\t \t <b>ACK file name ::</b> \t "+ackFileName +"\t <b> Invalid record count ::</b> \t "+invalidRecordCount);
-							iagAckMapper.mapToIagAckFile(fileName, "02", validateParam.getOutputFilePath()+"\\"+ackFileName, fileName.substring(0, 4),validateParam.getToAgency());
+							iagAckMapper.mapToIagAckFile(fileName, "02", validateParam.getOutputFilePath()+File.separator+ackFileName, fileName.substring(0, 4),validateParam.getToAgency());
 						}else {
 							log.info("Sucess ACK created");
-							iagAckMapper.mapToIagAckFile(fileName, "00", validateParam.getOutputFilePath()+"\\"+ackFileName, fileName.substring(0, 4),validateParam.getToAgency());
+							iagAckMapper.mapToIagAckFile(fileName, "00", validateParam.getOutputFilePath()+File.separator+ackFileName, fileName.substring(0, 4),validateParam.getToAgency());
 						}
+					} catch (FileNotFoundException e) {
+						log.error("FileNotFoundException :: Error while reading a file."+e.getMessage());
+						validateParam.setResponseMsg("\t \t File not Found. Please check file path");
+						e.printStackTrace();
+						return false;
 					} catch (IOException e) {
 						e.printStackTrace();
 						// Display pop up message if exception occurs
 						log.error("Error while reading a file.");
+						return false;
 					}
         			 
         		 }else {
-        			 iagAckMapper.mapToIagAckFile(fileName, "07", validateParam.getOutputFilePath()+"\\"+ackFileName, fileName.substring(0, 4),validateParam.getToAgency());
+        			 iagAckMapper.mapToIagAckFile(fileName, "07", validateParam.getOutputFilePath()+File.separator+ackFileName, fileName.substring(0, 4),validateParam.getToAgency());
         			 //validateParam.setResponseMsg("FAILED Reason:: ITAG file Name validation is failed");
         			 log.error("ITAG file Name validation is failed");
         			 controller.getErrorMsglist().add(new ErrorMsgDetail(FILE_RECORD_TYPE,"File Name","ITAG file Name validation is failed"));

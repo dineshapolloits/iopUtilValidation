@@ -109,7 +109,7 @@ public class ICRXFileDetailValidation {
 					// Start to validate file header and detail record
 					long noOfRecords = 0;
 					try (BufferedReader br = new BufferedReader(
-							new FileReader(zipFile.getFile().getParent() + "\\" + fileName))) {
+							new FileReader(zipFile.getFile().getParent() + File.separator + fileName))) {
 
 						String fileRowData;
 						long headerCount = 0l;
@@ -125,7 +125,7 @@ public class ICRXFileDetailValidation {
 									ackCode = "01";
 								}
 								iagAckMapper.mapToIagAckFile(fileName, ackCode,
-										validateParam.getOutputFilePath() + "\\" + ackFileName,
+										validateParam.getOutputFilePath() + File.separator + ackFileName,
 										fileName.substring(0, 4), validateParam.getToAgency());
 								if (validateParam.getValidateType().equals("header")) {
 									log.info("Only file name and header validation");
@@ -141,7 +141,7 @@ public class ICRXFileDetailValidation {
 							validateParam.setResponseMsg("FAILED Reason:: Header count(" + headerCount
 									+ ") and detail count not matching ::" + noOfRecords);
 							iagAckMapper.mapToIagAckFile(fileName, "01",
-									validateParam.getOutputFilePath() + "\\" + ackFileName, fileName.substring(0, 4),
+									validateParam.getOutputFilePath() + File.separator + ackFileName, fileName.substring(0, 4),
 									validateParam.getToAgency());
 							return false;
 						}
@@ -154,7 +154,7 @@ public class ICRXFileDetailValidation {
 							
 						}
 						iagAckMapper.mapToIagAckFile(fileName, ackcode,
-								validateParam.getOutputFilePath() + "\\" + ackFileName, fileName.substring(0, 4),
+								validateParam.getOutputFilePath() + File.separator + ackFileName, fileName.substring(0, 4),
 								validateParam.getToAgency());
 						
 					} catch (IOException e) {

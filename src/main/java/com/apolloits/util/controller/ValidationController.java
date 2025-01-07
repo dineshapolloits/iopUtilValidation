@@ -144,6 +144,8 @@ public class ValidationController {
     public String ValidateFile(@ModelAttribute("fileValidationParam") FileValidationParam validateParam,Model model) throws IOException {
 		errorMsglist = new ArrayList<>();
 		log.info("ValidateFile ::"+validateParam.toString());
+		//UI validation 
+		//validateUIField(validateParam);
 		boolean fileValidation = false ;
 		validateParam.setResponseMsg("\t Contact Administrator");
 			cscIdTagAgencyMap =  dbLog.getCSCIdbyAgencyMap(validateParam.getFromAgency());
@@ -183,7 +185,7 @@ public class ValidationController {
 				}
 				exListExcelWriter.createExceptionExcel(errorMsglist, exceptionFileName);
 			}else
-				model.addAttribute("result", "Sucess");
+				model.addAttribute("result", "Success");
 			
 			 model.addAttribute("homeAgencyMap", dbLog.getCscAgencyIdandShortNamebymap());
         return "ValidateFile";

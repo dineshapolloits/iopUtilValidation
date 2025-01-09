@@ -43,7 +43,7 @@ public class IagAckFileMapper {
             fileWriter.write(iagAckFile.getOrigFileName());
             fileWriter.write(iagAckFile.getFileCreationDate());
             fileWriter.write(iagAckFile.getReturnCode());
-            fileWriter.write("\r\n");
+            fileWriter.write("\n");
             fileWriter.close();
         } catch (IOException e) {
             e.printStackTrace();

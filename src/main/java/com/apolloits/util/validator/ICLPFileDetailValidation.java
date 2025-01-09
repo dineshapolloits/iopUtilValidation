@@ -128,7 +128,7 @@ public class ICLPFileDetailValidation {
 					return false;
 				}
 				if(controller.getErrorMsglist().size()>0) {
-					validateParam.setResponseMsg(" \t <b>ACK file name ::</b> \t"+ackFileName +"\t <b> Invalid record count ::</b> \t "+invalidRecordCount);
+					validateParam.setResponseMsg(" \t <b>ACK file name ::</b> \t"+ackFileName +"\t <b> Invalid record detail count ::</b> \t "+invalidRecordCount);
 					iagAckMapper.mapToIagAckFile(fileName, "02", validateParam.getOutputFilePath()+File.separator+ackFileName, fileName.substring(0, 4),validateParam.getToAgency());
 				}else {
 					log.info("Sucess ACK created");

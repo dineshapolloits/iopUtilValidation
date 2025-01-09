@@ -137,7 +137,7 @@ public class ITAGFileDetailValidation {
 						 //validate Duplicate serial no
 							validateDuplicateTagSerialNo(zipFile.getFile().getParent()+File.separator+fileName,validateParam);
 						if(controller.getErrorMsglist().size()>0) {
-							validateParam.setResponseMsg("\t \t <b>ACK file name ::</b> \t "+ackFileName +"\t <b> Invalid record count ::</b> \t "+invalidRecordCount);
+							validateParam.setResponseMsg("\t \t <b>ACK file name ::</b> \t "+ackFileName +"\t <b> Invalid detail record count ::</b> \t "+invalidRecordCount);
 							iagAckMapper.mapToIagAckFile(fileName, "02", validateParam.getOutputFilePath()+File.separator+ackFileName, fileName.substring(0, 4),validateParam.getToAgency());
 						}else {
 							log.info("Sucess ACK created");

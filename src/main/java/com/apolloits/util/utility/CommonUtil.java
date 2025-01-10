@@ -49,11 +49,13 @@ import org.apache.poi.ss.usermodel.Cell;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Component;
 import org.springframework.util.FileCopyUtils;
 
 import com.apolloits.util.IAGConstants;
+import com.apolloits.util.IagAckFileMapper;
 import com.apolloits.util.controller.ValidationController;
 import com.apolloits.util.modal.ErrorMsgDetail;
 import com.apolloits.util.modal.FileValidationParam;
@@ -83,6 +85,12 @@ private static AgencyDataExcelReader appConfig;
 	@Autowired
 	@Lazy
 	ValidationController controller;
+	
+	@Autowired
+	private IagAckFileMapper iagAckMapper;
+	
+	@Value("${validate.fileStartYear}")
+	int fileStartYear;
 	
 	public static void main1(String args[]) throws IOException {
 	/*	String trim = "      ab           ";
@@ -138,7 +146,8 @@ private static AgencyDataExcelReader appConfig;
 	}
 
 	
-	public static boolean validateZIPFileName(String fileName) {
+	public boolean validateZIPFileName(String fileName,FileValidationParam validateParam) {
+		boolean zipNameValidation = false;
 		if (fileName != null && fileName.length() == 28) {
 			String[] fileParams = fileName.split("[_.]");
 			System.out.println("validateZIPFileName() ::  fileParams ::"+Arrays.toString(fileParams) );
@@ -150,15 +159,34 @@ private static AgencyDataExcelReader appConfig;
 				SimpleDateFormat dateFormat = new SimpleDateFormat(IAGConstants.YYYY_MM_DD_HH_MM_SS);
 				dateFormat.setLenient(false);
 				try {
+					if(Integer.parseInt(fileParams[1].substring(0, 4))<fileStartYear) {
+						throw new ParseException("Invalid Year ::"+fileParams[1].substring(0, 4), 0);
+					}
 					dateFormat.parse(fileParams[1].trim());
-					return true;
-				} catch (ParseException pe) {
-					return false;
+					zipNameValidation = true;
+				}catch (ParseException pe) {
+					pe.printStackTrace();
+					log.error("ParseException in validateZIPFileName ::"+pe.getMessage());
+					zipNameValidation =  false;
+				}catch (Exception e) {
+					e.printStackTrace();
+					log.error("Exceptin in validateZIPFileName ::"+e.getMessage());
+					zipNameValidation =  false;
 				}
 				
 			}
 		}
-		return false;
+		if(!zipNameValidation) {
+			log.info("ZIP file validation is failed "+fileName);
+			String ackFileName = validateParam.getToAgency() + "_" + fileName.replace(".ZIP", "") + IAGConstants.ACK_FILE_EXTENSION;
+			log.info("ZIP file validation is failed ackFileName ::"+ackFileName);
+			iagAckMapper.mapToIagAckFile(fileName, "07", validateParam.getOutputFilePath()+File.separator+ackFileName, fileName.substring(0, 4),validateParam.getToAgency());
+   		 	validateParam.setResponseMsg("\t Invalid ZIP file format");
+   		 	controller.getErrorMsglist().add(new ErrorMsgDetail(FILE_RECORD_TYPE,"ZIP File Name","ZIP file Name validation is failed"));
+		}
+		System.out.println("zipNameValidation ::"+zipNameValidation);
+		
+		return zipNameValidation;
  }
 	
 	 public static boolean validateFileName(String fileName) {

@@ -42,6 +42,9 @@ public class ITAGFileDetailValidation {
 	@Lazy
 	ValidationController controller;
 	
+	@Autowired
+	CommonUtil commonUtil;
+	
 	int invalidRecordCount = 0;
 	
 	public boolean itagValidation(FileValidationParam validateParam) throws IOException {
@@ -75,7 +78,7 @@ public class ITAGFileDetailValidation {
         	 }
         	 
         	 // validate ZIP file name 
-        	 if(CommonUtil.validateZIPFileName(inputItagZipFile.getName())) {
+        	 if(commonUtil.validateZIPFileName(inputItagZipFile.getName(),validateParam)) {
         		 String fileName="";
         		 //extract ZIP file 
         		 ZipFile zipFile = new ZipFile(inputItagZipFile);
@@ -166,7 +169,7 @@ public class ITAGFileDetailValidation {
         	 }else {
         		 //validateParam.setResponseMsg("FAILED Reason:: ZIP file Name validation is failed");
         		 log.error("ZIP File Name","ZIP file Name validation is failed");
-        		 controller.getErrorMsglist().add(new ErrorMsgDetail(FILE_RECORD_TYPE,"ZIP File Name","ZIP file Name validation is failed"));
+        		// controller.getErrorMsglist().add(new ErrorMsgDetail(FILE_RECORD_TYPE,"ZIP File Name","ZIP file Name validation is failed"));
         		 return false;
         	 }
 			 return true;

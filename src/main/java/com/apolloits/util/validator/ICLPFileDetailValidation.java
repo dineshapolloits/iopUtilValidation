@@ -47,6 +47,9 @@ public class ICLPFileDetailValidation {
 	@Lazy
 	ValidationController controller;
 	
+	@Autowired
+	CommonUtil commonUtil;
+	
 	int invalidRecordCount = 0;
 	
 	public boolean iclpValidation(FileValidationParam validateParam) throws IOException {
@@ -65,7 +68,7 @@ public class ICLPFileDetailValidation {
        		 return false;
        	 }
         	// validate ZIP file name 
-       	 if(CommonUtil.validateZIPFileName(inputItagZipFile.getName())) {
+       	 if(commonUtil.validateZIPFileName(inputItagZipFile.getName(),validateParam)) {
        		 String fileName="";
        		ZipFile zipFile = new ZipFile(inputItagZipFile);
    		 try {
@@ -155,10 +158,13 @@ public class ICLPFileDetailValidation {
     		 return false;
        	 }
         }else {
+        	//validateParam.setResponseMsg("\t Invalid ZIP file format");
         	log.info("FAILED Reason:: ICLP Invalid ZIP file name ::\"+inputItagZipFile.getName()");
         	log.error("ZIP File Name","ZIP file Name validation is failed");
-   		 	controller.getErrorMsglist().add(new ErrorMsgDetail(FILE_RECORD_TYPE,"ZIP File Name","ZIP file Name validation is failed"));
-        	//validateParam.setResponseMsg("FAILED Reason:: ICLP Invalid ZIP file name ::"+inputItagZipFile.getName());
+   		 	//controller.getErrorMsglist().add(new ErrorMsgDetail(FILE_RECORD_TYPE,"ZIP File Name","ZIP file Name validation is failed"));
+   		 	//ackFileName = validateParam.getToAgency() + "_" + inputItagZipFile.getName().replace(".", "_") + IAGConstants.ACK_FILE_EXTENSION;
+   		 	//iagAckMapper.mapToIagAckFile(inputItagZipFile.getName(), "07", validateParam.getOutputFilePath()+File.separator+ackFileName, inputItagZipFile.getName().substring(0, 4),validateParam.getToAgency());
+   		 	//validateParam.setResponseMsg("FAILED Reason:: ICLP Invalid ZIP file name ::"+inputItagZipFile.getName());
    		 return false;
         }
        	 return true;

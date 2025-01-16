@@ -116,7 +116,7 @@ public class ITAGFileDetailValidation {
 									//create ACK file 
 									 //String ackFileName = IAGConstants.SRTA_HOME_AGENCY_ID + "_" + fileName.replace(".", "_") + IAGConstants.ACK_FILE_EXTENSION;
 									iagAckMapper.mapToIagAckFile(fileName, "01", validateParam.getOutputFilePath()+File.separator+ackFileName, fileName.substring(0, 4),validateParam.getToAgency());
-									return false;
+									//return false;
 								}
 								if(validateParam.getValidateType().equals("header")) {
 						        	 log.info("Only file name and header validation");
@@ -132,17 +132,17 @@ public class ITAGFileDetailValidation {
 							noOfRecords++;
 						}
 						if((noOfRecords-1) != headerCount ) {
-							validateParam.setResponseMsg("\t Header count("+headerCount+") and detail count not matching ::"+noOfRecords +"\t <b> Invalid record count ::</b> \t "+invalidRecordCount);
+							validateParam.setResponseMsg("\t Header count("+headerCount+") and detail count not matching ::"+(noOfRecords-1));
 							iagAckMapper.mapToIagAckFile(fileName, "01", validateParam.getOutputFilePath()+File.separator+ackFileName, fileName.substring(0, 4),validateParam.getToAgency());
 							return false;
 						}
 						
 						 //validate Duplicate serial no
 							validateDuplicateTagSerialNo(zipFile.getFile().getParent()+File.separator+fileName,validateParam);
-						if(controller.getErrorMsglist().size()>0) {
+						if(controller.getErrorMsglist().size()>0 && invalidRecordCount >0) {
 							validateParam.setResponseMsg("\t \t <b>ACK file name ::</b> \t "+ackFileName +"\t <b> Invalid detail record count ::</b> \t "+invalidRecordCount);
 							iagAckMapper.mapToIagAckFile(fileName, "02", validateParam.getOutputFilePath()+File.separator+ackFileName, fileName.substring(0, 4),validateParam.getToAgency());
-						}else {
+						}else if(controller.getErrorMsglist().size()== 0 && invalidRecordCount == 0 ) {
 							log.info("Sucess ACK created");
 							iagAckMapper.mapToIagAckFile(fileName, "00", validateParam.getOutputFilePath()+File.separator+ackFileName, fileName.substring(0, 4),validateParam.getToAgency());
 						}
@@ -216,6 +216,7 @@ public class ITAGFileDetailValidation {
 
 	public boolean validateItagHeader(String headervalue,FileValidationParam validateParam,String fileName) {
 		log.info("headervalue :: "+headervalue);
+		boolean invalidHeaderRecord = false;
 		 String fileDate = fileName.substring(5, 13);
          String fileTime = fileName.substring(13, 19); //filename value
          String fromAgencyId = fileName.substring(0, 4);
@@ -238,13 +239,13 @@ public class ITAGFileDetailValidation {
         	// validateParam.setResponseMsg("FAILED Reason:: Header record for ITAG file is invalid format or length - " + headervalue);
         	log.error("FAILED Reason:: Header record for ITAG file is invalid format or length - " + headervalue);
         	 addErrorMsg(HEADER_RECORD_TYPE,"HeaderDate", "Header record for ITAG file is invalid format or length - " + headervalue);
-        	 //return false;
+        	 invalidHeaderRecord = true;
          }
          if(!headerFileType.equals(IAGConstants.ITAG_FILE_TYPE)) {
         	 log.error("FAILED Reason:: Header record file type is invalid - " + headerFileType);
         	 //validateParam.setResponseMsg("FAILED Reason:: Header record file type is invalid - " + headerFileType);
         	 addErrorMsg(HEADER_RECORD_TYPE,"File Type", "Header record file type is invalid - " + headerFileType);
-        	 //return false;
+        	 invalidHeaderRecord = true;
          }
          final Pattern pattern = Pattern.compile(IAGConstants.IAG_HEADER_VERSION_FORMAT);
          if (!pattern.matcher(headerVersion).matches() || 
@@ -252,20 +253,28 @@ public class ITAGFileDetailValidation {
         	 log.error("FAILED Reason:: Invalid header, version format is incorrect - " + headerVersion + "\t excepted version ::"+ValidationController.cscIdTagAgencyMap.get(fromAgencyId).getVersionNumber());
         	 addErrorMsg(HEADER_RECORD_TYPE,"IAG Version", "Version format is incorrect - " + headerVersion + "\t excepted version ::"+ValidationController.cscIdTagAgencyMap.get(fromAgencyId).getVersionNumber());
         	// validateParam.setResponseMsg("FAILED Reason:: Invalid header, version format is incorrect - " + headerVersion + "\t excepted version ::"+ValidationController.cscIdTagAgencyMap.get(fromAgencyId).getVersionNumber());
-        	// return false;
+        	 invalidHeaderRecord = true;
          }
          
          if(!headerFromAgencyId.equals(fromAgencyId) || !AgencyDataExcelReader.agencyCode.contains(fromAgencyId)) {
         	 log.error("FAILED Reason:: Invalid header agency ID - " + fromAgencyId);
-        	 addErrorMsg(HEADER_RECORD_TYPE,"FromAgencyId", "From agency ID and headerAgency Id not matched - " + fromAgencyId);
+        	 addErrorMsg(HEADER_RECORD_TYPE,"FromAgencyId", "From agency ID and headerAgency Id not matched - " + headerFromAgencyId);
         	// validateParam.setResponseMsg("FAILED Reason:: Invalid header agency ID - " + fromAgencyId);
-        	 //return false;
+        	 invalidHeaderRecord = true;
+         }
+         if (!headervalue.substring(16, 36).matches(IAGConstants.FILE_DATE_TIME_FORMAT)) {
+             
+        	 controller.getErrorMsglist().add(new ErrorMsgDetail(HEADER_RECORD_TYPE,"FILE_DATE_TIME"," date and time format is invalid. Format should be YYYY-MM-DDThh:mm:ssZ  \t ::"+headervalue.substring(16, 36)));
+             invalidHeaderRecord = true;
          }
 
          if (!fileDate.equals(headerDate.replace("-", "")) || !fileTime.equals(headerTime.replace(":", ""))) {
         	 log.error("Header datetime and file date time not matched");
         	 addErrorMsg(HEADER_RECORD_TYPE,"Header DateTime","Header datetime and file date time not matched ::"+headerDate);
-        	 //return false;
+        	 invalidHeaderRecord = true;
+         }
+         if(invalidHeaderRecord) {
+        	 return false;
          }
 		return true;
 	}

@@ -109,7 +109,7 @@ public class ICLPFileDetailValidation {
 							//create ACK file 
 							 //String ackFileName = IAGConstants.SRTA_HOME_AGENCY_ID + "_" + fileName.replace(".", "_") + IAGConstants.ACK_FILE_EXTENSION;
 							iagAckMapper.mapToIagAckFile(fileName, "01", validateParam.getOutputFilePath()+File.separator+ackFileName, fileName.substring(0, 4),validateParam.getToAgency());
-							return false;
+							//return false;
 						}
 						if(validateParam.getValidateType().equals("header")) {
 				        	 log.info("Only file name and header validation");
@@ -123,19 +123,21 @@ public class ICLPFileDetailValidation {
 					}
 					noOfRecords++;
 				}
-				if((noOfRecords-1) != headerCount ) {
-					log.error("FAILED Reason :: Header count("+headerCount+") and detail count not matching ::"+noOfRecords);
-					controller.getErrorMsglist().add(new ErrorMsgDetail(DETAIL_RECORD_TYPE,"File","Header count("+headerCount+") and detail count not matching ::"+noOfRecords));
-					//validateParam.setResponseMsg("FAILED Reason :: Header count("+headerCount+") and detail count not matching ::"+noOfRecords);
-					iagAckMapper.mapToIagAckFile(fileName, "01", validateParam.getOutputFilePath()+"\\"+ackFileName, fileName.substring(0, 4),validateParam.getToAgency());
-					return false;
-				}
-				if(controller.getErrorMsglist().size()>0) {
+				
+				if(controller.getErrorMsglist().size()>0 && invalidRecordCount>0 ) {
 					validateParam.setResponseMsg(" \t <b>ACK file name ::</b> \t"+ackFileName +"\t <b> Invalid record detail count ::</b> \t "+invalidRecordCount);
 					iagAckMapper.mapToIagAckFile(fileName, "02", validateParam.getOutputFilePath()+File.separator+ackFileName, fileName.substring(0, 4),validateParam.getToAgency());
-				}else {
+				}else if(controller.getErrorMsglist().size()== 0 && invalidRecordCount == 0 ) {
 					log.info("Sucess ACK created");
 					iagAckMapper.mapToIagAckFile(fileName, "00", validateParam.getOutputFilePath()+File.separator+ackFileName, fileName.substring(0, 4),validateParam.getToAgency());
+				}
+				
+				if((noOfRecords-1) != headerCount ) {
+					log.error("FAILED Reason :: Header count("+headerCount+") and detail count not matching ::"+(noOfRecords-1));
+					controller.getErrorMsglist().add(new ErrorMsgDetail(DETAIL_RECORD_TYPE,"File","Header count("+headerCount+") and detail count not matching ::"+(noOfRecords-1)));
+					//validateParam.setResponseMsg("FAILED Reason :: Header count("+headerCount+") and detail count not matching ::"+noOfRecords);
+					iagAckMapper.mapToIagAckFile(fileName, "01", validateParam.getOutputFilePath()+File.separator+ackFileName, fileName.substring(0, 4),validateParam.getToAgency());
+					return false;
 				}
 			} catch (FileNotFoundException e) {
 				log.error("FileNotFoundException :: Error while reading a file." + e.getMessage());
@@ -174,6 +176,7 @@ public class ICLPFileDetailValidation {
 	
 	public boolean validateIclpHeader(String headervalue,FileValidationParam validateParam,String fileName) {
 		log.info("ICLP headervalue :: "+headervalue);
+		boolean invalidHeaderRecord = false;
 		 String fileDate = fileName.substring(5, 13);
          String fileTime = fileName.substring(13, 19); //filename value
          String fromAgencyId = fileName.substring(0, 4);
@@ -200,7 +203,7 @@ public class ICLPFileDetailValidation {
         	 controller.getErrorMsglist().add(new ErrorMsgDetail(HEADER_RECORD_TYPE,"File Type","invalid FileType " + headerFileType));
         	 log.error("Header record file type is invalid - " + headerFileType);
         	 //validateParam.setResponseMsg("Header record file type is invalid - " + headerFileType);
-        	// return false;
+        	 invalidHeaderRecord = true;
          }
          final Pattern pattern = Pattern.compile(IAGConstants.IAG_HEADER_VERSION_FORMAT);
          if (!pattern.matcher(headerVersion).matches() ||
@@ -208,20 +211,29 @@ public class ICLPFileDetailValidation {
         	 log.error("FAILED Reason:: Invalid header, version format is incorrect - " + headerVersion + "\t excepted version ::"+ValidationController.cscIdTagAgencyMap.get(fromAgencyId).getVersionNumber());
         	 controller.getErrorMsglist().add(new ErrorMsgDetail(HEADER_RECORD_TYPE,"IAG Version","Invalid version " + headerVersion));
         	 //validateParam.setResponseMsg("Invalid header, version format is incorrect - " + headerVersion + "\t excepted version ::"+ValidationController.cscIdTagAgencyMap.get(fromAgencyId).getVersionNumber());
-        	 //return false;
+        	 invalidHeaderRecord = true;
          }
          //System.out.println("AgencyDataExcelReader.agencyCode.contains(fromAgencyId) :: " +AgencyDataExcelReader.agencyCode.contains(fromAgencyId));
          if(!headerFromAgencyId.equals(fromAgencyId) || !AgencyDataExcelReader.agencyCode.contains(fromAgencyId)) {
         	 //validateParam.setResponseMsg("Invalid header agency ID - " + fromAgencyId);
-        	 controller.getErrorMsglist().add(new ErrorMsgDetail(HEADER_RECORD_TYPE,"From Agency","Invalid header agency ID - " + fromAgencyId));
+        	 controller.getErrorMsglist().add(new ErrorMsgDetail(HEADER_RECORD_TYPE,"From Agency","Invalid header agency ID - " + headerFromAgencyId));
         	 log.error("Invalid header agency ID - " + fromAgencyId);
-        	 //return false;
+        	 invalidHeaderRecord = true;
          }
 
          if (!fileDate.equals(headerDate.replace("-", "")) || !fileTime.equals(headerTime.replace(":", ""))) {
         	 controller.getErrorMsglist().add(new ErrorMsgDetail(HEADER_RECORD_TYPE,"FileDateTime","File DateTime - " + headerDate +"\t headerTime - "+headerTime));
         	 log.error("File DateTime - " + headerDate +"\t headerTime - "+headerTime);
-        	 //return false;
+        	 invalidHeaderRecord = true;
+         }
+         if (!headervalue.substring(16, 36).matches(IAGConstants.FILE_DATE_TIME_FORMAT)) {
+             
+        	 controller.getErrorMsglist().add(new ErrorMsgDetail(HEADER_RECORD_TYPE,"FILE_DATE_TIME"," date and time format is invalid. Format should be YYYY-MM-DDThh:mm:ssZ  \t ::"+headervalue.substring(16, 36)));
+             invalidHeaderRecord = true;
+         }
+         
+         if(invalidHeaderRecord) {
+        	 return false;
          }
          if(validateParam.getValidateType().equals("header")) {
         	 log.info("Only file name and header validation");

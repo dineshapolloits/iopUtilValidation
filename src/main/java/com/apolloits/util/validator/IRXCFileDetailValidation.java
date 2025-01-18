@@ -76,7 +76,7 @@ public class IRXCFileDetailValidation {
 				return false;
 			}
 			// validate ZIP file name format
-			if (commonUtil.validateTransactionZIPFileName(inputItagZipFile.getName(), IAGConstants.IRXC_FILE_TYPE)) {
+			if (commonUtil.validateTransactionZIPFileName(inputItagZipFile.getName(), IAGConstants.IRXC_FILE_TYPE,validateParam)) {
 
 				String fileName = "";
 				// extract ZIP file

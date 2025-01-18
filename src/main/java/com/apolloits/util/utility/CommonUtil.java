@@ -92,7 +92,7 @@ private static AgencyDataExcelReader appConfig;
 	@Value("${validate.fileStartYear}")
 	int fileStartYear;
 	
-	public static void main1(String args[]) throws IOException {
+	public static void main(String args[]) throws IOException {
 	/*	String trim = "      ab           ";
 		System.out.println(trim.length());
 		System.out.println(trim.trim().length());
@@ -143,6 +143,14 @@ private static AgencyDataExcelReader appConfig;
 		System.out.println(" headervalue.substring(16, 36);"+ fileRowData.substring(16, 36).replaceAll("[-T:Z]", ""));
 		String filename = "0008_20241025002300.ITAG";
 		System.out.println(" headervalue.substring(16, 36);"+ filename.substring(5, filename.lastIndexOf(".")));
+		String zipfileName = "AB0001#   ";
+		String TRAN_ZIP_FILE_NAME_FORMAT = "^[A-Z \\d-.&]{10}$";
+		
+		if(zipfileName.matches(TRAN_ZIP_FILE_NAME_FORMAT)) {
+			System.out.println("true");
+		}else {
+			System.out.println("false");
+		}
 	}
 
 	
@@ -829,9 +837,9 @@ private static AgencyDataExcelReader appConfig;
 		}
 		return true;
 	}
-	public boolean validateTransactionZIPFileName(String zipFileName,String fileType) {
-		
-		if (zipFileName != null && zipFileName.length() == 33) {
+	public boolean validateTransactionZIPFileName(String zipFileName,String fileType,FileValidationParam validateParam) {
+		boolean zipNameValidation = false;
+		if (zipFileName != null && zipFileName.length() == 33 && zipFileName.matches(IAGConstants.TRAN_ZIP_FILE_NAME_FORMAT)) {
 			String[] fileParams = zipFileName.split("[_.]");
 			System.out.println("zipFileName ::"+Arrays.toString(fileParams));
 			if ((fileParams.length == 5 && fileParams[3].equals(fileType)
@@ -843,19 +851,28 @@ private static AgencyDataExcelReader appConfig;
 				dateFormat.setLenient(false);
 				try {
 					dateFormat.parse(fileParams[2].trim());
-					return true;
+					zipNameValidation = true;
 				} catch (ParseException pe) {
+					pe.printStackTrace();
 					controller.getErrorMsglist().add(new ErrorMsgDetail(FILE_RECORD_TYPE,"File","Zip file Name Date and time invalid :: YYYYMMDDHHMMSS \t ::"+zipFileName));
-					return false;
+					zipNameValidation = false;
 					
 				}
 
 			}
-			controller.getErrorMsglist().add(new ErrorMsgDetail(FILE_RECORD_TYPE,"File","Zip file Name Validation Failed :: {FROM_AGENCY_ID}_{TO_AGENCY_ID}_YYYYMMDDHHMMSS."+fileType+" \t ::"+zipFileName));
-		}else {
-		controller.getErrorMsglist().add(new ErrorMsgDetail(FILE_RECORD_TYPE,"File","Zip file Name invalid length :: file lenght should be 33 \t ::"+zipFileName));
 		}
-			return false;
+		
+		if(!zipNameValidation) {
+			log.info("Transaction ZIP file validation is failed "+zipFileName);
+			String ackFileName = validateParam.getToAgency() + "_" + zipFileName.replace(".ZIP", "") + IAGConstants.ACK_FILE_EXTENSION;
+			log.info("Transaction ZIP file validation is failed ackFileName ::"+ackFileName);
+			iagAckMapper.mapToIagAckFile(zipFileName, "07", validateParam.getOutputFilePath()+File.separator+ackFileName, zipFileName.substring(0, 4),validateParam.getToAgency());
+   		 	validateParam.setResponseMsg("\t Invalid ZIP file format");
+   		 	controller.getErrorMsglist().add(new ErrorMsgDetail(FILE_RECORD_TYPE,"ZIP File Name","ZIP file Name validation is failed"));
+		}
+		System.out.println("zipNameValidation ::"+zipNameValidation);
+		
+			return zipNameValidation;
 	}
 	
 	public boolean validateParameter(FileValidationParam validateParam) {

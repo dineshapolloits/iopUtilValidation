@@ -52,6 +52,7 @@ public class ITXCFileDetailValidation {
 	
 	List<ITXCTemplate> itxcTempList;
 	
+	@Autowired
 	ICTXFileDetailValidation ictxfileValidation;
 	
 	
@@ -85,7 +86,7 @@ public boolean itxcValidation(FileValidationParam validateParam) throws IOExcept
        	 }
         	
         	//validate ZIP file name format
-        	if(commonUtil.validateTransactionZIPFileName(inputItagZipFile.getName(), IAGConstants.ITXC_FILE_TYPE)) {
+        	if(commonUtil.validateTransactionZIPFileName(inputItagZipFile.getName(), IAGConstants.ITXC_FILE_TYPE,validateParam)) {
         		
         		String fileName="";
        		 //extract ZIP file 
@@ -119,11 +120,12 @@ public boolean itxcValidation(FileValidationParam validateParam) throws IOExcept
 					long headerCount =0l;
 					String ackCode="00";
 					String itxcFileNum="";
+					ictxfileValidation.invalidRecordCount = 0;
 					while ((fileRowData = br.readLine()) != null) {
 						log.info(noOfRecords + " :: " + fileRowData);
 						if(noOfRecords == 0) {
 							// Validate Header record
-							headerCount = Long.parseLong(fileRowData.substring(40, 48));
+							
 							
 							if(!validateItxcHeader(fileRowData,validateParam,fileName)) {
 								//create ACK file 
@@ -133,6 +135,14 @@ public boolean itxcValidation(FileValidationParam validateParam) throws IOExcept
 							}
 							
 							iagAckMapper.mapToIagAckFile(fileName, ackCode, validateParam.getOutputFilePath()+File.separator+ackFileName, fileName.substring(0, 4),validateParam.getToAgency());
+							if (fileRowData.length()> 48 && fileRowData.substring(40, 48).matches(IAGConstants.TRAN_RECORD_COUNT_FORMAT)) {
+								headerCount = Long.parseLong(fileRowData.substring(40, 48));
+							}else {
+								log.error("Invalid count format ::"+fileRowData);
+								headerCount =0;
+								controller.getErrorMsglist().add(new ErrorMsgDetail(HEADER_RECORD_TYPE,"RECORD_COUNT","Invalid count format::"+fileRowData));
+								return false;
+							}
 							if(validateParam.getValidateType().equals("header")) {
 					        	 log.info("Only file name and header validation");
 					        	 return true;
@@ -149,15 +159,16 @@ public boolean itxcValidation(FileValidationParam validateParam) throws IOExcept
 						}
 						noOfRecords++;
 					}
+					log.info("ictxfileValidation.invalidRecordCount :: = "+ictxfileValidation.invalidRecordCount);
 					if((noOfRecords-1) != headerCount ) {
-						validateParam.setResponseMsg("FAILED Reason:: Header count("+headerCount+") and detail count not matching ::"+noOfRecords);
+						validateParam.setResponseMsg("\t Header count("+headerCount+") and detail count not matching ::"+(noOfRecords-1));
 						iagAckMapper.mapToIagAckFile(fileName, "01", validateParam.getOutputFilePath()+File.separator+ackFileName, fileName.substring(0, 4),validateParam.getToAgency());
 						return false;
 					}
-					if(controller.getErrorMsglist().size()>0) {
+					if(controller.getErrorMsglist().size()>0 && ictxfileValidation.invalidRecordCount >0) {
 						validateParam.setResponseMsg("\t \t ACK file name ::"+ackFileName);
 						iagAckMapper.mapToIagAckFile(fileName, "02", validateParam.getOutputFilePath()+File.separator+ackFileName, fileName.substring(0, 4),validateParam.getToAgency());
-					} else {
+					} else if(controller.getErrorMsglist().size()== 0 && ictxfileValidation.invalidRecordCount == 0 ) {
 						// generate ICTXTemplate format excel file.
 						log.info("itxcTempList size ::" + itxcTempList.size());
 						if (controller.getErrorMsglist().size() == 0) {
@@ -229,42 +240,46 @@ private boolean validateItxcDetail(String fileRowData, FileValidationParam valid
     	addErrorMsg(DETAIL_RECORD_TYPE, "CORR_REASON",
 				"Correction code should be 01|02|03|04|05|06|07|08 ::\t "
 						+ fileRowData.substring(0, 2) + "\t " + lineNo);
-    	
-    	ictxfileValidation.validateIctxDetail(fileRowData.substring(2),validateParam,rowNo);
+    	ictxfileValidation.invalidRecordCount ++;
     }
-    
-	return false;
+    	ictxfileValidation.validateIctxDetail(fileRowData.substring(2),validateParam,rowNo);
+    	
+	return true;
 }
 
 
 private boolean validateItxcHeader(String fileRowData, FileValidationParam validateParam, String fileName) {
-	
+	boolean invalidHeaderRecord = false;
 	// Header Total 61
     if (fileRowData == null || fileRowData.length() != 60 || fileRowData.isEmpty()) {
-    	controller.getErrorMsglist().add(new ErrorMsgDetail(HEADER_RECORD_TYPE,"Header Length","Invalid header lenght \t Header Row::"+fileRowData));
+    	controller.getErrorMsglist().add(new ErrorMsgDetail(HEADER_RECORD_TYPE,"Header Length","Invalid header length \t Header Row::"+fileRowData));
+    	return false;
     }
     
     // FILE_TYPE
     if (!fileRowData.substring(0, 4).equals(IAGConstants.ITXC_FILE_TYPE)) {
+    	invalidHeaderRecord = true;
         controller.getErrorMsglist().add(new ErrorMsgDetail(HEADER_RECORD_TYPE,"FILE_TYPE","File Type should be ITXC ::\t "+fileRowData.substring(0, 4)+" \t :: Header Row::\t "+fileRowData));
     }
     //IAG Version
-    if (!fileRowData.substring(4, 12).matches(IAGConstants.IAG_HEADER_VERSION_FORMAT) || 
-    		!fileRowData.substring(4, 12).equals(ValidationController.cscIdTagAgencyMap.get(fileRowData.substring(12, 16)).getVersionNumber())) {
+    if (!fileRowData.substring(4, 12).matches(IAGConstants.IAG_HEADER_VERSION_FORMAT) || ( ValidationController.cscIdTagAgencyMap.get(fileRowData.substring(12, 16)) != null &&
+    		!fileRowData.substring(4, 12).equals(ValidationController.cscIdTagAgencyMap.get(fileRowData.substring(12, 16)).getVersionNumber()))) {
+    	invalidHeaderRecord = true;
     	addErrorMsg(HEADER_RECORD_TYPE,"VERSION","IAG Version not matched ::\t "+fileRowData.substring(0, 4)+" \t :: Header Row::\t "+fileRowData);
     }
 	
     // FROM_AGENCY_ID  //CHAR(4)
 	if (!fileRowData.substring(12, 16).matches(IAGConstants.AGENCY_ID_FORMAT)
-			|| !AgencyDataExcelReader.agencyCode.contains(fileRowData.substring(12, 16))) {
+			|| !AgencyDataExcelReader.agencyCode.contains(fileRowData.substring(12, 16)) || !fileRowData.substring(12, 16).equals(validateParam.getFromAgency())) {
 		addErrorMsg(HEADER_RECORD_TYPE,"FROM_AGENCY_ID","From Agency ID not match with configuration. Please check Agency list \t ::"+fileRowData.substring(12, 16));
-		
+		invalidHeaderRecord = true;
 	}
 
     // TO_AGENCY_ID //CHAR(4)
 
 	if (!fileRowData.substring(16, 20).matches(IAGConstants.AGENCY_ID_FORMAT)
-			|| !AgencyDataExcelReader.agencyCode.contains(fileRowData.substring(16, 20))) {
+			|| !AgencyDataExcelReader.agencyCode.contains(fileRowData.substring(16, 20)) || !fileRowData.substring(16, 20).equals(validateParam.getToAgency())) {
+		invalidHeaderRecord = true;
 		addErrorMsg(HEADER_RECORD_TYPE,"TO_AGENCY_ID","To Agency ID not match with configuration. Please check Agency list \t ::"+fileRowData.substring(16, 20));
 		
 	}
@@ -272,26 +287,31 @@ private boolean validateItxcHeader(String fileRowData, FileValidationParam valid
 	// FILE_DATE_TIME CHAR(20) Format: YYYY-MM-DDThh:mm:ssZ
 	String headerfileDateandTime = fileRowData.substring(20, 40);
     if (!headerfileDateandTime.matches(IAGConstants.FILE_DATE_TIME_FORMAT)) {
-        
+    	invalidHeaderRecord = true;
         addErrorMsg(HEADER_RECORD_TYPE,"FILE_DATE_TIME"," date and time format is invalid. Format should be YYYY-MM-DDThh:mm:ssZ  \t ::"+headerfileDateandTime);
     }else {
     	//Check if the date and time are valid
     	if (!commonUtil.isValidDateTimeInDetail(headerfileDateandTime)) {
+    		invalidHeaderRecord = true;
     		addErrorMsg(HEADER_RECORD_TYPE,"FILE_DATE_TIME"," Invalid date and time. Please check(YYYY-MM-DDThh:mm:ssZ)   \t ::"+headerfileDateandTime);
         }
     }
     
 	// RECORD_COUNT CHAR(8) Values: 00000000 – 99999999
 	if (!fileRowData.substring(40, 48).matches(IAGConstants.TRAN_RECORD_COUNT_FORMAT)) {
+		invalidHeaderRecord = true;
 		addErrorMsg(HEADER_RECORD_TYPE,"RECORD_COUNT"," Invalid record count format. Values: 00000000 – 99999999    \t ::"+fileRowData.substring(40, 48));
 	}
 
 	// ICTX_FILE_NUM CHAR(12) Values 000000000001 – 999999999999.
 
 	if (!fileRowData.substring(48, 60).matches(IAGConstants.ICTX_FILE_NUM_FORMAT)) {
+		invalidHeaderRecord = true;
 		addErrorMsg(HEADER_RECORD_TYPE,"ICTX_FILE_NUM"," Invalid ICTX file number format  \t ::"+fileRowData.substring(48, 60));
 	}
-
+	if (invalidHeaderRecord) {
+		return false;
+	}
 	return true;
 }
 

@@ -104,7 +104,7 @@ public class ICLPFileDetailValidation {
 					log.info(noOfRecords + " :: " + fileRowData);
 					if(noOfRecords == 0) {
 						// Validate Header record
-						headerCount = Long.parseLong(fileRowData.substring(36,46));
+						
 						if(!validateIclpHeader(fileRowData,validateParam,fileName)) {
 							//create ACK file 
 							 //String ackFileName = IAGConstants.SRTA_HOME_AGENCY_ID + "_" + fileName.replace(".", "_") + IAGConstants.ACK_FILE_EXTENSION;
@@ -115,6 +115,25 @@ public class ICLPFileDetailValidation {
 				        	 log.info("Only file name and header validation");
 				        	 return true;
 				         }
+						try {
+							headerCount = Long.parseLong(fileRowData.substring(36,46));
+						}catch (Exception e) {
+							log.error("Invalid Header Count format  ::"+fileRowData);
+							headerCount =0;
+							controller.getErrorMsglist().add(new ErrorMsgDetail(HEADER_RECORD_TYPE,"RECORD_COUNT","Invalid record count format ::"+fileRowData));
+							e.printStackTrace();
+							return false;
+							// TODO: handle exception
+						}
+						/*if (fileRowData.length() == 46 && fileRowData.substring(36,46).matches(IAGConstants.ITAG_HEADER_COUNT_FORMAT)) {
+							headerCount = Long.parseLong(fileRowData.substring(36,46));
+						}else {
+							log.error("Invalid Header Count format  ::"+fileRowData);
+							headerCount =0;
+							controller.getErrorMsglist().add(new ErrorMsgDetail(HEADER_RECORD_TYPE,"RECORD_COUNT","Invalid record count format ::"+fileRowData));
+							return false;
+						}*/
+						//headerCount = Long.parseLong(fileRowData.substring(36,46));
 					}else {
 						if(!validateIclpDetail(fileRowData,validateParam,fileName,noOfRecords)) {
 							iagAckMapper.mapToIagAckFile(fileName, "02", validateParam.getOutputFilePath()+File.separator+ackFileName, fileName.substring(0, 4),validateParam.getToAgency());
@@ -199,12 +218,17 @@ public class ICLPFileDetailValidation {
         	 log.error("Header record for ICLP file is invalid - " + headervalue);
         	 return false;
          }
+         if (headervalue == null || headervalue.length() != 46 || headervalue.isEmpty()) {
+          	controller.getErrorMsglist().add(new ErrorMsgDetail(HEADER_RECORD_TYPE,"Header Length","Invalid header length \t Header Row::"+headervalue));
+          	return false;
+          }
          if(!headerFileType.equals(IAGConstants.ICLP_FILE_TYPE)) {
         	 controller.getErrorMsglist().add(new ErrorMsgDetail(HEADER_RECORD_TYPE,"File Type","invalid FileType " + headerFileType));
         	 log.error("Header record file type is invalid - " + headerFileType);
         	 //validateParam.setResponseMsg("Header record file type is invalid - " + headerFileType);
         	 invalidHeaderRecord = true;
          }
+         
          final Pattern pattern = Pattern.compile(IAGConstants.IAG_HEADER_VERSION_FORMAT);
          if (!pattern.matcher(headerVersion).matches() ||
         		 !headerVersion.equals(ValidationController.cscIdTagAgencyMap.get(fromAgencyId).getVersionNumber())) {

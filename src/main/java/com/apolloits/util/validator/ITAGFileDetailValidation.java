@@ -111,7 +111,7 @@ public class ITAGFileDetailValidation {
 							log.info(noOfRecords + " :: " + fileRowData);
 							if(noOfRecords == 0) {
 								// Validate Header record
-								headerCount = Long.parseLong(fileRowData.substring(36,46));
+								//headerCount = Long.parseLong(fileRowData.substring(36,46));
 								if(!validateItagHeader(fileRowData,validateParam,fileName)) {
 									//create ACK file 
 									 //String ackFileName = IAGConstants.SRTA_HOME_AGENCY_ID + "_" + fileName.replace(".", "_") + IAGConstants.ACK_FILE_EXTENSION;
@@ -122,6 +122,17 @@ public class ITAGFileDetailValidation {
 						        	 log.info("Only file name and header validation");
 						        	 return true;
 						         }
+								
+								try {
+									headerCount = Long.parseLong(fileRowData.substring(36,46));
+								}catch (Exception e) {
+									log.error("Invalid Header Count format  ::"+fileRowData);
+									headerCount =0;
+									controller.getErrorMsglist().add(new ErrorMsgDetail(HEADER_RECORD_TYPE,"RECORD_COUNT","Invalid record count format ::"+fileRowData));
+									e.printStackTrace();
+									return false;
+									// TODO: handle exception
+								}
 							}else {
 								if(!validateItagDetail(fileRowData,validateParam,fileName,noOfRecords)) {
 									validateParam.setResponseMsg(validateParam.getResponseMsg() +"\t    Line No::"+noOfRecords);
@@ -241,6 +252,10 @@ public class ITAGFileDetailValidation {
         	 addErrorMsg(HEADER_RECORD_TYPE,"HeaderDate", "Header record for ITAG file is invalid format or length - " + headervalue);
         	 invalidHeaderRecord = true;
          }
+         if (headervalue == null || headervalue.length() != 46 || headervalue.isEmpty()) {
+           	controller.getErrorMsglist().add(new ErrorMsgDetail(HEADER_RECORD_TYPE,"Header Length","Invalid header length \t Header Row::"+headervalue));
+           	return false;
+           }
          if(!headerFileType.equals(IAGConstants.ITAG_FILE_TYPE)) {
         	 log.error("FAILED Reason:: Header record file type is invalid - " + headerFileType);
         	 //validateParam.setResponseMsg("FAILED Reason:: Header record file type is invalid - " + headerFileType);

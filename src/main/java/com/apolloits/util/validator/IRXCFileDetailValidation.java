@@ -42,9 +42,11 @@ public class IRXCFileDetailValidation {
 	@Autowired
 	private CommonUtil commonUtil;
 	
+	int invalidRecordCount = 0;
+	
 	
 	public boolean irxcValidation(FileValidationParam validateParam) throws IOException {
-
+		invalidRecordCount = 0;
 		File inputItagZipFile = new File(validateParam.getInputFilePath());
 		String ackFileName = null;
 		if (!inputItagZipFile.exists()) {
@@ -144,9 +146,11 @@ public class IRXCFileDetailValidation {
 							return false;
 						}
 						String ackcode = "00";
-						if (controller.getErrorMsglist().size() > 0) {
+						if (controller.getErrorMsglist().size() > 0 && invalidRecordCount>0) {
 							validateParam.setResponseMsg("\t \t ACK file name ::" + ackFileName);
 							ackcode="02";
+						}else if(controller.getErrorMsglist().size() > 0 && invalidRecordCount == 0 ) {
+							ackcode="01";
 						}else {
 							validateParam.setResponseMsg("\t \t ACK file name ::" + ackFileName);
 							
@@ -171,9 +175,10 @@ public class IRXCFileDetailValidation {
 	private boolean validateIrxcDetail(String fileRowData, FileValidationParam validateParam, String fileName,
 			long rowNo) {
 		String lineNo = "\t <b>Row :: </b>"+fileRowData +"\t <b>Line No:: </b>"+rowNo;
-		
+		boolean invalidRecord = false;
 		if (fileRowData == null || fileRowData.length() != 59) {
 			 addErrorMsg(DETAIL_RECORD_TYPE,"Detail Length","Record length is not match with IRXC length 201 ::\t "+lineNo);
+			 invalidRecordCount++;
 		        return false;
 	    }
 		
@@ -182,12 +187,14 @@ public class IRXCFileDetailValidation {
 			addErrorMsg(DETAIL_RECORD_TYPE, "ETC_TRX_SERIAL_NUM",
 					"Format not matched Values: 00000000000000000000 – 99999999999999999999 ::\t "
 							+ fileRowData.substring(0, 20) + "\t " + lineNo);
+			invalidRecord = true;
 		}
 		// ETC_POST_STATUS CHAR(4)
 		if (!fileRowData.substring(20, 24).matches("POST|PPST|NPST|INSU|RJPL|OLD1|OLD2|ACCB|RINV|TAGB|RJDP|RJTA")) {
 			addErrorMsg(DETAIL_RECORD_TYPE, "ETC_POST_STATUS",
 					"Value should be POST|PPST|NPST|INSU|RJPL|OLD1|OLD2|ACCB|RINV|TAGB|RJDP|RJTA ::\t "
 							+ fileRowData.substring(20, 24) + "\t " + lineNo);
+			invalidRecord = true;
 		}
 		//ETC_POST_PLAN CHAR(5)
 		if (!fileRowData.substring(24, 29)
@@ -195,12 +202,14 @@ public class IRXCFileDetailValidation {
 			addErrorMsg(DETAIL_RECORD_TYPE, "ETC_POST_PLAN",
 					"Value should be 00002|00003|00004|00005|00006|00007|00008|00009|00010|00011|00012|00013|00014|00023 or blank ::\t"
 							+ fileRowData.substring(24, 29) + "\t " + lineNo);
+			invalidRecord = true;
 		}
 		
 		//ETC_DEBIT_CREDIT /CHAR(1) 
 	    if (!fileRowData.substring(29, 30).matches(IAGConstants.ETC_DEBIT_CREDIT_FORMAT)) {
 	    	addErrorMsg(DETAIL_RECORD_TYPE, "ETC_DEBIT_CREDIT",
 					"Format should be [+,- or space] Invalid Format  \t ::"+ fileRowData.substring(29, 30) + "\t " + lineNo);
+	    	invalidRecord = true;
 	    }
 
 	    //ETC_OWED_AMOUNT
@@ -209,6 +218,7 @@ public class IRXCFileDetailValidation {
 			addErrorMsg(DETAIL_RECORD_TYPE, "ETC_TOLL_AMOUNT",
 					" Values: 000000000 ($0000000.00) – 000499999 ($0004999.99). \t  Invalid Format  \t ::"
 							+ fileRowData.substring(30, 39) + "\t " + lineNo);
+			invalidRecord = true;
 		}
 		
 		//ETC_DUP_SERIAL_NUM /CHAR(20) 
@@ -216,17 +226,21 @@ public class IRXCFileDetailValidation {
 	    	addErrorMsg(DETAIL_RECORD_TYPE, "ETC_DUP_SERIAL_NUM",
 					" Values should be : 00000000000000000000 – 99999999999999999999. \t  Invalid Format  \t ::"
 							+ fileRowData.substring(39, 59) + "\t " + lineNo);
+	    	invalidRecord = true;
 	    }
-	    
+	    if(invalidRecord) {
+	    	invalidRecordCount++;
+	    }
 		return true;
 	}
 	
 	private boolean validateIrxcHeader(String fileRowData, FileValidationParam validateParam, String fileName) {
-
+		boolean invalidHeaderRecord = false;
 		// Header Total 61
 		if (fileRowData == null || fileRowData.length() != 60 || fileRowData.isEmpty()) {
 			controller.getErrorMsglist().add(new ErrorMsgDetail(HEADER_RECORD_TYPE, "Header Length",
 					"Invalid header lenght \t <b>Header Row::</b>" + fileRowData));
+			return false;
 		}
 
 		// FILE_TYPE
@@ -234,12 +248,14 @@ public class IRXCFileDetailValidation {
 			controller.getErrorMsglist()
 					.add(new ErrorMsgDetail(HEADER_RECORD_TYPE, "FILE_TYPE", "File Type should be IRXC ::\t "
 							+ fileRowData.substring(0, 4) + " \t ::<b> Header Row::</b>\t " + fileRowData));
+			invalidHeaderRecord = true;
 		}
 		// IAG Version
 		if (!fileRowData.substring(4, 12).matches(IAGConstants.IAG_HEADER_VERSION_FORMAT) || !fileRowData.substring(4, 12)
 				.equals(ValidationController.cscIdTagAgencyMap.get(fileRowData.substring(12, 16)).getVersionNumber())) {
 			addErrorMsg(HEADER_RECORD_TYPE, "VERSION",
 					"IAG Version not matched ::\t " + fileRowData.substring(0, 4) + " \t :: Header Row::\t " + fileRowData);
+			invalidHeaderRecord = true;
 		}
 
 		// FROM_AGENCY_ID //CHAR(4)
@@ -248,6 +264,7 @@ public class IRXCFileDetailValidation {
 			addErrorMsg(HEADER_RECORD_TYPE, "FROM_AGENCY_ID",
 					"From Agency ID not match with configuration. Please check Agency list \t ::"
 							+ fileRowData.substring(12, 16));
+			invalidHeaderRecord = true;
 
 		}
 
@@ -258,6 +275,7 @@ public class IRXCFileDetailValidation {
 			addErrorMsg(HEADER_RECORD_TYPE, "TO_AGENCY_ID",
 					"To Agency ID not match with configuration. Please check Agency list \t ::"
 							+ fileRowData.substring(16, 20));
+			invalidHeaderRecord = true;
 
 		}
 
@@ -268,11 +286,13 @@ public class IRXCFileDetailValidation {
 			addErrorMsg(HEADER_RECORD_TYPE, "FILE_DATE_TIME",
 					" date and time format is invalid. Format should be YYYY-MM-DDThh:mm:ssZ  \t ::"
 							+ headerfileDateandTime);
+			invalidHeaderRecord = true;
 		} else {
 			// Check if the date and time are valid
 			if (!commonUtil.isValidDateTimeInDetail(headerfileDateandTime)) {
 				addErrorMsg(HEADER_RECORD_TYPE, "FILE_DATE_TIME",
 						" Invalid date and time. Please check(YYYY-MM-DDThh:mm:ssZ)   \t ::" + headerfileDateandTime);
+				invalidHeaderRecord = true;
 			}
 		}
 
@@ -280,6 +300,7 @@ public class IRXCFileDetailValidation {
 		if (!fileRowData.substring(40, 48).matches(IAGConstants.TRAN_RECORD_COUNT_FORMAT)) {
 			addErrorMsg(HEADER_RECORD_TYPE, "RECORD_COUNT",
 					" Invalid record count format. Values: 00000000 – 99999999    \t ::" + fileRowData.substring(40, 48));
+			invalidHeaderRecord = true;
 		}
 
 		// ICRX_FILE_NUM CHAR(12) Values 000000000001 – 999999999999.
@@ -287,8 +308,11 @@ public class IRXCFileDetailValidation {
 		if (!fileRowData.substring(48, 60).matches(IAGConstants.ICTX_FILE_NUM_FORMAT)) {
 			addErrorMsg(HEADER_RECORD_TYPE, "IRXC_FILE_NUM",
 					" Invalid ICRX file number format  \t ::" + fileRowData.substring(48, 60));
+			invalidHeaderRecord = true;
 		}
-
+		if(invalidHeaderRecord) {
+		   	 return false;
+		    }
 		return true;
 	}
 

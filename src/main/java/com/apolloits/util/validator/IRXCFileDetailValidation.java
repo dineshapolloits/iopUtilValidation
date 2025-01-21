@@ -55,7 +55,10 @@ public class IRXCFileDetailValidation {
 			return false;
 		} else {
 			log.info("irxcValidation FileValidationParam vaidation from UI ");
-			if (!validateParam.getFromAgency().equals(inputItagZipFile.getName().substring(0, 4))) {
+			if(!commonUtil.validateFromandToAgencyByFileName(inputItagZipFile.getName(),validateParam)) {
+        		return false;
+        	}
+		/*	if (!validateParam.getFromAgency().equals(inputItagZipFile.getName().substring(0, 4))) {
 				log.error("From Agency code not match with file Name");
 				controller.getErrorMsglist().add(new ErrorMsgDetail(FILE_RECORD_TYPE, "From Agency", "From Agency code "
 						+ validateParam.getFromAgency() + " not match with file Name ::" + inputItagZipFile.getName()));
@@ -76,7 +79,7 @@ public class IRXCFileDetailValidation {
 				controller.getErrorMsglist().add(new ErrorMsgDetail(FILE_RECORD_TYPE, "To Agency",
 						"To Agency code " + validateParam.getToAgency() + " not match with Configuration ::"));
 				return false;
-			}
+			}*/
 			// validate ZIP file name format
 			if (commonUtil.validateTransactionZIPFileName(inputItagZipFile.getName(), IAGConstants.IRXC_FILE_TYPE,validateParam)) {
 
@@ -100,7 +103,7 @@ public class IRXCFileDetailValidation {
 					return false;
 				}
 
-				if (commonUtil.isTransactionFileFormatValid(fileName, "IRXC")) {
+				if (commonUtil.isTransactionFileFormatValid(fileName, "IRXC",validateParam)) {
 					if (validateParam.getValidateType().equals("filename")) {
 						validateParam.setResponseMsg("File name validation is sucess");
 						return true;
@@ -260,9 +263,10 @@ public class IRXCFileDetailValidation {
 
 		// FROM_AGENCY_ID //CHAR(4)
 		if (!fileRowData.substring(12, 16).matches(IAGConstants.AGENCY_ID_FORMAT)
-				|| !AgencyDataExcelReader.agencyCode.contains(fileRowData.substring(12, 16))) {
+				|| !AgencyDataExcelReader.agencyCode.contains(fileRowData.substring(12, 16))
+				|| !fileRowData.substring(12, 16).equals(validateParam.getFromAgency())) {
 			addErrorMsg(HEADER_RECORD_TYPE, "FROM_AGENCY_ID",
-					"From Agency ID not match with configuration. Please check Agency list \t ::"
+					"From Agency ID not match with file name. Please check Agency list \t ::"
 							+ fileRowData.substring(12, 16));
 			invalidHeaderRecord = true;
 
@@ -271,9 +275,10 @@ public class IRXCFileDetailValidation {
 		// TO_AGENCY_ID //CHAR(4)
 
 		if (!fileRowData.substring(16, 20).matches(IAGConstants.AGENCY_ID_FORMAT)
-				|| !AgencyDataExcelReader.agencyCode.contains(fileRowData.substring(16, 20))) {
+				|| !AgencyDataExcelReader.agencyCode.contains(fileRowData.substring(16, 20))
+				|| !fileRowData.substring(16, 20).equals(validateParam.getToAgency())) {
 			addErrorMsg(HEADER_RECORD_TYPE, "TO_AGENCY_ID",
-					"To Agency ID not match with configuration. Please check Agency list \t ::"
+					"To Agency ID not match with file name. Please check Agency list \t ::"
 							+ fileRowData.substring(16, 20));
 			invalidHeaderRecord = true;
 

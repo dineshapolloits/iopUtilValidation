@@ -66,7 +66,10 @@ public boolean itxcValidation(FileValidationParam validateParam) throws IOExcept
 			 return false;
         }else {
         	log.info("ictxValidation FileValidationParam vaidation from UI ");
-        	if(!validateParam.getFromAgency().equals(inputItagZipFile.getName().substring(0,4))) {
+        	if(!commonUtil.validateFromandToAgencyByFileName(inputItagZipFile.getName(),validateParam)) {
+        		return false;
+        	}
+        	/*if(!validateParam.getFromAgency().equals(inputItagZipFile.getName().substring(0,4))) {
           		 log.error("From Agency code not match with file Name");
           		 controller.getErrorMsglist().add(new ErrorMsgDetail(FILE_RECORD_TYPE,"From Agency","From Agency code "+validateParam.getFromAgency()+" not match with file Name ::"+inputItagZipFile.getName()));
           		 return false;
@@ -83,7 +86,7 @@ public boolean itxcValidation(FileValidationParam validateParam) throws IOExcept
        		 //validateParam.setResponseMsg("From Agency code "+validateParam.getFromAgency()+" not match with file Name ::"+inputItagZipFile.getName());
        		 controller.getErrorMsglist().add(new ErrorMsgDetail(FILE_RECORD_TYPE,"To Agency","To Agency code "+validateParam.getToAgency()+" not match with Configuration ::"));
        		 return false;
-       	 }
+       	 }*/
         	
         	//validate ZIP file name format
         	if(commonUtil.validateTransactionZIPFileName(inputItagZipFile.getName(), IAGConstants.ITXC_FILE_TYPE,validateParam)) {
@@ -105,7 +108,7 @@ public boolean itxcValidation(FileValidationParam validateParam) throws IOExcept
 	        		 return false;
 				}
        		 
-       		if(commonUtil.isTransactionFileFormatValid(fileName,IAGConstants.ITXC_FILE_TYPE)) {
+       		if(commonUtil.isTransactionFileFormatValid(fileName,IAGConstants.ITXC_FILE_TYPE,validateParam)) {
    			 if(validateParam.getValidateType().equals("filename")) {
    				 validateParam.setResponseMsg("File name validation is sucess");
    				 return true;

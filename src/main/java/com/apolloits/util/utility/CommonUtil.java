@@ -697,7 +697,7 @@ private static AgencyDataExcelReader appConfig;
 		}
 	}
 	
-	public boolean isTransactionFileFormatValid(String transactionFilename,String fileType ) {
+	public boolean isTransactionFileFormatValid(String transactionFilename,String fileType,FileValidationParam validateParam ) {
 		boolean isvalid = true;
 		String fileName="File Name";
 		String[] fileParams = transactionFilename.split("[_.]"); //this param need to apply all below if condition
@@ -741,6 +741,12 @@ private static AgencyDataExcelReader appConfig;
 	    if(!AgencyDataExcelReader.agencyCode.contains(transactionFilename.substring(5, 9))) {
 	    	controller.getErrorMsglist().add(new ErrorMsgDetail(FILE_RECORD_TYPE,fileName,"To agency  is not configured ::\t "+transactionFilename.substring(5, 9)));
 	    	isvalid = false;
+	    }
+	    if(!isvalid) {
+	    	String ackFileName = validateParam.getToAgency() + "_" + transactionFilename.replace(".", "_") + IAGConstants.ACK_FILE_EXTENSION;
+			log.info("Transaction ZIP file validation is failed ackFileName ::"+ackFileName);
+			iagAckMapper.mapToIagAckFile(transactionFilename, "07", validateParam.getOutputFilePath()+File.separator+ackFileName, transactionFilename.substring(0, 4),validateParam.getToAgency());
+   		 	
 	    }
 	    return isvalid;
 	}
@@ -956,5 +962,31 @@ private static AgencyDataExcelReader appConfig;
 		return value;
 	}
 	
+	public boolean validateFromandToAgencyByFileName(String fileName,FileValidationParam validateParam) {
+		boolean returnFlage= true;
+		try {
+			if(!validateParam.getFromAgency().equals(fileName.substring(0,4))) {
+         		 log.error("From Agency code not match with file Name");
+         		 controller.getErrorMsglist().add(new ErrorMsgDetail(FILE_RECORD_TYPE,"From Agency","From Agency code "+validateParam.getFromAgency()+" not match with file Name ::"+fileName));
+         		returnFlage= false;
+         	 }
+       	
+       	if(!validateParam.getToAgency().equals(fileName.substring(5,9))) {
+        		 log.error("TO Agency code not match with file Name ::"+fileName.substring(5,9));
+        		 controller.getErrorMsglist().add(new ErrorMsgDetail(FILE_RECORD_TYPE,"To Agency","To Agency code "+validateParam.getToAgency()+" not match with file Name ::"+fileName));
+        		 returnFlage= false;
+        	 }
+       	
+       	if(validateParam.getFromAgency().equals(validateParam.getToAgency())) {
+      		 log.error("From Agency code and To agency code should not be same");
+      		 controller.getErrorMsglist().add(new ErrorMsgDetail(FILE_RECORD_TYPE,"From Agency","From Agency code "+validateParam.getFromAgency()+" and Toagency code should not be same  ::"+validateParam.getToAgency()));
+      		returnFlage= false;
+      	 }
+		}catch (Exception e) {
+			returnFlage= false;
+			e.printStackTrace();
+		}
+		return returnFlage;
+	}
 	
 }

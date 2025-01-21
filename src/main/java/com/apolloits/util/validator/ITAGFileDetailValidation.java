@@ -397,7 +397,12 @@ public class ITAGFileDetailValidation {
         	addErrorMsg(DETAIL_RECORD_TYPE,"tag status", "Invalid  status - "+ tagStatus +lineNo);
         	invalidRecord=true;
         }
-
+        //TAG_HOME_AGENCY
+        if(ValidationController.cscIdTagAgencyMap.get(tagHomeAgency) == null ) {
+        	log.error("Invalid ITAG detail, TAG_HOME_AGENCY invalid Tag home agency  - "+tagHomeAgency+lineNo);
+        	addErrorMsg(DETAIL_RECORD_TYPE,"TAG_HOME_AGENCY", "Invalid tag home agency - "+tagHomeAgency+lineNo);
+        	invalidRecord=true;
+        }
          pattern = Pattern.compile(IAGConstants.ITAG_DTL_TAG_AC_TYP_IND);
         if (!pattern.matcher(tagAcTypeInd).matches()) {
         	log.error("Invalid ITAG detail, TAG_AC_TYPE_IND invalid tag type - "+tagAcTypeInd+lineNo);
@@ -405,7 +410,28 @@ public class ITAGFileDetailValidation {
         	//validateParam.setResponseMsg("Invalid ITAG detail, invalid tag type - "+tagAcTypeInd+" Row ::"+fileRowData);
         	invalidRecord=true;
         }
-
+        //TAG_ACCOUNT_NO
+        pattern = Pattern.compile("[0-9 A-Z*]{50}");
+        if (!pattern.matcher(tagAccountNo).matches()) {
+        	log.error("Invalid ITAG detail, TAG_ACCOUNT_NO invalid TAG_ACCOUNT_NO - "+tagAccountNo+lineNo);
+        	addErrorMsg(DETAIL_RECORD_TYPE,"TAG_ACCOUNT_NO", "Invalid TAG_ACCOUNT_NO - "+tagAccountNo+lineNo);
+        	invalidRecord=true;
+        }
+        
+        //TAG_PROTOCOL
+        pattern = Pattern.compile(IAGConstants.ITAG_DTL_TAG_PROTOCOL);
+        if (!pattern.matcher(tagProtocol).matches()) {
+        	log.error("Invalid ITAG detail, TAG_PROTOCOL invalid tag type - "+tagProtocol+lineNo);
+        	addErrorMsg(DETAIL_RECORD_TYPE,"TAG_PROTOCOL", "Invalid TAG_PROTOCOL - "+tagProtocol+lineNo);
+        	invalidRecord=true;
+        }
+        //TAG_TYPE
+        pattern = Pattern.compile(IAGConstants.ITAG_DTL_TAG_TYP);
+        if (!pattern.matcher(tagType).matches()) {
+        	log.error("Invalid ITAG detail, TAG_TYPE invalid tag type - "+tagType+lineNo);
+        	addErrorMsg(DETAIL_RECORD_TYPE,"TAG_TYPE", "Invalid tag  type - "+tagType+lineNo);
+        	invalidRecord=true;
+        }
          pattern = Pattern.compile(IAGConstants.ITAG_DTL_TAG_MOUNT);
         if (!pattern.matcher(tagMount).matches()) {
         	log.error("Invalid ITAG detail, invalid tag mount - "+tagMount +lineNo);

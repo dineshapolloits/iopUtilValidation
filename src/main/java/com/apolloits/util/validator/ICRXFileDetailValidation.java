@@ -156,6 +156,9 @@ public class ICRXFileDetailValidation {
 							iagAckMapper.mapToIagAckFile(fileName, "01",
 									validateParam.getOutputFilePath() + File.separator + ackFileName, fileName.substring(0, 4),
 									validateParam.getToAgency());
+							controller.getErrorMsglist()
+									.add(new ErrorMsgDetail(HEADER_RECORD_TYPE, "RECORD_COUNT", " Header count("
+											+ headerCount + ") and detail count not matching ::" + (noOfRecords - 1)));
 							return false;
 						}
 						String ackcode = "00";
@@ -267,7 +270,9 @@ private boolean validateIcrxHeader(String fileRowData, FileValidationParam valid
 		invalidHeaderRecord = true;
 	}
 	// IAG Version
-	if (!fileRowData.substring(4, 12).matches(IAGConstants.IAG_HEADER_VERSION_FORMAT) || !fileRowData.substring(4, 12)
+	if (!fileRowData.substring(4, 12).matches(IAGConstants.IAG_HEADER_VERSION_FORMAT) 
+			|| ValidationController.cscIdTagAgencyMap.get(fileRowData.substring(12, 16)) == null
+			|| !fileRowData.substring(4, 12)
 			.equals(ValidationController.cscIdTagAgencyMap.get(fileRowData.substring(12, 16)).getVersionNumber())) {
 		addErrorMsg(HEADER_RECORD_TYPE, "VERSION",
 				"IAG Version not matched ::\t " + fileRowData.substring(0, 4) + " \t :: Header Row::\t " + fileRowData);
@@ -298,10 +303,11 @@ private boolean validateIcrxHeader(String fileRowData, FileValidationParam valid
 
 	// FILE_DATE_TIME CHAR(20) Format: YYYY-MM-DDThh:mm:ssZ
 	String headerfileDateandTime = fileRowData.substring(20, 40);
-	if (!headerfileDateandTime.matches(IAGConstants.FILE_DATE_TIME_FORMAT)) {
+	if (!headerfileDateandTime.matches(IAGConstants.FILE_DATE_TIME_FORMAT)
+			|| !fileName.substring(10, 24).equals(headerfileDateandTime.replaceAll("[-T:Z]", ""))) {
 		invalidHeaderRecord = true;
 		addErrorMsg(HEADER_RECORD_TYPE, "FILE_DATE_TIME",
-				" date and time format is invalid. Format should be YYYY-MM-DDThh:mm:ssZ  \t ::"
+				" date and time format is invalid or not match with file name. Format should be YYYY-MM-DDThh:mm:ssZ  \t ::"
 						+ headerfileDateandTime);
 	} else {
 		// Check if the date and time are valid

@@ -263,8 +263,9 @@ public class ITAGFileDetailValidation {
         	 invalidHeaderRecord = true;
          }
          final Pattern pattern = Pattern.compile(IAGConstants.IAG_HEADER_VERSION_FORMAT);
-         if (!pattern.matcher(headerVersion).matches() || 
-        		 !headerVersion.equals(ValidationController.cscIdTagAgencyMap.get(fromAgencyId).getVersionNumber())) {
+         if (!pattern.matcher(headerVersion).matches() 
+        		 || ValidationController.cscIdTagAgencyMap.get(fromAgencyId) == null
+        		 || !headerVersion.equals(ValidationController.cscIdTagAgencyMap.get(fromAgencyId).getVersionNumber())) {
         	 log.error("FAILED Reason:: Invalid header, version format is incorrect - " + headerVersion + "\t excepted version ::"+ValidationController.cscIdTagAgencyMap.get(fromAgencyId).getVersionNumber());
         	 addErrorMsg(HEADER_RECORD_TYPE,"IAG Version", "Version format is incorrect - " + headerVersion + "\t excepted version ::"+ValidationController.cscIdTagAgencyMap.get(fromAgencyId).getVersionNumber());
         	// validateParam.setResponseMsg("FAILED Reason:: Invalid header, version format is incorrect - " + headerVersion + "\t excepted version ::"+ValidationController.cscIdTagAgencyMap.get(fromAgencyId).getVersionNumber());
@@ -410,6 +411,12 @@ public class ITAGFileDetailValidation {
         	log.error("Invalid ITAG detail, invalid tag mount - "+tagMount +lineNo);
         	addErrorMsg(DETAIL_RECORD_TYPE,"Tag Mount", "Invalid tag mount - "+tagMount +lineNo);
         	//validateParam.setResponseMsg("Invalid ITAG detail, invalid tag mount - "+tagMount +" Row ::"+fileRowData);
+        	invalidRecord=true;
+        }
+        pattern = Pattern.compile(IAGConstants.ITAG_TAG_CLASS);
+        if(!pattern.matcher(tagClass).matches() && !tagClass.equals("****")) {
+        	log.error("Invalid ITAG detail, invalid TAG_CLASSt - "+tagClass +lineNo);
+        	addErrorMsg(DETAIL_RECORD_TYPE,"TAG_CLASS", "Invalid tag mount - "+tagClass +lineNo);
         	invalidRecord=true;
         }
 	}

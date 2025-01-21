@@ -70,8 +70,9 @@ public class IAGConstants {
     public static final String ITAG_DTL_TAG_SERIAL_NO = "[0-9]{10}";
     public static final String ITAG_DTL_TAG_STATUS = "[1-3]{1}";
     public static final String ITAG_DTL_TAG_AC_TYP_IND = "[B,F,P,V,R,*]{1}";
-
+    public static final String ITAG_TAG_CLASS = "[0-9 ]{4}";
     public static final String ITAG_DTL_TAG_PROTOCOL = "[T,S,6,***]";
+    
     public static final String ITAG_DTL_TAG_TYP = "[F,G,H,S,T,V,*]{1}";
     public static final String ITAG_DTL_TAG_MOUNT = "[I,L,R,H,V,*]{1}";
     public static final String ITAG_HEADER_COUNT_FORMAT = "\\d{10}";

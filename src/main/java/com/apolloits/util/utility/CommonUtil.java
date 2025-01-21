@@ -143,13 +143,15 @@ private static AgencyDataExcelReader appConfig;
 		System.out.println(" headervalue.substring(16, 36);"+ fileRowData.substring(16, 36).replaceAll("[-T:Z]", ""));
 		String filename = "0008_20241025002300.ITAG";
 		System.out.println(" headervalue.substring(16, 36);"+ filename.substring(5, filename.lastIndexOf(".")));
-		String zipfileName = "AB0001#   ";
-		String TRAN_ZIP_FILE_NAME_FORMAT = "^[A-Z \\d-.&]{10}$";
-		
-		if(zipfileName.matches(TRAN_ZIP_FILE_NAME_FORMAT)) {
-			System.out.println("true");
-		}else {
+		String zipfileName = "10 *";
+		Pattern pattern = Pattern.compile(IAGConstants.ITAG_TAG_CLASS);
+		String fileNameDateTime = "0034_0008_20250119103210.IRXC".substring(10, 24);
+		String headerDate = "2025-01-19T11:32:10Z";
+		System.out.println("fileNameDateTime ::"+fileNameDateTime +"\t headerDate = "+headerDate.replaceAll("[-T:Z]", ""));
+		if(!pattern.matcher(zipfileName).matches()) {
 			System.out.println("false");
+		}else {
+			System.out.println("true");
 		}
 	}
 

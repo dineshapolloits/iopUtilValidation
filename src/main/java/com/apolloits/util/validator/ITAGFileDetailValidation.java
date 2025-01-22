@@ -397,6 +397,13 @@ public class ITAGFileDetailValidation {
         	addErrorMsg(DETAIL_RECORD_TYPE,"tag status", "Invalid  status - "+ tagStatus +lineNo);
         	invalidRecord=true;
         }
+        //TAG_ACCT_INFO
+        pattern = Pattern.compile("[0-9A-F]{6}");
+        if(!pattern.matcher(tagAcctInfo).matches()) {
+        	log.error("Invalid ITAG detail, TAG_ACCT_INFO invalid Tag account info  - "+tagAcctInfo+lineNo);
+        	addErrorMsg(DETAIL_RECORD_TYPE,"TAG_ACCT_INFO", "Invalid Tag account info - "+tagAcctInfo+lineNo);
+        	invalidRecord=true;
+        }
         //TAG_HOME_AGENCY
         if(ValidationController.cscIdTagAgencyMap.get(tagHomeAgency) == null ) {
         	log.error("Invalid ITAG detail, TAG_HOME_AGENCY invalid Tag home agency  - "+tagHomeAgency+lineNo);

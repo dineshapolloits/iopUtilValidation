@@ -117,7 +117,8 @@ public class ACKFileDetailValidation {
 			String fileRowData = br.readLine();
 			if(fileRowData== null ||  fileRowData.length() != 92 ) {
 				controller.getErrorMsglist().add(new ErrorMsgDetail(HEADER_RECORD_TYPE, "Header Length",
-						"Invalid header lenght \t <b>Header Row::</b>" + fileRowData));
+						"Invalid header length \t <b>Header Row::</b>" + fileRowData));
+				return;
 			}
 			
 			// FILE_TYPE
@@ -128,10 +129,12 @@ public class ACKFileDetailValidation {
 			}
 			
 			// IAG Version
-			if (!fileRowData.substring(4, 12).matches(IAGConstants.IAG_HEADER_VERSION_FORMAT) || !fileRowData.substring(4, 12)
+			if (!fileRowData.substring(4, 12).matches(IAGConstants.IAG_HEADER_VERSION_FORMAT)
+					|| ValidationController.cscIdTagAgencyMap.get(fileRowData.substring(12, 16)) == null
+					|| !fileRowData.substring(4, 12)
 					.equals(ValidationController.cscIdTagAgencyMap.get(fileRowData.substring(12, 16)).getVersionNumber())) {
 				addErrorMsg(HEADER_RECORD_TYPE, "VERSION",
-						"IAG Version not matched ::\t " + fileRowData.substring(0, 4) + " \t :: Header Row::\t " + fileRowData);
+						"IAG Version not matched ::\t " + fileRowData.substring(12, 16) + " \t :: Header Row::\t " + fileRowData);
 			}
 			
 			// FROM_AGENCY_ID //CHAR(4)
@@ -177,9 +180,9 @@ public class ACKFileDetailValidation {
 			}
 			
 			// RETURN_CODE CHAR(2)
-			if (!fileRowData.substring(90, 92).matches("00|01|02|03|04|05|06")) {
+			if (!fileRowData.substring(90, 92).matches("00|01|02|03|04|05|06|07")) {
 				addErrorMsg(HEADER_RECORD_TYPE, "RETURN_CODE",
-						"Value should be 00|01|02|03|04|05|06 ::\t "
+						"Value should be 00|01|02|03|04|05|06|07 ::\t "
 								+ fileRowData.substring(90, 92));
 			}
 			

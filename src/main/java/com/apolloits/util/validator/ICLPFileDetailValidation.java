@@ -290,33 +290,26 @@ public class ICLPFileDetailValidation {
 			invalidRecord = true;
 			return false;
 		}
+		//System.lineSeparator()
+		if(fileRowData.contains(System.lineSeparator())) {
+			System.out.println("@@@@@@@@@@@@@@ true");
+		}else {
+			System.out.println("$$$$$$$$$$$$$$$$ false");
+		}
 		try {
 			licState = fileRowData.substring(0, 2);
-			System.out.println("licState ::"+licState);
 			licNumber = fileRowData.substring(2, 12);;
-			System.out.println("licNumber ::"+licNumber);
 			licType = fileRowData.substring(12, 42);
-			System.out.println("licType ::"+licType);
 			tagAgencyid = fileRowData.substring(42, 46);
-			System.out.println("tagAgencyid ::"+tagAgencyid);
 			tagSerialNo = fileRowData.substring(46, 56);
-			System.out.println("tagSerialNo ::"+tagSerialNo);
 			licEffectiveFrom = fileRowData.substring(56, 76);
-			System.out.println("licEffectiveFrom ::"+licEffectiveFrom);
 			licEffectiveTo = fileRowData.substring(76, 96);
-			System.out.println("licEffectiveTo ::"+licEffectiveTo);
 			licHomeAgency = fileRowData.substring(96, 100);
-			System.out.println("licHomeAgency ::"+licHomeAgency);
 			licAccountNo = fileRowData.substring(100, 150);
-			System.out.println("licAccountNo ::"+licAccountNo);
 			LicVin = fileRowData.substring(150, 167);
-			System.out.println("LicVin ::"+LicVin);
 			licGuaranteed = fileRowData.substring(167, 168);
-			System.out.println("licGuaranteed ::"+licGuaranteed);
 			licRegDate = fileRowData.substring(168, 188);
-			System.out.println("licRegDate ::"+licRegDate);
 			licUpdateDate = fileRowData.substring(188, 208);
-			System.out.println("licUpdateDate ::"+licUpdateDate);
 			System.out.println("agDataExcel.getPlateStateSet() ::"+agDataExcel.getPlateStateSet());
 			System.out.println("agDataExcel.getPlateStateSet().contains(licState) ::"+agDataExcel.getPlateStateSet().contains(licState));
 			if (!licState.matches("[A-Z]{2}") ) {

@@ -49,8 +49,8 @@
 							     </option>
 							  </select>
 						</p>
-						<p><b>From Agency Code</b>
-													<select th:field="*{toAgency}" class="form-control mb-4 col-4" id ="toAgencyCode">
+						<p id ="toAgencyCode"><b>To Agency Code</b>
+													<select th:field="*{toAgency}" class="form-control mb-4 col-4" >
 													     <option value="NONE">----Select To Agency Code----</option>
 													     <option th:each="entry : ${homeAgencyMap.entrySet()}" th:value="${entry.key}" th:text="${entry.value}">
 													     </option>

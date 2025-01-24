@@ -37,7 +37,7 @@ public class ICLPFileGenerator {
 
 	private String filename = "";
 	private String fileCreateDateandTime = "";
-	int tagSequenceStart = 0;
+	long tagSequenceStart = 0;
 	int tagSequenceEnd = 0;
 	AgencyEntity agency;
 	private int detailCount = 0;
@@ -90,18 +90,18 @@ public class ICLPFileGenerator {
 				for (Map.Entry<String, AgencyEntity> entry : ValidationController.cscIdTagAgencyMap.entrySet()) {
 					AgencyEntity agEntity = entry.getValue();
 					System.out.println("Key: " + entry.getKey() + ", Value: " + entry.getValue());
-					int tagRangeCount = (Integer.parseInt(agEntity.getTagSequenceEnd()) - Integer.parseInt(agEntity.getTagSequenceStart()));
-					int validCount = (tagRangeCount * AgencyDataExcelReader.tagValid) /100; 
-					int lowbalCount = (tagRangeCount * AgencyDataExcelReader.tagLowBal) /100; 
-					int invalidCount = (tagRangeCount * AgencyDataExcelReader.tagInvalid) /100; 
-					System.out.println("tagRangeCount ##- "+tagRangeCount);
-					System.out.println("Tag Valid count ##- "+validCount +"\t lowbalCount ## "+lowbalCount +"\t invalidCount ## "+invalidCount);
+					long tagRangeCount = (Integer.parseInt(agEntity.getTagSequenceEnd()) - Integer.parseInt(agEntity.getTagSequenceStart()));
+					long validCount = (tagRangeCount * AgencyDataExcelReader.tagValid) /100; 
+					long lowbalCount = (tagRangeCount * AgencyDataExcelReader.tagLowBal) /100; 
+					long invalidCount = (tagRangeCount * AgencyDataExcelReader.tagInvalid) /100; 
+					System.out.println("tagRangeCount ## "+tagRangeCount);
+					System.out.println("Tag Valid count ## "+validCount +"\t lowbalCount ## "+lowbalCount +"\t invalidCount ## "+invalidCount);
 					this.tagSequenceStart = Integer.parseInt(agEntity.getTagSequenceStart());
-					for (int count = 1; count <= validCount; count++) {
+					for (long count = 1; count <= validCount; count++) {
 						writer.write(getICLPDetailRecord(validateParam,agEntity));
 						writer.write(System.lineSeparator());
 					}
-					for (int count = 1; count <= lowbalCount; count++) {
+					for (long count = 1; count <= lowbalCount; count++) {
 						writer.write(getICLPDetailRecord(validateParam,agEntity));
 						writer.write(System.lineSeparator());
 					}
@@ -215,18 +215,19 @@ private String getICLPHeader(FileValidationParam validateParam) {
 		filename =  validateParam.getFromAgency() +"_"+ fileCreateDateandTime.replaceAll("[-T:Z]", "")+IAGConstants.ICLP_FILE_EXTENSION;
 		StringBuilder itagHeader = new StringBuilder();
 		//Header count need to take based below all Map value tag range
-		int recordcount = 0;
+		long recordcount = 0;
 		for (Map.Entry<String, AgencyEntity> entry : ValidationController.cscIdTagAgencyMap.entrySet()) {
 			AgencyEntity agEntity = entry.getValue();
 			System.out.println("Key: " + entry.getKey() + ", Value: " + entry.getValue());
 		/*	recordcount = recordcount
 					+ (Integer.parseInt(agEntity.getTagSequenceEnd()) - Integer.parseInt(agEntity.getTagSequenceStart())) ;*/
-			int tagRangeCount = (Integer.parseInt(agEntity.getTagSequenceEnd()) - Integer.parseInt(agEntity.getTagSequenceStart()));
-			int validCount = (tagRangeCount * AgencyDataExcelReader.tagValid) /100; 
-			int lowbalCount = (tagRangeCount * AgencyDataExcelReader.tagLowBal) /100; 
-			int invalidCount = (tagRangeCount * AgencyDataExcelReader.tagInvalid) /100; 
+			long tagRangeCount = (Integer.parseInt(agEntity.getTagSequenceEnd()) - Integer.parseInt(agEntity.getTagSequenceStart()));
+			log.info("AgencyDataExcelReader.tagValid :: "+AgencyDataExcelReader.tagValid +"\t AgencyDataExcelReader.tagLowBal :: "+AgencyDataExcelReader.tagLowBal +"\t AgencyDataExcelReader.tagInvalid :: "+AgencyDataExcelReader.tagInvalid);
+			long validCount = (tagRangeCount * AgencyDataExcelReader.tagValid) /100; 
+			long lowbalCount = (tagRangeCount * AgencyDataExcelReader.tagLowBal) /100; 
+			long invalidCount = (tagRangeCount * AgencyDataExcelReader.tagInvalid) /100; 
 			System.out.println("tagRangeCount --- "+tagRangeCount);
-			System.out.println("Tag Valid count --- "+validCount +"\t lowbalCount -- "+lowbalCount +"\t invalidCount -- "+invalidCount);
+			log.info("Tag Valid count --- "+validCount +"\t lowbalCount -- "+lowbalCount +"\t invalidCount -- "+invalidCount);
 			recordcount = recordcount + validCount + lowbalCount;// +invalidCount;
 		}
 		log.info("Record count ::" +recordcount);

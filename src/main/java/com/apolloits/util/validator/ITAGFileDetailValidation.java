@@ -321,7 +321,9 @@ public class ITAGFileDetailValidation {
 			//return false;
 			invalidRecord=true;
 		}else {
-		
+		if(fileRowData.endsWith("\r\n")) {
+			System.out.println("@@@@@@@@@@@@@@ fasle");
+		}
 		try {
 			tagAgencyId = fileRowData.substring(0,4);
 			//System.out.println("tagAgencyId ::"+tagAgencyId);

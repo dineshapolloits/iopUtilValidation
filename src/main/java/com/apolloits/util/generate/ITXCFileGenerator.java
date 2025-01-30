@@ -99,9 +99,13 @@ public class ITXCFileGenerator {
 		itxc.setEtcRevenueDate(CommonUtil.formatStringLeftPad(itxcTemplate.getEtcRevenueDate(),8,' '));
 		itxc.setEtcFacAgency(validateParam.getFromAgency());
 		itxc.setEtcTrxType(CommonUtil.formatStringLeftPad(itxcTemplate.getEtcTrxType(), 1, ' '));
-		itxc.setEtcEntryDateTime(CommonUtil.formatStringLeftPad(itxcTemplate.getEtcEntryDateTime(),25,'*'));
-		itxc.setEtcEntryPlaza(CommonUtil.formatStringRightPad(itxcTemplate.getEtcEntryPlaza(),15,'*'));
-		itxc.setEtcEntryLane(CommonUtil.formatStringRightPad(itxcTemplate.getEtcEntryLane(),3,'*'));
+		char entryformat = '*';
+		if("C".equals(itxc.getEtcTrxType())) {
+			entryformat = ' ';
+		}
+		itxc.setEtcEntryDateTime(CommonUtil.formatStringLeftPad(itxcTemplate.getEtcEntryDateTime(),25,entryformat));
+		itxc.setEtcEntryPlaza(CommonUtil.formatStringRightPad(itxcTemplate.getEtcEntryPlaza(),15,entryformat));
+		itxc.setEtcEntryLane(CommonUtil.formatStringRightPad(itxcTemplate.getEtcEntryLane(),3,entryformat));
 		itxc.setEtcTagAgency(CommonUtil.formatStringLeftPad(itxcTemplate.getEtcTagAgency(),4,' '));
 		itxc.setEtcTagSerialNumber(CommonUtil.formatStringLeftPad(itxcTemplate.getEtcTagSerialNumber(),10,'0'));
 		itxc.setEtcReadPerformance(CommonUtil.formatStringRightPad(itxcTemplate.getEtcReadPerformance(),2,'*'));

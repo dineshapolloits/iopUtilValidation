@@ -95,7 +95,7 @@ public class ICRXFileGenerator {
 		icrx.setEtcPostPlan(CommonUtil.formatStringLeftPad(icrxTemplate.getEtcPostPlan(),5,' '));
 		icrx.setEtcDebitCredit(CommonUtil.formatStringLeftPad(icrxTemplate.getEtcDebitCredit(),1,' '));
 		icrx.setEtcOwedAmount(CommonUtil.formatStringLeftPad(icrxTemplate.getEtcTollAmount(),9,'0'));
-		icrx.setEtcDupSerialNum(CommonUtil.formatStringLeftPad(null,20,'0'));
+		icrx.setEtcDupSerialNum(CommonUtil.formatStringLeftPad(icrxTemplate.getEtcDupSerialNum(),20,'0'));
 		
 		return icrx.toString();
 	}

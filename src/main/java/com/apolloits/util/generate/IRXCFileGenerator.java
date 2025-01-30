@@ -97,7 +97,7 @@ public class IRXCFileGenerator {
 		icrx.setEtcPostPlan(CommonUtil.formatStringLeftPad(icrxTemplate.getEtcPostPlan(),5,' '));
 		icrx.setEtcDebitCredit(CommonUtil.formatStringLeftPad(icrxTemplate.getEtcDebitCredit(),1,' '));
 		icrx.setEtcOwedAmount(CommonUtil.formatStringLeftPad(icrxTemplate.getEtcTollAmount(),9,'0'));
-		icrx.setEtcDupSerialNum(CommonUtil.formatStringLeftPad(null,20,'0'));
+		icrx.setEtcDupSerialNum(CommonUtil.formatStringLeftPad(icrxTemplate.getEtcDupSerialNum(),20,'0'));
 		
 		return icrx.toString();
 	}
@@ -167,6 +167,7 @@ public class IRXCFileGenerator {
 	            icrxTemp.setEtcDebitCredit(commonUtil.getStringFormatCell(currentRow.getCell(26,MissingCellPolicy.CREATE_NULL_AS_BLANK)));
 	            icrxTemp.setEtcTollAmount(commonUtil.getStringFormatCell(currentRow.getCell(27,MissingCellPolicy.CREATE_NULL_AS_BLANK)));
 	            icrxTemp.setEtcDupSerialNum(commonUtil.getStringFormatCell(currentRow.getCell(28,MissingCellPolicy.CREATE_NULL_AS_BLANK)));
+	            System.out.println("icrxTemp ::"+icrxTemp.toString());
 	            irxcTemplateList.add(icrxTemp);
 	          }
 	         

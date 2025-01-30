@@ -46,6 +46,7 @@ import net.lingala.zip4j.model.enums.CompressionMethod;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.poi.ss.usermodel.Cell;
+import org.apache.poi.ss.util.NumberToTextConverter;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -952,8 +953,8 @@ private static AgencyDataExcelReader appConfig;
 		value = cell.getStringCellValue();
 		break;  
 		case NUMERIC:    //field that represents number cell type  
-			log.debug("Number :: "+cell.getNumericCellValue());
-		value = String.valueOf((int)cell.getNumericCellValue());
+			log.info("Number :: "+NumberToTextConverter.toText(cell.getNumericCellValue()));
+			value = NumberToTextConverter.toText(cell.getNumericCellValue());
 		break; 
 		case BLANK:    //field that represents number cell type  
 			log.info("Blank ");  

@@ -12,6 +12,7 @@ import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
+import org.apache.poi.ss.usermodel.Row.MissingCellPolicy;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
@@ -93,9 +94,13 @@ public class ICTXFileGenerator {
 		ictx.setEtcRevenueDate(CommonUtil.formatStringLeftPad(ictxTemplate.getEtcRevenueDate(),8,' '));
 		ictx.setEtcFacAgency(validateParam.getFromAgency());
 		ictx.setEtcTrxType(CommonUtil.formatStringLeftPad(ictxTemplate.getEtcTrxType(), 1, ' '));
-		ictx.setEtcEntryDateTime(CommonUtil.formatStringLeftPad(ictxTemplate.getEtcEntryDateTime(),25,'*'));
-		ictx.setEtcEntryPlaza(CommonUtil.formatStringRightPad(ictxTemplate.getEtcEntryPlaza(),15,'*'));
-		ictx.setEtcEntryLane(CommonUtil.formatStringRightPad(ictxTemplate.getEtcEntryLane(),3,'*'));
+		char entryformat = '*';
+		if("C".equals(ictx.getEtcTrxType())) {
+			entryformat = ' ';
+		}
+		ictx.setEtcEntryDateTime(CommonUtil.formatStringLeftPad(ictxTemplate.getEtcEntryDateTime(),25,entryformat));
+		ictx.setEtcEntryPlaza(CommonUtil.formatStringRightPad(ictxTemplate.getEtcEntryPlaza(),15,entryformat));
+		ictx.setEtcEntryLane(CommonUtil.formatStringRightPad(ictxTemplate.getEtcEntryLane(),3,entryformat));
 		ictx.setEtcTagAgency(CommonUtil.formatStringLeftPad(ictxTemplate.getEtcTagAgency(),4,' '));
 		ictx.setEtcTagSerialNumber(CommonUtil.formatStringLeftPad(ictxTemplate.getEtcTagSerialNumber(),10,'0'));
 		ictx.setEtcReadPerformance(CommonUtil.formatStringRightPad(ictxTemplate.getEtcReadPerformance(),2,'*'));
@@ -162,95 +167,97 @@ public class ICTXFileGenerator {
               Cell currentCell = cellsInRow.next();
               switch (cellIdx) {
               case 0:
-            	ictxTemp.setIctxFileNum(String.valueOf(getStringFormatCell(currentCell)));
+            	ictxTemp.setIctxFileNum(commonUtil.getStringFormatCell(currentCell));
            	   System.out.println("case 0::"+ictxTemp.getIctxFileNum());
                 break;
               case 1:
-            	  ictxTemp.setEtcTrxSerialNo(String.valueOf(getStringFormatCell(currentCell)));
-                  System.out.println("case 1::"+currentCell.getNumericCellValue());
+            	  //ictxTemp.setEtcTrxSerialNo(commonUtil.getStringFormatCell(currentCell));
+            	  ictxTemp.setEtcTrxSerialNo(commonUtil.getStringFormatCell(currentRow.getCell(1,MissingCellPolicy.CREATE_NULL_AS_BLANK)));
+                  System.out.println("case 1::"+ictxTemp.getEtcTrxSerialNo());
+                  
                 break;
               case 2:
-            	  ictxTemp.setEtcRevenueDate(getStringFormatCell(currentCell));
-                  System.out.println("case 2::"+ictxTemp.getEtcTrxSerialNo());
+            	  ictxTemp.setEtcRevenueDate(commonUtil.getStringFormatCell(currentCell));
+                  System.out.println("case 2::"+ictxTemp.getEtcRevenueDate());
                 break;
               case 3:
-            	  ictxTemp.setEtcTagAgency(getStringFormatCell(currentCell));
+            	  ictxTemp.setEtcTagAgency(commonUtil.getStringFormatCell(currentCell));
                 System.out.println("case 3::"+ictxTemp.getEtcTagAgency());
                 break;
               case 4:
-            	  ictxTemp.setEtcTagSerialNumber(getStringFormatCell(currentCell));
+            	  ictxTemp.setEtcTagSerialNumber(commonUtil.getStringFormatCell(currentCell));
                   System.out.println("case 4::"+ictxTemp.getEtcTagSerialNumber());
                   break;
               case 5:
-            	  ictxTemp.setEtcValidationStatus(getStringFormatCell(currentCell));
+            	  ictxTemp.setEtcValidationStatus(commonUtil.getStringFormatCell(currentCell));
                   System.out.println("case 5::"+ictxTemp.getEtcValidationStatus());
                   break;
               case 6:
-            	  ictxTemp.setEtcLicState(getStringFormatCell(currentCell));
+            	  ictxTemp.setEtcLicState(commonUtil.getStringFormatCell(currentCell));
                   System.out.println("case 6::"+ictxTemp.getEtcLicState());
                   break;
               case 7:
-            	  ictxTemp.setEtcLicNumber(getStringFormatCell(currentCell));
+            	  ictxTemp.setEtcLicNumber(commonUtil.getStringFormatCell(currentCell));
                   System.out.println("case 7::"+ictxTemp.getEtcLicNumber());
                   break;
               case 8:
-            	  ictxTemp.setEtcClassCharged(getStringFormatCell(currentCell));
+            	  ictxTemp.setEtcClassCharged(commonUtil.getStringFormatCell(currentCell));
                   System.out.println("case 8::"+ictxTemp.getEtcClassCharged());
                   break;
               case 9:
-            	  ictxTemp.setEtcExitDateTime(getStringFormatCell(currentCell));
+            	  ictxTemp.setEtcExitDateTime(commonUtil.getStringFormatCell(currentCell));
                   System.out.println("case 9::"+ictxTemp.getEtcExitDateTime());
                   break;
               case 10:
-            	  ictxTemp.setEtcExitPlaza(getStringFormatCell(currentCell));
+            	  ictxTemp.setEtcExitPlaza(commonUtil.getStringFormatCell(currentCell));
                   System.out.println("case 10::"+ictxTemp.getEtcExitPlaza());
                   break;
               case 11:
-            	  ictxTemp.setEtcExitLane(getStringFormatCell(currentCell));
+            	  ictxTemp.setEtcExitLane(commonUtil.getStringFormatCell(currentCell));
                   System.out.println("case 11::"+ictxTemp.getEtcExitLane());
                   break;
               case 12:
-            	  ictxTemp.setEtcTrxType(getStringFormatCell(currentCell));
+            	  ictxTemp.setEtcTrxType(commonUtil.getStringFormatCell(currentCell));
                   System.out.println("case 12::"+ictxTemp.getEtcTrxType());
                   break;
               case 13:
-            	  ictxTemp.setEtcEntryDateTime(getStringFormatCell(currentCell));
+            	  ictxTemp.setEtcEntryDateTime(commonUtil.getStringFormatCell(currentCell));
                   System.out.println("case 13::"+ictxTemp.getEtcEntryDateTime());
                   break;
               case 14:
-            	  ictxTemp.setEtcEntryPlaza(getStringFormatCell(currentCell));
+            	  ictxTemp.setEtcEntryPlaza(commonUtil.getStringFormatCell(currentCell));
                   System.out.println("case 14::"+ictxTemp.getEtcEntryPlaza());
                   break;
               case 15:
-            	  ictxTemp.setEtcEntryLane(getStringFormatCell(currentCell));
+            	  ictxTemp.setEtcEntryLane(commonUtil.getStringFormatCell(currentCell));
                   System.out.println("case 15::"+ictxTemp.getEtcEntryLane());
                   break;
               case 16:
-            	  ictxTemp.setEtcReadPerformance(getStringFormatCell(currentCell));
+            	  ictxTemp.setEtcReadPerformance(commonUtil.getStringFormatCell(currentCell));
                   System.out.println("case 16::"+ictxTemp.getEtcReadPerformance());
                   break;
               case 17:
-            	  ictxTemp.setEtcWritePerf(getStringFormatCell(currentCell));
+            	  ictxTemp.setEtcWritePerf(commonUtil.getStringFormatCell(currentCell));
                   System.out.println("case 17::"+ictxTemp.getEtcWritePerf());
                   break;
               case 18:
-            	  ictxTemp.setEtcTagPgmStatus(getStringFormatCell(currentCell));
+            	  ictxTemp.setEtcTagPgmStatus(commonUtil.getStringFormatCell(currentCell));
                   System.out.println("case 18::"+ictxTemp.getEtcTagPgmStatus());
                   break;
               case 19:
-            	  ictxTemp.setEtcLaneMode(getStringFormatCell(currentCell));
+            	  ictxTemp.setEtcLaneMode(commonUtil.getStringFormatCell(currentCell));
                   System.out.println("case 19::"+ictxTemp.getEtcLaneMode());
                   break;
               case 20:
-            	  ictxTemp.setEtcOverSpeed(getStringFormatCell(currentCell));
+            	  ictxTemp.setEtcOverSpeed(commonUtil.getStringFormatCell(currentCell));
                   System.out.println("case 20::"+ictxTemp.getEtcOverSpeed());
                   break;
               case 21:
-            	  ictxTemp.setEtcDebitCredit(getStringFormatCell(currentCell));
+            	  ictxTemp.setEtcDebitCredit(commonUtil.getStringFormatCell(currentCell));
                   System.out.println("case 21::"+ictxTemp.getEtcDebitCredit());
                   break;
               case 22:
-            	  ictxTemp.setEtcTollAmount(getStringFormatCell(currentCell));
+            	  ictxTemp.setEtcTollAmount(commonUtil.getStringFormatCell(currentCell));
                   System.out.println("case 22::"+ictxTemp.getEtcTollAmount());
                   break;
               default:
@@ -261,9 +268,11 @@ public class ICTXFileGenerator {
              
             }
             ictxTemplateList.add(ictxTemp);
+            System.out.println(ictxTemp.toString());
           }
          
           if(ictxTemplateList != null && ictxTemplateList.size()>0) {
+        	  System.out.println("ictxTemplateList ::"+ictxTemplateList);
           log.info("@@@@ ICTX input data  loaded sucessfully:: ******************** ::"+ictxTemplateList.size());
           }else {
        	   throw new IopTranslatorException("ICTX input data not loaded");
@@ -277,28 +286,6 @@ public class ICTXFileGenerator {
 		return ictxTemplateList;
 	}
 	
-	private String getStringFormatCell(Cell cell) {
-		System.out.println("cell type ::"+cell.getCellType());
-		String value ="";
-		switch (cell.getCellType())               
-		{  
-		case STRING:    //field that represents string cell type  
-		System.out.println("String :: "+cell.getStringCellValue() + "\t\t\t"); 
-		value = cell.getStringCellValue();
-		break;  
-		case NUMERIC:    //field that represents number cell type  
-		System.out.println("Number :: "+cell.getNumericCellValue() + "\t\t\t");
-		value = String.valueOf((int)cell.getNumericCellValue());
-		break; 
-		case BLANK:    //field that represents number cell type  
-			System.out.println("Blank ");  
-			break;
-		default:  
-		}  
-		System.out.println("return Value :: "+value);
-		return value;
-	}
-
 	private String getICTXHeader(FileValidationParam validateParam,List<ICTXTemplate> ictxTempList) {
 		
 		fileCreateDateandTime = commonUtil.getCurrentUTCDateandTime();

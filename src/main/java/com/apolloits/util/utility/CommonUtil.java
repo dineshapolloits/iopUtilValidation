@@ -197,13 +197,16 @@ private static AgencyDataExcelReader appConfig;
 		return zipNameValidation;
  }
 	
-	 public static boolean validateFileName(String fileName) {
+	 public boolean validateFileName(String fileName) {
 			if (fileName != null && fileName.length() == 24) {
 				String[] fileParams = fileName.split("[_.]");
 				
 				if ( IAGConstants.IAG_FILE_TYPES.contains(fileParams[2]) &&
 						AgencyDataExcelReader.agencyCode.contains(fileParams[0])) {
 					
+					if(Integer.parseInt(fileParams[1].substring(0, 4))<fileStartYear) {
+						return false;
+					}
 					SimpleDateFormat dateFormat = new SimpleDateFormat(IAGConstants.YYYY_MM_DD_HH_MM_SS);
 					dateFormat.setLenient(false);
 					try {

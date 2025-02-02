@@ -5,6 +5,7 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
+import java.text.ParseException;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
@@ -86,7 +87,7 @@ public class ICLPFileDetailValidation {
        		 return false;
 			}
    		 //validate extract ICLP file name 
-   		 if(CommonUtil.validateFileName(fileName)) {
+   		 if(commonUtil.validateFileName(fileName)) {
    			 
    			if(validateParam.getValidateType().equals("filename")) {
    				log.info("File name validation is sucess");

@@ -5,6 +5,7 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
+import java.text.ParseException;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.regex.Pattern;
@@ -95,7 +96,7 @@ public class ITAGFileDetailValidation {
 	        		 return false;
 				}
         		 //validate extract ITAG file name 
-        		 if(CommonUtil.validateFileName(fileName)) {
+        		 if(commonUtil.validateFileName(fileName)) {
         			 if(validateParam.getValidateType().equals("filename")) {
         				 validateParam.setResponseMsg("File name validation is sucess");
         				 return true;

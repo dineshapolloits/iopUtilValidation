@@ -373,7 +373,7 @@ public class ITAGFileDetailValidation {
         }
          pattern = Pattern.compile(IAGConstants.ITAG_DTL_TAG_SERIAL_NO);
         if (!pattern.matcher(tagSerialNo).matches()) { //need to check start and end tag range from DB
-        	validateParam.setResponseMsg("Invalid ITAG detail, invalid tag serial number - "+tagSerialNo +lineNo);
+        	validateParam.setResponseMsg("Invalid  detail, invalid tag serial number - "+tagSerialNo +lineNo);
         	log.error("Invalid ITAG detail, invalid tag serial number - "+tagSerialNo +" Row ::"+lineNo);
         	addErrorMsg(DETAIL_RECORD_TYPE,"Tag serial number","Invalid Tag serial number format-"+tagSerialNo +lineNo);
         	invalidRecord=true;

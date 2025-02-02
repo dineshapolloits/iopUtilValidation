@@ -8,6 +8,7 @@ public class IAGConstants {
 
     public static final String ITAG_FILE_TYPE = "ITAG";
     public static final String ICLP_FILE_TYPE = "ICLP";
+    public static final String ITGU_FILE_TYPE = "ITGU";
     public static final String IAG_VERSION_NO = "01.60.02";
     public static final String TVL_SUBMITTED_FILE_TYPE = "STVL";
     public static final String DETAIL_ROOT_ELEMENT_NAME = "TVLTagDetails";
@@ -49,7 +50,7 @@ public class IAGConstants {
     public static final String ACK_FILE_TYPE = "ACK";
     
 
-    public static final String IAG_FILE_TYPES = "ITAG,ICLP";
+    public static final String IAG_FILE_TYPES = "ITAG,ICLP,ITGU";
     public static final String TRANSLATOR_STATUS_LOAD_FAILED = "Load Failed";
     
     public static final String FILE_DATE_TIME_FORMAT = "\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}Z";

@@ -37,6 +37,7 @@ import com.apolloits.util.validator.ICRXFileDetailValidation;
 import com.apolloits.util.validator.ICTXFileDetailValidation;
 import com.apolloits.util.validator.IRXCFileDetailValidation;
 import com.apolloits.util.validator.ITAGFileDetailValidation;
+import com.apolloits.util.validator.ITGUFileDetailValidation;
 import com.apolloits.util.validator.ITXCFileDetailValidation;
 import com.apolloits.util.writer.ExceptionListExcelWriter;
 
@@ -59,6 +60,9 @@ public class ValidationController {
 	
 	@Autowired
 	ITAGFileDetailValidation fdValidation;
+	
+	@Autowired
+	ITGUFileDetailValidation itguValidation;
 	
 	@Autowired
 	ICLPFileDetailValidation iclpValidation;
@@ -168,6 +172,8 @@ public class ValidationController {
 			}else if (validateParam.getFileType().equals(IAGConstants.ACK_FILE_TYPE)) {
 				log.info("Inside ACK validation started");
 				fileValidation = ackValidation.ackValidation(validateParam);
+			} else if (validateParam.getFileType().equals(IAGConstants.ITGU_FILE_TYPE)) {
+				fileValidation = itguValidation.itguValidation(validateParam);
 			}
 			log.info("getResponseMsg ::"+validateParam.getResponseMsg() +"\t fileValidation ::"+fileValidation);
 			if(!fileValidation || errorMsglist.size()>0) {

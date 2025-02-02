@@ -150,6 +150,16 @@ public class IRXCFileDetailValidation {
 									+ ") and detail count not matching ::" + (noOfRecords-1)));
 							return false;
 						}
+						
+						//calling Delimiter validation for detail 
+						if (headerCount > 0 && controller.getErrorMsglist().size() == 0) {
+
+							if (!commonUtil.validateDelimiter(zipFile.getFile().getParent() + File.separator + fileName,
+									validateParam, fileName)) {
+								invalidRecordCount++;
+							}
+						}
+						
 						String ackcode = "00";
 						if (controller.getErrorMsglist().size() > 0 && invalidRecordCount>0) {
 							validateParam.setResponseMsg("\t \t ACK file name ::" + ackFileName);
@@ -182,7 +192,7 @@ public class IRXCFileDetailValidation {
 		String lineNo = "\t <b>Row :: </b>"+fileRowData +"\t <b>Line No:: </b>"+rowNo;
 		boolean invalidRecord = false;
 		if (fileRowData == null || fileRowData.length() != 59) {
-			 addErrorMsg(DETAIL_RECORD_TYPE,"Detail Length","Record length is not match with IRXC length 201 ::\t "+lineNo);
+			 addErrorMsg(DETAIL_RECORD_TYPE,"Detail Length","Record length is not match with IRXC length 59 ::\t "+lineNo);
 			 invalidRecordCount++;
 		        return false;
 	    }
@@ -311,6 +321,9 @@ public class IRXCFileDetailValidation {
 			addErrorMsg(HEADER_RECORD_TYPE, "RECORD_COUNT",
 					" Invalid record count format. Values: 00000000 – 99999999    \t ::" + fileRowData.substring(40, 48));
 			invalidHeaderRecord = true;
+		}else if(Long.parseLong(fileRowData.substring(40, 48)) <1) {
+			invalidHeaderRecord = true;
+			addErrorMsg(HEADER_RECORD_TYPE,"RECORD_COUNT"," Invalid Header or no delimiter     \t ::"+fileRowData.substring(40, 48));
 		}
 
 		// ICRX_FILE_NUM CHAR(12) Values 000000000001 – 999999999999.

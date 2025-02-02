@@ -1,11 +1,14 @@
 package com.apolloits.util.utility;
 
+import static com.apolloits.util.IAGConstants.DETAIL_RECORD_TYPE;
 import static com.apolloits.util.IAGConstants.FILE_RECORD_TYPE;
 
+import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.io.Writer;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -13,20 +16,16 @@ import java.nio.file.Paths;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.time.Instant;
+import java.time.LocalDateTime;
 import java.time.ZoneOffset;
 //import java.time.ZonedDateTime;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
-import java.time.format.DateTimeFormatterBuilder;
-import java.time.Instant;
-import java.time.LocalDateTime;
 import java.time.format.DateTimeParseException;
 import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Date;
-import java.util.GregorianCalendar;
-import java.util.Locale;
-import java.util.Map;
 import java.util.SimpleTimeZone;
 import java.util.TimeZone;
 import java.util.regex.Matcher;
@@ -35,13 +34,6 @@ import java.util.regex.Pattern;
 import javax.xml.datatype.DatatypeConfigurationException;
 import javax.xml.datatype.DatatypeFactory;
 import javax.xml.datatype.XMLGregorianCalendar;
-
-import lombok.extern.slf4j.Slf4j;
-import net.lingala.zip4j.ZipFile;
-import net.lingala.zip4j.exception.ZipException;
-import net.lingala.zip4j.model.ZipParameters;
-import net.lingala.zip4j.model.enums.CompressionLevel;
-import net.lingala.zip4j.model.enums.CompressionMethod;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -62,7 +54,12 @@ import com.apolloits.util.modal.ErrorMsgDetail;
 import com.apolloits.util.modal.FileValidationParam;
 import com.apolloits.util.reader.AgencyDataExcelReader;
 
-
+import lombok.extern.slf4j.Slf4j;
+import net.lingala.zip4j.ZipFile;
+import net.lingala.zip4j.exception.ZipException;
+import net.lingala.zip4j.model.ZipParameters;
+import net.lingala.zip4j.model.enums.CompressionLevel;
+import net.lingala.zip4j.model.enums.CompressionMethod;
 
 
 /**
@@ -990,6 +987,51 @@ private static AgencyDataExcelReader appConfig;
 			e.printStackTrace();
 		}
 		return returnFlage;
+	}
+	
+	public boolean validateDelimiter(String filepath,FileValidationParam validateParam,String fileName) {
+		String osName = System.getProperty("os.name").toLowerCase();
+
+		log.info("osName ::" + osName +"\t fileName ::"+fileName);
+		try {
+			if (osName.contains("nix") || osName.contains("nux")) {
+				log.info("Inside Linux/Unix ****************** fileName Location::" + filepath);
+				String[] command = { "/bin/bash", "-c", "tail -c 1 " + filepath };
+				Process process = Runtime.getRuntime().exec(command);
+
+				BufferedReader reader = new BufferedReader(new InputStreamReader(process.getInputStream()));
+				StringBuilder output = new StringBuilder();
+
+				String line;
+				while ((line = reader.readLine()) != null) {
+					log.info("line ::" + line);
+					output.append(line);
+				}
+
+				int exitCode = process.waitFor();
+				log.info("Exit Code: " + exitCode);
+				log.info("Output: " + output.toString());
+				log.info("output.length ::" + output.length());
+				if (output.length() > 0) {
+					log.error("Delimiter not found ");
+					controller.getErrorMsglist().add(new ErrorMsgDetail(DETAIL_RECORD_TYPE,"DELIMITER","Delimter not found. Please check end of file"));
+					if(!fileName.contains("ACK")) {
+					String ackFileName = validateParam.getToAgency() + "_" + fileName.replace(".", "_") + IAGConstants.ACK_FILE_EXTENSION;
+					log.info("Delimiter validation is failed ackFileName ::"+ackFileName);
+					iagAckMapper.mapToIagAckFile(fileName, "02", validateParam.getOutputFilePath()+File.separator+ackFileName, validateParam.getFromAgency(),validateParam.getToAgency());
+					}
+					return false;
+				}
+
+				log.info("********************* COMPLETD **************");
+			}
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+			log.error("Exception in Shell calling ");
+		}
+
+		return true;
 	}
 	
 }

@@ -148,6 +148,15 @@ public class ITAGFileDetailValidation {
 							return false;
 						}
 						
+						//calling Delimiter validation for detail 
+						if (headerCount > 0 && controller.getErrorMsglist().size() == 0) {
+
+							if (!commonUtil.validateDelimiter(zipFile.getFile().getParent() + File.separator + fileName,
+									validateParam, fileName)) {
+								invalidRecordCount++;
+							}
+						}
+						
 						 //validate Duplicate serial no
 							validateDuplicateTagSerialNo(zipFile.getFile().getParent()+File.separator+fileName,validateParam);
 						if(controller.getErrorMsglist().size()>0 && invalidRecordCount >0) {

@@ -132,7 +132,7 @@ public class ICRXFileDetailValidation {
 							if (noOfRecords == 0) {
 								// Validate Header record
 								headerCount = Long.parseLong(fileRowData.substring(40, 48));
-
+								
 								if (!validateIcrxHeader(fileRowData, validateParam, fileName)) {
 									// create ACK file
 									ackCode = "01";
@@ -161,6 +161,14 @@ public class ICRXFileDetailValidation {
 											+ headerCount + ") and detail count not matching ::" + (noOfRecords - 1)));
 							return false;
 						}
+						//calling Delimiter validation for detail 
+						if (headerCount > 0 && controller.getErrorMsglist().size() == 0) {
+
+							if (!commonUtil.validateDelimiter(zipFile.getFile().getParent() + File.separator + fileName,
+									validateParam, fileName)) {
+								invalidRecordCount++;
+							}
+						}
 						String ackcode = "00";
 						if (controller.getErrorMsglist().size() > 0 && invalidRecordCount>0 ) {
 							validateParam.setResponseMsg("\t \t ACK file name ::" + ackFileName);
@@ -175,6 +183,7 @@ public class ICRXFileDetailValidation {
 						iagAckMapper.mapToIagAckFile(fileName, ackcode,
 								validateParam.getOutputFilePath() + File.separator + ackFileName, fileName.substring(0, 4),
 								validateParam.getToAgency());
+						
 						
 					} catch (IOException e) {
 						e.printStackTrace();
@@ -323,6 +332,9 @@ private boolean validateIcrxHeader(String fileRowData, FileValidationParam valid
 		addErrorMsg(HEADER_RECORD_TYPE, "RECORD_COUNT",
 				" Invalid record count format. Values: 00000000 – 99999999    \t ::" + fileRowData.substring(40, 48));
 		invalidHeaderRecord = true;
+	}else if(Long.parseLong(fileRowData.substring(40, 48)) <1) {
+		invalidHeaderRecord = true;
+		addErrorMsg(HEADER_RECORD_TYPE,"RECORD_COUNT"," Invalid Header or no delimiter     \t ::"+fileRowData.substring(40, 48));
 	}
 
 	// ICRX_FILE_NUM CHAR(12) Values 000000000001 – 999999999999.

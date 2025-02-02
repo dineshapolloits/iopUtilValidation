@@ -170,6 +170,14 @@ public boolean itxcValidation(FileValidationParam validateParam) throws IOExcept
 								+ ") and detail count not matching ::" + (noOfRecords-1)));
 						return false;
 					}
+					//calling Delimiter validation for detail 
+					if (headerCount > 0 && controller.getErrorMsglist().size() == 0) {
+
+						if (!commonUtil.validateDelimiter(zipFile.getFile().getParent() + File.separator + fileName,
+								validateParam, fileName)) {
+							ictxfileValidation.invalidRecordCount++;
+						}
+					}
 					if(controller.getErrorMsglist().size()>0 && ictxfileValidation.invalidRecordCount >0) {
 						validateParam.setResponseMsg("\t \t ACK file name ::"+ackFileName);
 						iagAckMapper.mapToIagAckFile(fileName, "02", validateParam.getOutputFilePath()+File.separator+ackFileName, fileName.substring(0, 4),validateParam.getToAgency());
@@ -308,6 +316,9 @@ private boolean validateItxcHeader(String fileRowData, FileValidationParam valid
 	if (!fileRowData.substring(40, 48).matches(IAGConstants.TRAN_RECORD_COUNT_FORMAT)) {
 		invalidHeaderRecord = true;
 		addErrorMsg(HEADER_RECORD_TYPE,"RECORD_COUNT"," Invalid record count format. Values: 00000000 – 99999999    \t ::"+fileRowData.substring(40, 48));
+	}else if(Long.parseLong(fileRowData.substring(40, 48)) <1) {
+		invalidHeaderRecord = true;
+		addErrorMsg(HEADER_RECORD_TYPE,"RECORD_COUNT"," Invalid Header or no delimiter     \t ::"+fileRowData.substring(40, 48));
 	}
 
 	// ICTX_FILE_NUM CHAR(12) Values 000000000001 – 999999999999.

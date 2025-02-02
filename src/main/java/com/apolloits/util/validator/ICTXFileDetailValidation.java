@@ -8,6 +8,7 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Arrays;
@@ -126,6 +127,7 @@ public boolean ictxValidation(FileValidationParam validateParam) throws IOExcept
 				try (BufferedReader br = new BufferedReader(
 						new FileReader(zipFile.getFile().getParent()+File.separator+fileName))) {
 
+					
 					String fileRowData;
 					long headerCount =0l;
 					String ackCode="00";
@@ -170,16 +172,32 @@ public boolean ictxValidation(FileValidationParam validateParam) throws IOExcept
 								+ ") and detail count not matching ::" + (noOfRecords-1)));
 						return false;
 					}
+					
+					//calling Delimiter validation for detail 
+					if (headerCount > 0 && controller.getErrorMsglist().size() == 0) {
+
+						if (!commonUtil.validateDelimiter(zipFile.getFile().getParent() + File.separator + fileName,
+								validateParam, fileName)) {
+							invalidRecordCount++;
+						}
+					}
+					
 					log.info("ictxTempList size ::" + ictxTempList.size() +"\t invalidRecordCount = "+invalidRecordCount);
+					String ackcode = "00";
 					if(controller.getErrorMsglist().size()>0 && invalidRecordCount>0) {
 						validateParam.setResponseMsg("\t \t ACK file name ::"+ackFileName);
-						iagAckMapper.mapToIagAckFile(fileName, "02", validateParam.getOutputFilePath()+File.separator+ackFileName, fileName.substring(0, 4),validateParam.getToAgency());
-					} else if(controller.getErrorMsglist().size()== 0 && invalidRecordCount == 0 ) {
+						ackcode = "02";
+					}else if(controller.getErrorMsglist().size() > 0 && invalidRecordCount == 0 ) {
+						ackcode="01";
+					}else if(controller.getErrorMsglist().size()== 0 && invalidRecordCount == 0 ) {
 						// generate ICTXTemplate format excel file.
 						log.info("ictxTempList size ::" + ictxTempList.size());
 							String ictxTempExcelFileName =validateParam.getOutputFilePath()+File.separator+FilenameUtils.removeExtension(fileName)+"_ICTXTemplate.xlsx";
 							ictxtempExcel.createIctxTemplateExcel(ictxTempList, ictxTempExcelFileName, validateParam);
 					}
+					iagAckMapper.mapToIagAckFile(fileName, ackcode,
+							validateParam.getOutputFilePath() + File.separator + ackFileName, fileName.substring(0, 4),
+							validateParam.getToAgency());
 				} catch (IOException e) {
 					e.printStackTrace();
 					// Display pop up message if exceptionn occurs
@@ -519,6 +537,9 @@ private boolean validateIctxHeader(String fileRowData, FileValidationParam valid
 	if (!fileRowData.substring(40, 48).matches(IAGConstants.TRAN_RECORD_COUNT_FORMAT)) {
 		invalidHeaderRecord = true;
 		addErrorMsg(HEADER_RECORD_TYPE,"RECORD_COUNT"," Invalid record count format. Values: 00000000 – 99999999    \t ::"+fileRowData.substring(40, 48));
+	}else if(Long.parseLong(fileRowData.substring(40, 48)) <1) {
+		invalidHeaderRecord = true;
+		addErrorMsg(HEADER_RECORD_TYPE,"RECORD_COUNT"," Invalid Header or no delimiter     \t ::"+fileRowData.substring(40, 48));
 	}
 
 	// ICTX_FILE_NUM CHAR(12) Values 000000000001 – 999999999999.
@@ -534,34 +555,6 @@ private boolean validateIctxHeader(String fileRowData, FileValidationParam valid
 	return true;
 }
 
-private boolean validateZIPFileName(String zipFileName) {
-	
-	if (zipFileName != null && zipFileName.length() == 33) {
-		String[] fileParams = zipFileName.split("[_.]");
-		System.out.println("zipFileName ::"+Arrays.toString(fileParams));
-		if ((fileParams.length == 5 && fileParams[3].equals(IAGConstants.ICTX_FILE_TYPE)
-				&& "zip".equalsIgnoreCase(fileParams[4])) && AgencyDataExcelReader.agencyCode.contains(fileParams[0])
-						&& AgencyDataExcelReader.agencyCode.contains(fileParams[1])
-				) {
-
-			SimpleDateFormat dateFormat = new SimpleDateFormat(IAGConstants.YYYY_MM_DD_HH_MM_SS);
-			dateFormat.setLenient(false);
-			try {
-				dateFormat.parse(fileParams[2].trim());
-				return true;
-			} catch (ParseException pe) {
-				controller.getErrorMsglist().add(new ErrorMsgDetail(FILE_RECORD_TYPE,"File","Zip file Name Date and time invalid :: YYYYMMDDHHMMSS \t ::"+zipFileName));
-				return false;
-				
-			}
-
-		}
-		controller.getErrorMsglist().add(new ErrorMsgDetail(FILE_RECORD_TYPE,"File","Zip file Name Validation Failed :: {FROM_AGENCY_ID}_{TO_AGENCY_ID}_YYYYMMDDHHMMSS.ICTX \t ::"+zipFileName));
-	}else {
-	controller.getErrorMsglist().add(new ErrorMsgDetail(FILE_RECORD_TYPE,"File","Zip file Name invalid length :: file lenght should be 33 \t ::"+zipFileName));
-	}
-		return false;
-}
 
 private void addErrorMsg(String fileType,String fieldName,String errorMsg) {
 	controller.getErrorMsglist().add(new ErrorMsgDetail(fileType,fieldName,errorMsg));

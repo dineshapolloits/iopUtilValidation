@@ -186,6 +186,8 @@ public class ACKFileDetailValidation {
 								+ fileRowData.substring(90, 92));
 			}
 			
+			commonUtil.validateDelimiter(validateParam.getInputFilePath(),
+					validateParam, ackFileName);
 			
 		}catch (IOException e) {
 			e.printStackTrace();

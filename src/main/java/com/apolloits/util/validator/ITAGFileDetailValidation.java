@@ -401,8 +401,12 @@ public class ITAGFileDetailValidation {
 			//validateParam.setResponseMsg("Invalid TAG_SERIAL_NUMBER format from excel or file  - " + fileRowData);
 			invalidRecord=true;
 		}
-
-         pattern = Pattern.compile(IAGConstants.ITAG_DTL_TAG_STATUS);
+		if(validateParam.getFileType().equals(IAGConstants.ITGU_FILE_TYPE) ){
+			 pattern = Pattern.compile(IAGConstants.ITGU_DTL_TAG_STATUS);
+		}else {
+			 pattern = Pattern.compile(IAGConstants.ITAG_DTL_TAG_STATUS);
+		}
+        // pattern = Pattern.compile(IAGConstants.ITAG_DTL_TAG_STATUS);
         if (!pattern.matcher(tagStatus).matches()) {
         	log.error("Invalid ITAG detail, invalid tag status - "+tagStatus +lineNo);
         	//validateParam.setResponseMsg("Invalid ITAG detail, invalid tag status - "+tagStatus +" Row ::"+fileRowData);

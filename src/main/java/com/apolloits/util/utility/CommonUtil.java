@@ -156,7 +156,7 @@ private static AgencyDataExcelReader appConfig;
 	
 	public boolean validateZIPFileName(String fileName,FileValidationParam validateParam) {
 		boolean zipNameValidation = false;
-		if (fileName != null && fileName.length() == 28) {
+		if (fileName != null && fileName.length() == 28 && fileName.matches(IAGConstants.INFO_ZIP_FILE_NAME_FORMAT)) {
 			String[] fileParams = fileName.split("[_.]");
 			System.out.println("validateZIPFileName() ::  fileParams ::"+Arrays.toString(fileParams) );
 			System.out.println(" AgencyDataExcelReader.agencyCode ::" + AgencyDataExcelReader.agencyCode );

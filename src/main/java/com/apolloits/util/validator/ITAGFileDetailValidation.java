@@ -108,6 +108,7 @@ public class ITAGFileDetailValidation {
 
 						String fileRowData;
 						long headerCount =0l;
+						String ackCode="00";
 						while ((fileRowData = br.readLine()) != null) {
 							log.info(noOfRecords + " :: " + fileRowData);
 							if(noOfRecords == 0) {
@@ -115,11 +116,10 @@ public class ITAGFileDetailValidation {
 								//headerCount = Long.parseLong(fileRowData.substring(36,46));
 								if(!validateItagHeader(fileRowData,validateParam,fileName)) {
 									//create ACK file 
-									 //String ackFileName = IAGConstants.SRTA_HOME_AGENCY_ID + "_" + fileName.replace(".", "_") + IAGConstants.ACK_FILE_EXTENSION;
-									iagAckMapper.mapToIagAckFile(fileName, "01", validateParam.getOutputFilePath()+File.separator+ackFileName, fileName.substring(0, 4),validateParam.getToAgency());
-									//return false;
+									ackCode="01";
 								}
 								if(validateParam.getValidateType().equals("header")) {
+									iagAckMapper.mapToIagAckFile(fileName, ackCode, validateParam.getOutputFilePath()+File.separator+ackFileName, fileName.substring(0, 4),validateParam.getToAgency());
 						        	 log.info("Only file name and header validation");
 						        	 return true;
 						         }

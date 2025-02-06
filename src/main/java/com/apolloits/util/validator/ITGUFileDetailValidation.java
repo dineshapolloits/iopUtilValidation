@@ -100,6 +100,7 @@ public class ITGUFileDetailValidation {
 					itagValidation.invalidRecordCount = 0;
 					String fileRowData;
 					long headerCount =0l;
+					String ackCode="00";
 					while ((fileRowData = br.readLine()) != null) {
 						log.info(noOfRecords + " :: " + fileRowData);
 						if(noOfRecords == 0) {
@@ -107,12 +108,11 @@ public class ITGUFileDetailValidation {
 							//headerCount = Long.parseLong(fileRowData.substring(36,46));
 							if(!validateItguHeader(fileRowData,validateParam,fileName)) {
 								//create ACK file 
-								 //String ackFileName = IAGConstants.SRTA_HOME_AGENCY_ID + "_" + fileName.replace(".", "_") + IAGConstants.ACK_FILE_EXTENSION;
-								iagAckMapper.mapToIagAckFile(fileName, "01", validateParam.getOutputFilePath()+File.separator+ackFileName, fileName.substring(0, 4),validateParam.getToAgency());
-								//return false;
+								ackCode="01";
 							}
 							if(validateParam.getValidateType().equals("header")) {
 					        	 log.info("Only file name and header validation");
+									iagAckMapper.mapToIagAckFile(fileName, ackCode, validateParam.getOutputFilePath()+File.separator+ackFileName, fileName.substring(0, 4),validateParam.getToAgency());
 					        	 return true;
 					         }
 							
@@ -204,6 +204,7 @@ public class ITGUFileDetailValidation {
          String headerDate = "";
          String headerTime = "";
          String preFileDateTime ="";
+         String headerCount = "";
          try {
              headerFileType = headervalue.substring(0, 4);
              headerVersion = headervalue.substring(4, 12);
@@ -211,6 +212,7 @@ public class ITGUFileDetailValidation {
              headerDate = headervalue.substring(16, 26);
              headerTime = headervalue.substring(27, 35);
              preFileDateTime=headervalue.substring(36,56);
+             headerCount = headervalue.substring(56,66);
          } catch (Exception e) {
         	log.error("FAILED Reason:: Header record for ITGU file is invalid format or length - " + headervalue);
         	 addErrorMsg(HEADER_RECORD_TYPE,"HeaderDate", "Header record for ITAG file is invalid format or length - " + headervalue);
@@ -259,6 +261,14 @@ public class ITGUFileDetailValidation {
 								" date and time format is invalid. Format should be YYYY-MM-DDThh:mm:ssZ  \t ::"
 										+ preFileDateTime));
 				invalidHeaderRecord = true;
+			}
+			
+			if (!headerCount.matches(IAGConstants.INFO_RECORD_COUNT_FORMAT)) {
+				invalidHeaderRecord = true;
+				addErrorMsg(HEADER_RECORD_TYPE,"RECORD_COUNT"," Invalid record count format. Values: 00000000 – 99999999    \t ::"+headerCount);
+			}else if(Long.parseLong(headerCount) <1) {
+				invalidHeaderRecord = true;
+				addErrorMsg(HEADER_RECORD_TYPE,"RECORD_COUNT"," Invalid Header or no delimiter     \t ::"+headerCount);
 			}
          if(invalidHeaderRecord) {
         	 return false;

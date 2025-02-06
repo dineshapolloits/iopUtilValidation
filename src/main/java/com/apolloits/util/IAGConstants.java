@@ -77,10 +77,12 @@ public class IAGConstants {
     public static final String ITAG_DTL_TAG_TYP = "[F,G,H,S,T,V,*]{1}";
     public static final String ITAG_DTL_TAG_MOUNT = "[I,L,R,H,V,*]{1}";
     public static final String ITAG_HEADER_COUNT_FORMAT = "\\d{10}";
+    public static final String INFO_RECORD_COUNT_FORMAT = "\\d{10}";
     
     public static final String ITGU_DTL_TAG_STATUS = "[1-4]{1}";
     
     public static final String TRAN_ZIP_FILE_NAME_FORMAT = "\\d{4}_\\d{4}_\\d{14}_[A-Z]{4}.[A-Za-z]{3}";
+    public static final String INFO_ZIP_FILE_NAME_FORMAT = "\\d{4}_\\d{14}_[A-Z]{4}.[A-Za-z]{3}";
     
     public static final String HEADER_RECORD_TYPE ="Header";
     public static final String DETAIL_RECORD_TYPE ="Detail";

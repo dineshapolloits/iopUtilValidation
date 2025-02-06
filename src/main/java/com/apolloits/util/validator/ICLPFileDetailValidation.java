@@ -96,6 +96,7 @@ public class ICLPFileDetailValidation {
 			 }
 			 //Start to validate file header and detail  record
 			 long noOfRecords = 0;
+			 String ackCode="00";
 			try (BufferedReader br = new BufferedReader(
 					new FileReader(zipFile.getFile().getParent()+File.separator+fileName))) {
 
@@ -107,13 +108,12 @@ public class ICLPFileDetailValidation {
 						// Validate Header record
 						
 						if(!validateIclpHeader(fileRowData,validateParam,fileName)) {
-							//create ACK file 
-							 //String ackFileName = IAGConstants.SRTA_HOME_AGENCY_ID + "_" + fileName.replace(".", "_") + IAGConstants.ACK_FILE_EXTENSION;
-							iagAckMapper.mapToIagAckFile(fileName, "01", validateParam.getOutputFilePath()+File.separator+ackFileName, fileName.substring(0, 4),validateParam.getToAgency());
-							//return false;
+							//create ACK file
+							ackCode="01";
 						}
 						if(validateParam.getValidateType().equals("header")) {
 				        	 log.info("Only file name and header validation");
+								iagAckMapper.mapToIagAckFile(fileName, ackCode, validateParam.getOutputFilePath()+File.separator+ackFileName, fileName.substring(0, 4),validateParam.getToAgency());
 				        	 return true;
 				         }
 						try {

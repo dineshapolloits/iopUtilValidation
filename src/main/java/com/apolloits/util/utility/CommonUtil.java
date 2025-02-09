@@ -144,13 +144,14 @@ private static AgencyDataExcelReader appConfig;
 		String zipfileName = "10 *";
 		Pattern pattern = Pattern.compile(IAGConstants.ITAG_TAG_CLASS);
 		String fileNameDateTime = "0034_0008_20250119103210.IRXC".substring(10, 24);
-		String headerDate = "2025-01-19T11:32:10Z";
+		String headerDate = "2025-02-01T14:16:34Z";
 		System.out.println("fileNameDateTime ::"+fileNameDateTime +"\t headerDate = "+headerDate.replaceAll("[-T:Z]", ""));
 		if(!pattern.matcher(zipfileName).matches()) {
 			System.out.println("false");
 		}else {
 			System.out.println("true");
 		}
+		
 	}
 
 	
@@ -940,6 +941,30 @@ private static AgencyDataExcelReader appConfig;
 	        	 }
 			}
 		 
+		return true;
+	}
+	/**
+	 * @author DK
+	 * This method help to validate information file generation UI parameter. (ITAG,ICLP AND ITGU)
+	 * @return
+	 */
+	public boolean validateInfoFileGenParameter(FileValidationParam validateParam) {
+
+		// Validate file location
+		File isfolder = new File(validateParam.getOutputFilePath());
+
+		if (!isfolder.exists()) {
+			log.error("Folder not persent. Please check your path");
+			validateParam.setResponseMsg("Folder not persent. Please check your path");
+			return false;
+		}
+		Path path = Path.of(validateParam.getOutputFilePath());
+		if (!Files.isWritable(path)) {
+			log.error("Not able to create file. Please check folder Permisison");
+			validateParam.setResponseMsg("Not able to create file. Please check folder Permisison");
+			return false;
+		}
+		
 		return true;
 	}
 	

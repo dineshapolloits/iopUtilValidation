@@ -93,9 +93,9 @@ public class ICLPFileGenerator {
 					long tagRangeCount = (Integer.parseInt(agEntity.getTagSequenceEnd()) - Integer.parseInt(agEntity.getTagSequenceStart()));
 					long validCount = (tagRangeCount * AgencyDataExcelReader.tagValid) /100; 
 					long lowbalCount = (tagRangeCount * AgencyDataExcelReader.tagLowBal) /100; 
-					long invalidCount = (tagRangeCount * AgencyDataExcelReader.tagInvalid) /100; 
+					long zeroNegativeCount = (tagRangeCount * AgencyDataExcelReader.tagZeroNegativeBal) /100; 
 					System.out.println("tagRangeCount ## "+tagRangeCount);
-					System.out.println("Tag Valid count ## "+validCount +"\t lowbalCount ## "+lowbalCount +"\t invalidCount ## "+invalidCount);
+					System.out.println("Tag Valid count ## "+validCount +"\t lowbalCount ## "+lowbalCount +"\t tagZeroNegativeBal ## "+zeroNegativeCount);
 					this.tagSequenceStart = Integer.parseInt(agEntity.getTagSequenceStart());
 					for (long count = 1; count <= validCount; count++) {
 						writer.write(getICLPDetailRecord(validateParam,agEntity));
@@ -222,13 +222,13 @@ private String getICLPHeader(FileValidationParam validateParam) {
 		/*	recordcount = recordcount
 					+ (Integer.parseInt(agEntity.getTagSequenceEnd()) - Integer.parseInt(agEntity.getTagSequenceStart())) ;*/
 			long tagRangeCount = (Integer.parseInt(agEntity.getTagSequenceEnd()) - Integer.parseInt(agEntity.getTagSequenceStart()));
-			log.info("AgencyDataExcelReader.tagValid :: "+AgencyDataExcelReader.tagValid +"\t AgencyDataExcelReader.tagLowBal :: "+AgencyDataExcelReader.tagLowBal +"\t AgencyDataExcelReader.tagInvalid :: "+AgencyDataExcelReader.tagInvalid);
+			log.info("AgencyDataExcelReader.tagValid :: "+AgencyDataExcelReader.tagValid +"\t AgencyDataExcelReader.tagLowBal :: "+AgencyDataExcelReader.tagLowBal +"\t AgencyDataExcelReader.tagZeroNegativeBal :: "+AgencyDataExcelReader.tagZeroNegativeBal);
 			long validCount = (tagRangeCount * AgencyDataExcelReader.tagValid) /100; 
 			long lowbalCount = (tagRangeCount * AgencyDataExcelReader.tagLowBal) /100; 
-			long invalidCount = (tagRangeCount * AgencyDataExcelReader.tagInvalid) /100; 
+			long zeroNegativeCount = (tagRangeCount * AgencyDataExcelReader.tagZeroNegativeBal) /100; 
 			System.out.println("tagRangeCount --- "+tagRangeCount);
-			log.info("Tag Valid count --- "+validCount +"\t lowbalCount -- "+lowbalCount +"\t invalidCount -- "+invalidCount);
-			recordcount = recordcount + validCount + lowbalCount;// +invalidCount;
+			log.info("Tag Valid count --- "+validCount +"\t lowbalCount -- "+lowbalCount +"\t tagZeroNegativeBal -- "+zeroNegativeCount);
+			recordcount = recordcount + validCount + lowbalCount;// +zeroNegativeCount;
 		}
 		log.info("Record count ::" +recordcount);
 		validateParam.setRecordCount(recordcount);

@@ -23,6 +23,7 @@ import com.apolloits.util.generate.ICRXFileGenerator;
 import com.apolloits.util.generate.ICTXFileGenerator;
 import com.apolloits.util.generate.IRXCFileGenerator;
 import com.apolloits.util.generate.ITAGFileGenerator;
+import com.apolloits.util.generate.ITGUFileGenerator;
 import com.apolloits.util.generate.ITXCFileGenerator;
 import com.apolloits.util.modal.AgencyEntity;
 import com.apolloits.util.modal.ErrorMsgDetail;
@@ -99,6 +100,9 @@ public class ValidationController {
 	
 	@Autowired
 	IRXCFileGenerator irxcGen;
+	
+	@Autowired
+	ITGUFileGenerator itguGen;
 	
 	List<ErrorMsgDetail> errorMsglist;
 	
@@ -245,7 +249,10 @@ public class ValidationController {
 			}else if(validateParam.getFileType().equals(IAGConstants.IRXC_FILE_TYPE)) {
 				log.info("IRXC Generation started");
 				fileValidation = irxcGen.irxcGen(validateParam,IAGConstants.IRXC_FILE_TYPE);
-			}
+			}else if (validateParam.getFileType().equals(IAGConstants.ITGU_FILE_TYPE)) {
+				log.info("ITGU  Generation started");
+				fileValidation = itguGen.itguGen(validateParam);
+			} 
 				log.info("getResponseMsg ::"+validateParam.getResponseMsg() +"\t fileValidation ::"+fileValidation);
 				log.info("fileValidation.getFileDate ::"+validateParam.getFileDate());
 			if(!fileValidation)

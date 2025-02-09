@@ -52,7 +52,9 @@ public class AgencyDataExcelReader {
 	
 	public static int tagValid = 0;
 	public static int tagLowBal = 0;
-	public static int tagInvalid = 0;
+	public static int tagZeroNegativeBal = 0;
+	public static int tagInvalidBal = 0;
+	//public static int tagInvalid = 0;
 	public static String TYPE = "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet";
 	String AgencyListing_SHEET = "UtilityAgencyListing";
 	String UtilityParam_SHEET = "UtilityParam";
@@ -239,8 +241,10 @@ public class AgencyDataExcelReader {
 						tagValid = Integer.parseInt(utilParam.getTypeValue());
 					}else if(utilParam.getType().equals("ITAG_LOW_Bal")) {
 						tagLowBal = Integer.parseInt(utilParam.getTypeValue());
+					}else if(utilParam.getType().equals("ITAG_ZERO_Negative")) {
+						tagZeroNegativeBal = Integer.parseInt(utilParam.getTypeValue());
 					}else if(utilParam.getType().equals("ITAG_Invalid")) {
-						tagInvalid = Integer.parseInt(utilParam.getTypeValue());
+						tagInvalidBal = Integer.parseInt(utilParam.getTypeValue());
 					}
 				}
 

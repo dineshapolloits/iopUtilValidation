@@ -157,6 +157,8 @@ public class ITGUFileDetailValidation {
 					}else if(controller.getErrorMsglist().size()== 0 && itagValidation.invalidRecordCount == 0 ) {
 						log.info("Sucess ACK created");
 						iagAckMapper.mapToIagAckFile(fileName, "00", validateParam.getOutputFilePath()+File.separator+ackFileName, fileName.substring(0, 4),validateParam.getToAgency());
+					}else if(controller.getErrorMsglist().size()>0 && itagValidation.invalidRecordCount ==0) {
+						iagAckMapper.mapToIagAckFile(fileName, "01", validateParam.getOutputFilePath()+File.separator+ackFileName, fileName.substring(0, 4),validateParam.getToAgency());
 					}
 				} catch (FileNotFoundException e) {
 					log.error("FileNotFoundException :: Error while reading a file."+e.getMessage());

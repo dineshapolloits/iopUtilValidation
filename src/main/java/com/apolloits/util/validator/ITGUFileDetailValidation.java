@@ -57,12 +57,12 @@ public class ITGUFileDetailValidation {
 			 log.error("FAILED Reason::  ZIP file not found");
 			 return false;
         }else {
-       	 if(!validateParam.getFromAgency().equals(inputItagZipFile.getName().substring(0,4))) {
+       	 /*if(!validateParam.getFromAgency().equals(inputItagZipFile.getName().substring(0,4))) {
        		 log.error("From Agency code not match with file Name");
        		 //validateParam.setResponseMsg("From Agency code "+validateParam.getFromAgency()+" not match with file Name ::"+inputItagZipFile.getName());
        		 controller.getErrorMsglist().add(new ErrorMsgDetail(FILE_RECORD_TYPE,"From Agency","From Agency code "+validateParam.getFromAgency()+" not match with file Name ::"+inputItagZipFile.getName()));
        		 return false;
-       	 }
+       	 }*/
        	 
        	 if(validateParam.getFromAgency().equals(validateParam.getToAgency())) {
        		 log.error("From Agency code and To agency code should not be same");

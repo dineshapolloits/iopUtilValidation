@@ -74,7 +74,7 @@ public class ACKFileDetailValidation {
 			}*/
 			
 			//validating ITAG and ICLP ack filename
-			if(fileName.contains(IAGConstants.ITAG_FILE_TYPE) || fileName.contains(IAGConstants.ICLP_FILE_TYPE)) {
+			if(fileName.contains(IAGConstants.ITAG_FILE_TYPE) || fileName.contains(IAGConstants.ICLP_FILE_TYPE)|| fileName.contains(IAGConstants.ITGU_FILE_TYPE)) {
 				log.info("Information file ACK validation");
 				if(!validateITAGandICLPAckname(fileName,validateParam)) {
 					controller.getErrorMsglist().add(new ErrorMsgDetail(FILE_RECORD_TYPE, "File Name",

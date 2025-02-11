@@ -176,9 +176,7 @@ public class ITGUFileGenerator {
 				+ IAGConstants.ITGU_FILE_EXTENSION;
 		StringBuilder itagHeader = new StringBuilder();
 		this.agency = ValidationController.cscIdTagAgencyMap.get(validateParam.getFromAgency());
-		// this.tagSequenceStart = Integer.parseInt(agency.getTagSequenceStart());
-		// this.tagSequenceEnd = Integer.parseInt(agency.getTagSequenceEnd());
-
+		
 		long recordcount = 0;
 		log.info("AgencyDataExcelReader.tagValid :: "
 				+ (AgencyDataExcelReader.tagValid - AgencyDataExcelReader.tagInvalidBal)
@@ -238,11 +236,10 @@ public class ITGUFileGenerator {
 		try {
 		// Parse the current date string
 		LocalDateTime currentDate = LocalDateTime.parse(date, formatter);
-
 		// Subtract one day to get the previous date
 		LocalDateTime previousDate = currentDate.minusDays(1);
 		System.out.println("Previous: " + previousDate.toString());
-		return previousDate.toString();
+		return previousDate.toString()+"Z";
 		}catch (Exception e) {
 			log.error("Exception in getPreviousDateUTCFormat ::"+date);
 			e.printStackTrace();

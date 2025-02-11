@@ -203,7 +203,7 @@ public class ACKFileDetailValidation {
 	private boolean validateITAGandICLPAckname(String ackFileName, FileValidationParam validateParam) {
 		
 
-		if (ackFileName != null && ackFileName.length() == 33) {
+		if (ackFileName != null && ackFileName.length() == 33 && ackFileName.matches(IAGConstants.INFO_ACK_FILE_NAME_FORMAT)) {
 			String[] fileParams = fileName.split("[_.]");
 			
 			if ( IAGConstants.IAG_FILE_TYPES.contains(fileParams[3]) &&

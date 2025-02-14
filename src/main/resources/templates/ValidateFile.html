@@ -78,6 +78,14 @@
 			</p>
 			
 			</div>
+			<div class="row">
+			<p class="col-md-6">	<b>IAG Version</b>		<select th:field="*{version}" class="form-control">
+				<option value="NONE">----Select IAG Version----</option>
+						    <option th:value="01.60.02" th:text="01.60.02"></option>
+							<option th:value="01.60.03" th:text="01.60.03"></option>
+						</select>
+						</p>
+			</div>
 			<p class="col-md-6">
 						<button type="submit" class="btn btn-info btn-lg  ">Validate</button>
 						</p>

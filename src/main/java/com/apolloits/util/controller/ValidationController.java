@@ -153,7 +153,11 @@ public class ValidationController {
 		errorMsglist = new ArrayList<>();
 		log.info("ValidateFile ::"+validateParam.toString());
 		//UI validation 
-		//validateUIField(validateParam);
+		if(!validateUIField(validateParam)) {
+			model.addAttribute("homeAgencyMap", dbLog.getCscAgencyIdandShortNamebymap());
+			model.addAttribute("result", validateParam.getResponseMsg());
+			return "ValidateFile";
+		}
 		boolean fileValidation = false ;
 		validateParam.setResponseMsg("\t Contact Administrator");
 			cscIdTagAgencyMap =  dbLog.getCSCIdbyAgencyMap(validateParam.getFromAgency());
@@ -316,5 +320,15 @@ public class ValidationController {
 		request.getSession().invalidate(); 
         return "LoginPage";
     }
+	
+	private boolean validateUIField(FileValidationParam validateParam) {
+		//validate IAG version
+		if(validateParam.getVersion().equals("NONE")) {
+			validateParam.setResponseMsg("<b>Please select IAG version</b>");
+			return false;
+		}
+		return true;
+		
+	}
 
 }

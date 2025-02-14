@@ -130,11 +130,12 @@ public class ACKFileDetailValidation {
 			
 			// IAG Version
 			if (!fileRowData.substring(4, 12).matches(IAGConstants.IAG_HEADER_VERSION_FORMAT)
-					|| ValidationController.cscIdTagAgencyMap.get(fileRowData.substring(12, 16)) == null
 					|| !fileRowData.substring(4, 12)
-					.equals(ValidationController.cscIdTagAgencyMap.get(fileRowData.substring(12, 16)).getVersionNumber())) {
+					//.equals(ValidationController.cscIdTagAgencyMap.get(fileRowData.substring(12, 16)).getVersionNumber())
+					.equals(validateParam.getVersion())
+					) {
 				addErrorMsg(HEADER_RECORD_TYPE, "VERSION",
-						"IAG Version not matched ::\t " + fileRowData.substring(12, 16) + " \t :: Header Row::\t " + fileRowData);
+						"IAG Version not matched ::\t " + fileRowData.substring(4, 12) + " \t ::<b> Header Row ::</b>\t " + fileRowData);
 			}
 			
 			// FROM_AGENCY_ID //CHAR(4)

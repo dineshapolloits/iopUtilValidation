@@ -18,5 +18,7 @@ public class FileValidationParam {
 	
 	private String responseMsg;
 	
+	private String version;
+	
 	
 }

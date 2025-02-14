@@ -233,8 +233,10 @@ public class ICLPFileDetailValidation {
          
          final Pattern pattern = Pattern.compile(IAGConstants.IAG_HEADER_VERSION_FORMAT);
          if (!pattern.matcher(headerVersion).matches() 
-        		  || ValidationController.cscIdTagAgencyMap.get(fromAgencyId) == null
-        				  || !headerVersion.equals(ValidationController.cscIdTagAgencyMap.get(fromAgencyId).getVersionNumber())) {
+        		 // || ValidationController.cscIdTagAgencyMap.get(fromAgencyId) == null
+        			//	  || !headerVersion.equals(ValidationController.cscIdTagAgencyMap.get(fromAgencyId).getVersionNumber())
+        		 || !headerVersion.equals(validateParam.getVersion())
+        				  ) {
         	 log.error("FAILED Reason:: Invalid header, version format is incorrect - " + headerVersion + "\t excepted version ::"+ValidationController.cscIdTagAgencyMap.get(fromAgencyId).getVersionNumber());
         	 controller.getErrorMsglist().add(new ErrorMsgDetail(HEADER_RECORD_TYPE,"IAG Version","Invalid version " + headerVersion));
         	 //validateParam.setResponseMsg("Invalid header, version format is incorrect - " + headerVersion + "\t excepted version ::"+ValidationController.cscIdTagAgencyMap.get(fromAgencyId).getVersionNumber());

@@ -496,8 +496,10 @@ private boolean validateIctxHeader(String fileRowData, FileValidationParam valid
     }
     //IAG Version
     if (!fileRowData.substring(4, 12).matches(IAGConstants.IAG_HEADER_VERSION_FORMAT) || 
-    		ValidationController.cscIdTagAgencyMap.get(fileRowData.substring(12, 16)) == null ||
-    		!fileRowData.substring(4, 12).equals(ValidationController.cscIdTagAgencyMap.get(fileRowData.substring(12, 16)).getVersionNumber())) {
+    		//ValidationController.cscIdTagAgencyMap.get(fileRowData.substring(12, 16)) == null ||
+    		//!fileRowData.substring(4, 12).equals(ValidationController.cscIdTagAgencyMap.get(fileRowData.substring(12, 16)).getVersionNumber())
+    		!fileRowData.substring(4, 12).equals(validateParam.getVersion())
+    		) {
     	addErrorMsg(HEADER_RECORD_TYPE,"VERSION","IAG Version not matched ::\t "+fileRowData.substring(0, 4)+" \t :: Header Row::\t "+fileRowData);
     	invalidHeaderRecord = true;
     }

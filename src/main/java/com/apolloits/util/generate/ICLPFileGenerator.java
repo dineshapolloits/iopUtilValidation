@@ -54,7 +54,9 @@ public class ICLPFileGenerator {
 		String Header = getICLPHeader(validateParam);
 		log.info("ITAG file name ::"+filename);
 		log.info("ITAG Header :: " + Header);
-
+		if(Header.length() != 46 ) {
+			return false;
+		}
 		FileWriter writer;
 		try {
 			String filePath = validateParam.getOutputFilePath() + File.separator + filename;
@@ -233,6 +235,10 @@ private String getICLPHeader(FileValidationParam validateParam) {
 		log.info("Record count ::" +recordcount);
 		validateParam.setRecordCount(recordcount);
 		this.agency = ValidationController.cscIdTagAgencyMap.get(validateParam.getFromAgency());
+		if(this.agency == null) {
+			validateParam.setResponseMsg("Please check agency configuation");
+			return "invalidAgency";
+		}
 		//this.tagSequenceStart = Integer.parseInt(agency.getTagSequenceStart());
 		//this.tagSequenceEnd = Integer.parseInt(agency.getTagSequenceEnd());
 		itagHeader.append(IAGConstants.ICLP_FILE_TYPE);

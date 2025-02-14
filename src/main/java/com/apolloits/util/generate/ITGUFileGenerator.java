@@ -51,6 +51,9 @@ public class ITGUFileGenerator {
 		log.info("ITAG file name ::"+filename);
 		log.info("ITAG Header :: " + Header);
 		
+		if(Header.length() != 66 ) {
+			return false;
+		}
 		FileWriter writer;
 		try {
 			String filePath = validateParam.getOutputFilePath() + File.separator + filename;
@@ -72,28 +75,6 @@ public class ITGUFileGenerator {
 		return true;
 	}
 	
-	private String moveToZipFile(String filePath,FileValidationParam validateParam) {
-		File file = new File(filePath);
-		ZipParameters parameters = new ZipParameters();
-		parameters.setCompressionMethod(CompressionMethod.DEFLATE);
-		parameters.setCompressionLevel(CompressionLevel.ULTRA);
-
-		String zipFileName = file.getName().replace(".", "_") + ".ZIP";
-		String zipFilePath = file.getParent() + "/" + zipFileName;
-
-		ZipFile zipFile = new ZipFile(zipFilePath);
-		try {
-			zipFile.addFile(file, parameters);
-		} catch (ZipException e) {
-			validateParam.setResponseMsg("Exception in ZIP file creation");
-			log.error("Exception in ZIP file creation");
-			e.printStackTrace();
-		}
-		file.delete();
-		return zipFileName;
-		
-	}
-
 	private void writeDetails(FileValidationParam validateParam, String header, Writer writer)
 			throws IOException {
 		long start = System.currentTimeMillis();
@@ -176,6 +157,10 @@ public class ITGUFileGenerator {
 				+ IAGConstants.ITGU_FILE_EXTENSION;
 		StringBuilder itagHeader = new StringBuilder();
 		this.agency = ValidationController.cscIdTagAgencyMap.get(validateParam.getFromAgency());
+		if(this.agency == null) {
+			validateParam.setResponseMsg("Please check agency configuation");
+			return "invalidAgency";
+		}
 		
 		long recordcount = 0;
 		log.info("AgencyDataExcelReader.tagValid :: "

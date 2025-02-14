@@ -47,7 +47,9 @@ public class ITAGFileGenerator {
 		String Header = getITAGHeader(validateParam);
 		log.info("ITAG file name ::"+filename);
 		log.info("ITAG Header :: " + Header);
-
+		if(Header.length() != 46 ) {
+			return false;
+		}
 		FileWriter writer;
 		try {
 			String filePath = validateParam.getOutputFilePath() + File.separator + filename;
@@ -169,7 +171,10 @@ public class ITAGFileGenerator {
 		this.agency = ValidationController.cscIdTagAgencyMap.get(validateParam.getFromAgency());
 		//this.tagSequenceStart = Integer.parseInt(agency.getTagSequenceStart());
 		//this.tagSequenceEnd = Integer.parseInt(agency.getTagSequenceEnd());
-		
+		if(this.agency == null) {
+			validateParam.setResponseMsg("Please check agency configuation");
+			return "invalidAgency";
+		}
 		long recordcount = 0;
 		log.info("AgencyDataExcelReader.tagValid :: "+AgencyDataExcelReader.tagValid +"\t AgencyDataExcelReader.tagLowBal :: "+AgencyDataExcelReader.tagLowBal +"\t AgencyDataExcelReader.tagZeroNegativeBal :: "+AgencyDataExcelReader.tagZeroNegativeBal);
 		for (Map.Entry<String, AgencyEntity> entry : ValidationController.cscIdTagAgencyMap.entrySet()) {

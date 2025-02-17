@@ -147,7 +147,7 @@ public boolean ictxValidation(FileValidationParam validateParam) throws IOExcept
 								ictxFileNum = fileRowData.substring(48, 60);
 							}
 							
-							iagAckMapper.mapToIagAckFile(fileName, ackCode, validateParam.getOutputFilePath()+File.separator+ackFileName, fileName.substring(0, 4),validateParam.getToAgency());
+							iagAckMapper.mapToIagAckFile(fileName, ackCode, validateParam.getOutputFilePath()+File.separator+ackFileName, fileName.substring(0, 4),validateParam.getToAgency(),validateParam.getVersion());
 							if(validateParam.getValidateType().equals("header")) {
 					        	 log.info("Only file name and header validation");
 					        	 return true;
@@ -167,7 +167,7 @@ public boolean ictxValidation(FileValidationParam validateParam) throws IOExcept
 					if((noOfRecords-1) != headerCount ) {
 						log.error("Header count("+headerCount+") and detail count not matching ::\t"+noOfRecords);
 						validateParam.setResponseMsg("\t Header count("+headerCount+") and detail count not matching ::\t"+noOfRecords);
-						iagAckMapper.mapToIagAckFile(fileName, "01", validateParam.getOutputFilePath()+File.separator+ackFileName, fileName.substring(0, 4),validateParam.getToAgency());
+						iagAckMapper.mapToIagAckFile(fileName, "01", validateParam.getOutputFilePath()+File.separator+ackFileName, fileName.substring(0, 4),validateParam.getToAgency(),validateParam.getVersion());
 						controller.getErrorMsglist().add(new ErrorMsgDetail(HEADER_RECORD_TYPE,"RECORD_COUNT"," Header count(" + headerCount
 								+ ") and detail count not matching ::" + (noOfRecords-1)));
 						return false;
@@ -197,7 +197,7 @@ public boolean ictxValidation(FileValidationParam validateParam) throws IOExcept
 					}
 					iagAckMapper.mapToIagAckFile(fileName, ackcode,
 							validateParam.getOutputFilePath() + File.separator + ackFileName, fileName.substring(0, 4),
-							validateParam.getToAgency());
+							validateParam.getToAgency(),validateParam.getVersion());
 				} catch (IOException e) {
 					e.printStackTrace();
 					// Display pop up message if exceptionn occurs

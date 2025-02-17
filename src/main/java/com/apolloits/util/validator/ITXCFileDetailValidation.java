@@ -137,7 +137,7 @@ public boolean itxcValidation(FileValidationParam validateParam) throws IOExcept
 								//return false;
 							}
 							
-							iagAckMapper.mapToIagAckFile(fileName, ackCode, validateParam.getOutputFilePath()+File.separator+ackFileName, fileName.substring(0, 4),validateParam.getToAgency());
+							iagAckMapper.mapToIagAckFile(fileName, ackCode, validateParam.getOutputFilePath()+File.separator+ackFileName, fileName.substring(0, 4),validateParam.getToAgency(),validateParam.getVersion());
 							if (fileRowData.length()> 48 && fileRowData.substring(40, 48).matches(IAGConstants.TRAN_RECORD_COUNT_FORMAT)) {
 								headerCount = Long.parseLong(fileRowData.substring(40, 48));
 							}else {
@@ -155,7 +155,7 @@ public boolean itxcValidation(FileValidationParam validateParam) throws IOExcept
 						}else {
 							if(!validateItxcDetail(fileRowData,validateParam,noOfRecords)) {
 								//validateParam.setResponseMsg(validateParam.getResponseMsg() +"\t    Line No::"+noOfRecords);
-								iagAckMapper.mapToIagAckFile(fileName, "02", validateParam.getOutputFilePath()+File.separator+ackFileName, fileName.substring(0, 4),validateParam.getToAgency());
+								iagAckMapper.mapToIagAckFile(fileName, "02", validateParam.getOutputFilePath()+File.separator+ackFileName, fileName.substring(0, 4),validateParam.getToAgency(),validateParam.getVersion());
 								//return false;
 							}
 								addITXCTemplate(fileRowData.substring(2),itxcFileNum,fileRowData.substring(0, 2)); //This method add ITXCtemplate value in list
@@ -165,7 +165,7 @@ public boolean itxcValidation(FileValidationParam validateParam) throws IOExcept
 					log.info("ictxfileValidation.invalidRecordCount :: = "+ictxfileValidation.invalidRecordCount);
 					if((noOfRecords-1) != headerCount ) {
 						validateParam.setResponseMsg("\t Header count("+headerCount+") and detail count not matching ::"+(noOfRecords-1));
-						iagAckMapper.mapToIagAckFile(fileName, "01", validateParam.getOutputFilePath()+File.separator+ackFileName, fileName.substring(0, 4),validateParam.getToAgency());
+						iagAckMapper.mapToIagAckFile(fileName, "01", validateParam.getOutputFilePath()+File.separator+ackFileName, fileName.substring(0, 4),validateParam.getToAgency(),validateParam.getVersion());
 						controller.getErrorMsglist().add(new ErrorMsgDetail(HEADER_RECORD_TYPE,"RECORD_COUNT"," Header count(" + headerCount
 								+ ") and detail count not matching ::" + (noOfRecords-1)));
 						return false;
@@ -180,7 +180,7 @@ public boolean itxcValidation(FileValidationParam validateParam) throws IOExcept
 					}
 					if(controller.getErrorMsglist().size()>0 && ictxfileValidation.invalidRecordCount >0) {
 						validateParam.setResponseMsg("\t \t ACK file name ::"+ackFileName);
-						iagAckMapper.mapToIagAckFile(fileName, "02", validateParam.getOutputFilePath()+File.separator+ackFileName, fileName.substring(0, 4),validateParam.getToAgency());
+						iagAckMapper.mapToIagAckFile(fileName, "02", validateParam.getOutputFilePath()+File.separator+ackFileName, fileName.substring(0, 4),validateParam.getToAgency(),validateParam.getVersion());
 					} else if(controller.getErrorMsglist().size()== 0 && ictxfileValidation.invalidRecordCount == 0 ) {
 						// generate ICTXTemplate format excel file.
 						log.info("itxcTempList size ::" + itxcTempList.size());

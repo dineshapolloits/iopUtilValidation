@@ -139,7 +139,7 @@ public class ICRXFileDetailValidation {
 								}
 								iagAckMapper.mapToIagAckFile(fileName, ackCode,
 										validateParam.getOutputFilePath() + File.separator + ackFileName,
-										fileName.substring(0, 4), validateParam.getToAgency());
+										fileName.substring(0, 4), validateParam.getToAgency(),validateParam.getVersion());
 								if (validateParam.getValidateType().equals("header")) {
 									log.info("Only file name and header validation");
 									return true;
@@ -155,7 +155,7 @@ public class ICRXFileDetailValidation {
 									+ ") and detail count not matching ::" + noOfRecords);
 							iagAckMapper.mapToIagAckFile(fileName, "01",
 									validateParam.getOutputFilePath() + File.separator + ackFileName, fileName.substring(0, 4),
-									validateParam.getToAgency());
+									validateParam.getToAgency(),validateParam.getVersion());
 							controller.getErrorMsglist()
 									.add(new ErrorMsgDetail(HEADER_RECORD_TYPE, "RECORD_COUNT", " Header count("
 											+ headerCount + ") and detail count not matching ::" + (noOfRecords - 1)));
@@ -182,7 +182,7 @@ public class ICRXFileDetailValidation {
 						}
 						iagAckMapper.mapToIagAckFile(fileName, ackcode,
 								validateParam.getOutputFilePath() + File.separator + ackFileName, fileName.substring(0, 4),
-								validateParam.getToAgency());
+								validateParam.getToAgency(),validateParam.getVersion());
 						
 						
 					} catch (IOException e) {

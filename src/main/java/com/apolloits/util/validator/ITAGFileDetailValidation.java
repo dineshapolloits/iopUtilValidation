@@ -118,8 +118,8 @@ public class ITAGFileDetailValidation {
 									//create ACK file 
 									ackCode="01";
 								}
+								iagAckMapper.mapToIagAckFile(fileName, ackCode, validateParam.getOutputFilePath()+File.separator+ackFileName, fileName.substring(0, 4),validateParam.getToAgency(),validateParam.getVersion());
 								if(validateParam.getValidateType().equals("header")) {
-									iagAckMapper.mapToIagAckFile(fileName, ackCode, validateParam.getOutputFilePath()+File.separator+ackFileName, fileName.substring(0, 4),validateParam.getToAgency());
 						        	 log.info("Only file name and header validation");
 						        	 return true;
 						         }
@@ -137,7 +137,7 @@ public class ITAGFileDetailValidation {
 							}else {
 								if(!validateItagDetail(fileRowData,validateParam,fileName,noOfRecords)) {
 									validateParam.setResponseMsg(validateParam.getResponseMsg() +"\t    Line No::"+noOfRecords);
-									iagAckMapper.mapToIagAckFile(fileName, "02", validateParam.getOutputFilePath()+File.separator+ackFileName, fileName.substring(0, 4),validateParam.getToAgency());
+									iagAckMapper.mapToIagAckFile(fileName, "02", validateParam.getOutputFilePath()+File.separator+ackFileName, fileName.substring(0, 4),validateParam.getToAgency(),validateParam.getVersion());
 									//return false;
 								}
 							}
@@ -145,7 +145,7 @@ public class ITAGFileDetailValidation {
 						}
 						if((noOfRecords-1) != headerCount ) {
 							validateParam.setResponseMsg("\t Header count("+headerCount+") and detail count not matching ::"+(noOfRecords-1));
-							iagAckMapper.mapToIagAckFile(fileName, "01", validateParam.getOutputFilePath()+File.separator+ackFileName, fileName.substring(0, 4),validateParam.getToAgency());
+							iagAckMapper.mapToIagAckFile(fileName, "01", validateParam.getOutputFilePath()+File.separator+ackFileName, fileName.substring(0, 4),validateParam.getToAgency(),validateParam.getVersion());
 							return false;
 						}
 						
@@ -162,10 +162,10 @@ public class ITAGFileDetailValidation {
 							validateDuplicateTagSerialNo(zipFile.getFile().getParent()+File.separator+fileName,validateParam);
 						if(controller.getErrorMsglist().size()>0 && invalidRecordCount >0) {
 							validateParam.setResponseMsg("\t \t <b>ACK file name ::</b> \t "+ackFileName +"\t <b> Invalid detail record count ::</b> \t "+invalidRecordCount);
-							iagAckMapper.mapToIagAckFile(fileName, "02", validateParam.getOutputFilePath()+File.separator+ackFileName, fileName.substring(0, 4),validateParam.getToAgency());
+							iagAckMapper.mapToIagAckFile(fileName, "02", validateParam.getOutputFilePath()+File.separator+ackFileName, fileName.substring(0, 4),validateParam.getToAgency(),validateParam.getVersion());
 						}else if(controller.getErrorMsglist().size()== 0 && invalidRecordCount == 0 ) {
 							log.info("Sucess ACK created");
-							iagAckMapper.mapToIagAckFile(fileName, "00", validateParam.getOutputFilePath()+File.separator+ackFileName, fileName.substring(0, 4),validateParam.getToAgency());
+							iagAckMapper.mapToIagAckFile(fileName, "00", validateParam.getOutputFilePath()+File.separator+ackFileName, fileName.substring(0, 4),validateParam.getToAgency(),validateParam.getVersion());
 						}
 					} catch (FileNotFoundException e) {
 						log.error("FileNotFoundException :: Error while reading a file."+e.getMessage());
@@ -180,7 +180,7 @@ public class ITAGFileDetailValidation {
 					}
         			 
         		 }else {
-        			 iagAckMapper.mapToIagAckFile(fileName, "07", validateParam.getOutputFilePath()+File.separator+ackFileName, fileName.substring(0, 4),validateParam.getToAgency());
+        			 iagAckMapper.mapToIagAckFile(fileName, "07", validateParam.getOutputFilePath()+File.separator+ackFileName, fileName.substring(0, 4),validateParam.getToAgency(),validateParam.getVersion());
         			 //validateParam.setResponseMsg("FAILED Reason:: ITAG file Name validation is failed");
         			 log.error("ITAG file Name validation is failed");
         			 controller.getErrorMsglist().add(new ErrorMsgDetail(FILE_RECORD_TYPE,"File Name","ITAG file Name validation is failed"));

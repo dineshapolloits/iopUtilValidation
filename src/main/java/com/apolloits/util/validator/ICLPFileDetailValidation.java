@@ -111,9 +111,9 @@ public class ICLPFileDetailValidation {
 							//create ACK file
 							ackCode="01";
 						}
+						iagAckMapper.mapToIagAckFile(fileName, ackCode, validateParam.getOutputFilePath()+File.separator+ackFileName, fileName.substring(0, 4),validateParam.getToAgency(),validateParam.getVersion());
 						if(validateParam.getValidateType().equals("header")) {
 				        	 log.info("Only file name and header validation");
-								iagAckMapper.mapToIagAckFile(fileName, ackCode, validateParam.getOutputFilePath()+File.separator+ackFileName, fileName.substring(0, 4),validateParam.getToAgency());
 				        	 return true;
 				         }
 						try {
@@ -129,7 +129,7 @@ public class ICLPFileDetailValidation {
 						
 					}else {
 						if(!validateIclpDetail(fileRowData,validateParam,fileName,noOfRecords)) {
-							iagAckMapper.mapToIagAckFile(fileName, "02", validateParam.getOutputFilePath()+File.separator+ackFileName, fileName.substring(0, 4),validateParam.getToAgency());
+							iagAckMapper.mapToIagAckFile(fileName, "02", validateParam.getOutputFilePath()+File.separator+ackFileName, fileName.substring(0, 4),validateParam.getToAgency(),validateParam.getVersion());
 							return false;
 						}
 					}
@@ -147,17 +147,17 @@ public class ICLPFileDetailValidation {
 				
 				if(controller.getErrorMsglist().size()>0 && invalidRecordCount>0 ) {
 					validateParam.setResponseMsg(" \t <b>ACK file name ::</b> \t"+ackFileName +"\t <b> Invalid record detail count ::</b> \t "+invalidRecordCount);
-					iagAckMapper.mapToIagAckFile(fileName, "02", validateParam.getOutputFilePath()+File.separator+ackFileName, fileName.substring(0, 4),validateParam.getToAgency());
+					iagAckMapper.mapToIagAckFile(fileName, "02", validateParam.getOutputFilePath()+File.separator+ackFileName, fileName.substring(0, 4),validateParam.getToAgency(),validateParam.getVersion());
 				}else if(controller.getErrorMsglist().size()== 0 && invalidRecordCount == 0 ) {
 					log.info("Sucess ACK created");
-					iagAckMapper.mapToIagAckFile(fileName, "00", validateParam.getOutputFilePath()+File.separator+ackFileName, fileName.substring(0, 4),validateParam.getToAgency());
+					iagAckMapper.mapToIagAckFile(fileName, "00", validateParam.getOutputFilePath()+File.separator+ackFileName, fileName.substring(0, 4),validateParam.getToAgency(),validateParam.getVersion());
 				}
 				
 				if((noOfRecords-1) != headerCount ) {
 					log.error("FAILED Reason :: Header count("+headerCount+") and detail count not matching ::"+(noOfRecords-1));
 					controller.getErrorMsglist().add(new ErrorMsgDetail(DETAIL_RECORD_TYPE,"File","Header count("+headerCount+") and detail count not matching ::"+(noOfRecords-1)));
 					//validateParam.setResponseMsg("FAILED Reason :: Header count("+headerCount+") and detail count not matching ::"+noOfRecords);
-					iagAckMapper.mapToIagAckFile(fileName, "01", validateParam.getOutputFilePath()+File.separator+ackFileName, fileName.substring(0, 4),validateParam.getToAgency());
+					iagAckMapper.mapToIagAckFile(fileName, "01", validateParam.getOutputFilePath()+File.separator+ackFileName, fileName.substring(0, 4),validateParam.getToAgency(),validateParam.getVersion());
 					return false;
 				}
 			} catch (FileNotFoundException e) {
@@ -174,7 +174,7 @@ public class ICLPFileDetailValidation {
 	            
 			 
 		 }else {
-			 iagAckMapper.mapToIagAckFile(fileName, "07", validateParam.getOutputFilePath()+File.separator+ackFileName, fileName.substring(0, 4),validateParam.getToAgency());
+			 iagAckMapper.mapToIagAckFile(fileName, "07", validateParam.getOutputFilePath()+File.separator+ackFileName, fileName.substring(0, 4),validateParam.getToAgency(),validateParam.getVersion());
 			 controller.getErrorMsglist().add(new ErrorMsgDetail(FILE_RECORD_TYPE,"File","Inside ZIP ICLP file Name validation is failed - File name :: " +fileName));
 			 log.error("FAILED Reason:: Inside ZIP ICLP file Name validation is failed");
 			 // validateParam.setResponseMsg("FAILED Reason:: Inside ZIP ICLP file Name validation is failed");

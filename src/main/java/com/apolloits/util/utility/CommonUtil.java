@@ -146,11 +146,14 @@ private static AgencyDataExcelReader appConfig;
 		String fileNameDateTime = "0034_0008_20250119103210.IRXC".substring(10, 24);
 		String headerDate = "2025-02-01T14:16:34Z";
 		System.out.println("fileNameDateTime ::"+fileNameDateTime +"\t headerDate = "+headerDate.replaceAll("[-T:Z]", ""));
-		if(!pattern.matcher(zipfileName).matches()) {
-			System.out.println("false");
-		}else {
-			System.out.println("true");
-		}
+
+		DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ssX");
+		// Parse the current date string
+		LocalDateTime currentDate = LocalDateTime.parse(headerDate, formatter);
+
+		// Subtract one day to get the previous date
+		LocalDateTime previousDate = currentDate.minusDays(1);
+		System.out.println("Previous: " + previousDate.toString()+"Z");
 		
 	}
 
@@ -189,7 +192,7 @@ private static AgencyDataExcelReader appConfig;
 			log.info("ZIP file validation is failed "+fileName);
 			String ackFileName = validateParam.getToAgency() + "_" + fileName.replace(".ZIP", "") + IAGConstants.ACK_FILE_EXTENSION;
 			log.info("ZIP file validation is failed ackFileName ::"+ackFileName);
-			iagAckMapper.mapToIagAckFile(fileName, "07", validateParam.getOutputFilePath()+File.separator+ackFileName, fileName.substring(0, 4),validateParam.getToAgency());
+			iagAckMapper.mapToIagAckFile(fileName, "07", validateParam.getOutputFilePath()+File.separator+ackFileName, fileName.substring(0, 4),validateParam.getToAgency(),validateParam.getVersion());
    		 	validateParam.setResponseMsg("\t Invalid ZIP file format");
    		 	controller.getErrorMsglist().add(new ErrorMsgDetail(FILE_RECORD_TYPE,"ZIP File Name","ZIP file Name validation is failed"));
 		}
@@ -749,7 +752,7 @@ private static AgencyDataExcelReader appConfig;
 	    if(!isvalid) {
 	    	String ackFileName = validateParam.getToAgency() + "_" + transactionFilename.replace(".", "_") + IAGConstants.ACK_FILE_EXTENSION;
 			log.info("Transaction ZIP file validation is failed ackFileName ::"+ackFileName);
-			iagAckMapper.mapToIagAckFile(transactionFilename, "07", validateParam.getOutputFilePath()+File.separator+ackFileName, transactionFilename.substring(0, 4),validateParam.getToAgency());
+			iagAckMapper.mapToIagAckFile(transactionFilename, "07", validateParam.getOutputFilePath()+File.separator+ackFileName, transactionFilename.substring(0, 4),validateParam.getToAgency(),validateParam.getVersion());
    		 	
 	    }
 	    return isvalid;
@@ -876,7 +879,7 @@ private static AgencyDataExcelReader appConfig;
 			log.info("Transaction ZIP file validation is failed "+zipFileName);
 			String ackFileName = validateParam.getToAgency() + "_" + zipFileName.replace(".ZIP", "") + IAGConstants.ACK_FILE_EXTENSION;
 			log.info("Transaction ZIP file validation is failed ackFileName ::"+ackFileName);
-			iagAckMapper.mapToIagAckFile(zipFileName, "07", validateParam.getOutputFilePath()+File.separator+ackFileName, zipFileName.substring(0, 4),validateParam.getToAgency());
+			iagAckMapper.mapToIagAckFile(zipFileName, "07", validateParam.getOutputFilePath()+File.separator+ackFileName, zipFileName.substring(0, 4),validateParam.getToAgency(),validateParam.getVersion());
    		 	validateParam.setResponseMsg("\t Invalid ZIP file format");
    		 	controller.getErrorMsglist().add(new ErrorMsgDetail(FILE_RECORD_TYPE,"ZIP File Name","ZIP file Name validation is failed"));
 		}
@@ -1046,7 +1049,7 @@ private static AgencyDataExcelReader appConfig;
 					if(!fileName.contains("ACK")) {
 					String ackFileName = validateParam.getToAgency() + "_" + fileName.replace(".", "_") + IAGConstants.ACK_FILE_EXTENSION;
 					log.info("Delimiter validation is failed ackFileName ::"+ackFileName);
-					iagAckMapper.mapToIagAckFile(fileName, "02", validateParam.getOutputFilePath()+File.separator+ackFileName, validateParam.getFromAgency(),validateParam.getToAgency());
+					iagAckMapper.mapToIagAckFile(fileName, "02", validateParam.getOutputFilePath()+File.separator+ackFileName, validateParam.getFromAgency(),validateParam.getToAgency(),validateParam.getVersion());
 					}
 					return false;
 				}

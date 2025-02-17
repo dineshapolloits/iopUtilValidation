@@ -17,10 +17,10 @@ import java.time.format.DateTimeFormatter;
 public class IagAckFileMapper {
 
 
-    public IagAckFile mapToIagAckFile(String fileName, String returnCode, String ackFilePath, String toAgencyId,String fromAgencyId) {
+    public IagAckFile mapToIagAckFile(String fileName, String returnCode, String ackFilePath, String toAgencyId,String fromAgencyId,String iagVersion) {
         IagAckFile iagAckFile = new IagAckFile();
         iagAckFile.setFileType("ACK ");
-        iagAckFile.setFileVersion("01.60.02");
+        iagAckFile.setFileVersion(iagVersion);
         iagAckFile.setFromAgencyId(fromAgencyId);
         iagAckFile.setToAgencyId(toAgencyId);
         iagAckFile.setOrigFileName(CommonUtil.formatStringRightPad(fileName, 50, ' '));

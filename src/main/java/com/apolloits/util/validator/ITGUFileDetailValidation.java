@@ -110,9 +110,9 @@ public class ITGUFileDetailValidation {
 								//create ACK file 
 								ackCode="01";
 							}
+							iagAckMapper.mapToIagAckFile(fileName, ackCode, validateParam.getOutputFilePath()+File.separator+ackFileName, fileName.substring(0, 4),validateParam.getToAgency(),validateParam.getVersion());
 							if(validateParam.getValidateType().equals("header")) {
 					        	 log.info("Only file name and header validation");
-									iagAckMapper.mapToIagAckFile(fileName, ackCode, validateParam.getOutputFilePath()+File.separator+ackFileName, fileName.substring(0, 4),validateParam.getToAgency(),validateParam.getVersion());
 					        	 return true;
 					         }
 							

@@ -7,46 +7,114 @@
 	href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css"
 	integrity="sha384-MCw98/SFnGE8fJT3GXwEOngsV7Zt27NXFoaoApmYm81iuXoPkFOJwJ8ERdknLPMO"
 	crossorigin="anonymous">
+<style>
+	.table-wrapper {
+	  max-height: 300px;
+	  overflow: auto;
+	  display:inline-block;
+	}
+</style>
 </head>
 <body>
 	<div class="container">
 		<h1>IOP Util Validate Files</h1>
+		<div align="right">
+				<a th:href="@{/Logout}" class="btn btn-primary link-danger">Logout</a>
+				</div>
 		<hr>
 		<h2>Validation Parameter</h2>
 
 		<form action="#" th:action="@{/ValidateFile}" th:object="${fileValidationParam}"
-			method="POST">
-			<p>	<b>File Type</b>		<select th:field="*{fileType}" class="form-control mb-4 col-4">
+			method="POST" >
+			<div class="row">
+			<p class="col-md-6">	<b>File Type</b>		<select th:field="*{fileType}" class="form-control">
 			    <option th:value="ITAG" th:text="ITAG"></option>
+				<option th:value="ITGU" th:text="ITGU"></option>
 			    <option th:value="ICLP" th:text="ICLP"></option>
+				<option th:value="ICTX" th:text="ICTX"></option>
+				<option th:value="ICRX" th:text="ICRX"></option>
+				<option th:value="ITXC" th:text="ITXC"></option>
+				<option th:value="IRXC" th:text="IRXC"></option>
+				<option th:value="ACK" th:text="ACK"></option>
 			</select>
 			</p>
-			<p>	<b>Validate Type</b>		<select th:field="*{validateType}" class="form-control mb-4 col-4">
+			<p class="col-md-6">	<b>Validate Type</b>		<select th:field="*{validateType}" class="form-control">
 						    <option th:value="all" th:text="All"></option>
 						    <option th:value="filename" th:text="File-Name"></option>
 							<option th:value="header" th:text="Header"></option>
 						</select>
 						</p>
-			<p><b>From Agency Code</b>
-				<input type="text" th:field="*{fromAgency}" placeholder="From agency code" class="form-control mb-4 col-4" minlength="4" maxlength="4">
+						</div>
+		<div class="row">	
+			<p class="col-md-6"><b>From Agency Code</b>
+							<select th:field="*{fromAgency}" class="form-control">
+							     <option value="NONE">----Select Agency Code----</option>
+							     <option th:each="entry : ${homeAgencyMap.entrySet()}" th:value="${entry.key}" th:text="${entry.value}">
+							     </option>
+							  </select>
+						</p> 			
+		<!--	<p class="col-md-6"><b>From Agency Code</b>
+				<input type="text" th:field="*{fromAgency}" placeholder="From agency code" class="form-control " minlength="4" maxlength="4">
 			</p>
-			<p><b>To Agency Code</b>
-				<input type="text" th:field="*{toAgency}" placeholder="To agency code" class="form-control mb-4 col-4">
+			
+			<p class="col-md-6"><b>To Agency Code</b>
+							<input type="text" th:field="*{toAgency}" placeholder="From agency code" class="form-control " minlength="4" maxlength="4">
+						</p>  -->
+		 	<p class="col-md-6"><b>To Agency Code</b>
+				<select th:field="*{toAgency}" class="form-control">
+				     <option value="NONE">----Select Agency Code----</option>
+				     <option th:each="entry : ${homeAgencyMap.entrySet()}" th:value="${entry.key}" th:text="${entry.value}">
+				     </option>
+				  </select>
+			</p> 
+			
+			</div>
+			<div class="row">
+			<p class="col-md-6"><b>File Input Path</b>
+								<input type="text" th:field="*{inputFilePath}" placeholder="input file path" class="form-control">
+							</p>
+			<p class="col-md-6"><b>ACK Output Path</b>
+				<input type="text" th:field="*{outputFilePath}" placeholder="Ack output file path" class="form-control">
 			</p>
-			<p><b>File Input Path</b>
-				<input type="text" th:field="*{inputFilePath}" placeholder="input file path" class="form-control mb-4 col-4">
-			</p>
-			<p><b>ACK Output Path</b>
-				<input type="text" th:field="*{outputFilePath}" placeholder="Ack output file path" class="form-control mb-4 col-4">
-			</p>
-
-			<button type="submit" class="btn btn-info col-2">Validate</button>
+			
+			</div>
+			<div class="row">
+			<p class="col-md-6">	<b>IAG Version</b>		<select th:field="*{version}" class="form-control">
+				<option value="NONE">----Select IAG Version----</option>
+						    <option th:value="01.60.02" th:text="01.60.02"></option>
+							<option th:value="01.60.03" th:text="01.60.03"></option>
+						</select>
+						</p>
+			</div>
+			<p class="col-md-6">
+						<button type="submit" class="btn btn-info btn-lg  ">Validate</button>
+						</p>
 		</form>
 
 		<hr>
 		<!-- <p th:text="|Result :: ${now}!|" /> -->
-		<p><b>Result: </b><label th:text="${result}"></label></p>
-		<a th:href="@{/AgencyList}"> Back to Agency List</a>
+		<p><b>Result: </b><label th:utext="${result}"></label></p>
+		<div class="table-responsive table-wrapper">
+		<table class="table table-bordered table-striped border-2">
+		    <thead>
+		      <tr>
+		        <th style="width:1px; white-space:nowrap;">#</th>
+				<th style="width:130px;">Record Type</th>
+		        <th style="width:200px;">Field Name</th>
+		        <th>Error message</th>
+		      </tr>
+		    </thead>
+		    <tbody>
+		      <tr th:each="error, iterStat : ${errorMsgList}">
+		        <td th:text="${iterStat.index+1}"></td>
+				<td th:text="${error.fileType}"></td>
+		        <td th:text="${error.fieldName}"></td>
+		        <td th:utext="${error.errorMsg}"></td>
+		      </tr>
+		    </tbody>
+		  </table>
+		  </div>
+		<a th:href="@{/AgencyList}">Back to Agency Configuration</a>
 	</div>
 </body>
 </html>

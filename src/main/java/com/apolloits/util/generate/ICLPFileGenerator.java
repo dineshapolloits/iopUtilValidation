@@ -7,19 +7,22 @@ import java.io.Writer;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.time.format.DateTimeParseException;
+import java.util.Map;
 import java.util.Random;
 import java.util.stream.Collectors;
 
 import org.apache.commons.lang3.RandomStringUtils;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import com.apolloits.util.CommonUtil;
 import com.apolloits.util.IAGConstants;
 import com.apolloits.util.controller.ValidationController;
 import com.apolloits.util.modal.AgencyEntity;
 import com.apolloits.util.modal.FileValidationParam;
+import com.apolloits.util.reader.AgencyDataExcelReader;
+import com.apolloits.util.utility.CommonUtil;
 
 import lombok.extern.slf4j.Slf4j;
 import net.lingala.zip4j.ZipFile;
@@ -34,9 +37,13 @@ public class ICLPFileGenerator {
 
 	private String filename = "";
 	private String fileCreateDateandTime = "";
-	int tagSequenceStart = 0;
+	long tagSequenceStart = 0;
 	int tagSequenceEnd = 0;
 	AgencyEntity agency;
+	private int detailCount = 0;
+	
+	@Autowired
+	AgencyDataExcelReader agDataExcelRead;
 	
 	
 	public boolean iclpGen(FileValidationParam validateParam) {
@@ -47,17 +54,19 @@ public class ICLPFileGenerator {
 		String Header = getICLPHeader(validateParam);
 		log.info("ITAG file name ::"+filename);
 		log.info("ITAG Header :: " + Header);
-
+		if(Header.length() != 46 ) {
+			return false;
+		}
 		FileWriter writer;
 		try {
-			String filePath = validateParam.getInputFilePath() + File.separator + filename;
+			String filePath = validateParam.getOutputFilePath() + File.separator + filename;
 			writer = new FileWriter(filePath, true);
 			System.out.print("Writing record raw... ");
 			writeDetails(validateParam, Header, writer);
 			
 			String zipFilename = moveToZipFile(filePath,validateParam);
 			log.info("ITAG Zip file name :: "+zipFilename);
-			validateParam.setResponseMsg("Sucess ITAG file created :::"+zipFilename);
+			validateParam.setResponseMsg("ICLP file created :: \t "+zipFilename);
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			validateParam.setResponseMsg("ITAG file creation issue. Please check logs");
@@ -75,10 +84,35 @@ public class ICLPFileGenerator {
 		try {
 			writer.write(header);
 			writer.write(System.lineSeparator());
-			for (int count = 1; count <= validateParam.getRecordCount(); count++) {
+		/*	for (int count = 1; count <= validateParam.getRecordCount(); count++) {
 				writer.write(getICLPDetailRecord(validateParam));
 				writer.write(System.lineSeparator());
-			}
+			}*/
+				
+				for (Map.Entry<String, AgencyEntity> entry : ValidationController.cscIdTagAgencyMap.entrySet()) {
+					AgencyEntity agEntity = entry.getValue();
+					System.out.println("Key: " + entry.getKey() + ", Value: " + entry.getValue());
+					long tagRangeCount = (Integer.parseInt(agEntity.getTagSequenceEnd()) - Integer.parseInt(agEntity.getTagSequenceStart()));
+					long validCount = (tagRangeCount * AgencyDataExcelReader.tagValid) /100; 
+					long lowbalCount = (tagRangeCount * AgencyDataExcelReader.tagLowBal) /100; 
+					long zeroNegativeCount = (tagRangeCount * AgencyDataExcelReader.tagZeroNegativeBal) /100; 
+					System.out.println("tagRangeCount ## "+tagRangeCount);
+					System.out.println("Tag Valid count ## "+validCount +"\t lowbalCount ## "+lowbalCount +"\t tagZeroNegativeBal ## "+zeroNegativeCount);
+					this.tagSequenceStart = Integer.parseInt(agEntity.getTagSequenceStart());
+					for (long count = 1; count <= validCount; count++) {
+						writer.write(getICLPDetailRecord(validateParam,agEntity));
+						writer.write(System.lineSeparator());
+					}
+					for (long count = 1; count <= lowbalCount; count++) {
+						writer.write(getICLPDetailRecord(validateParam,agEntity));
+						writer.write(System.lineSeparator());
+					}
+					/*for (int count = 1; count <= invalidCount; count++) {
+						writer.write(getICLPDetailRecord(validateParam));
+						writer.write(System.lineSeparator());
+					}*/
+				}
+				
 			// writer.flush(); // close() should take care of this
 			writer.flush();
 			writer.close();
@@ -90,12 +124,12 @@ public class ICLPFileGenerator {
 		System.out.println((end - start) / 1000f + " seconds");
 	}
 	
-	private String getICLPDetailRecord(FileValidationParam validateParam) {
+	private String getICLPDetailRecord(FileValidationParam validateParam,AgencyEntity agEntity) {
 		StringBuilder iclpDetail = new StringBuilder();
 		iclpDetail.append("FL");
 		iclpDetail.append(CommonUtil.formatStringRightPad(getPlateRandomNo(6),10,' ')); //Lic No
 		iclpDetail.append(CommonUtil.formatStringRightPad("",30,'*')); //Lic_Type
-		iclpDetail.append(validateParam.getFromAgency()); //TAG_agency_ID
+		iclpDetail.append(agEntity.getTagAgencyID()); //TAG_agency_ID
 		iclpDetail.append(CommonUtil.formatStringLeftPad(String.valueOf(tagSequenceStart),10,'0')); // TAG_SERIAL_NUMBER
 		iclpDetail.append(getUTCDateandTime()); //LIC_EFFECTIVE_FROM
 		iclpDetail.append(CommonUtil.formatStringLeftPad("",20,'*')); //LIC_EFFECTIVE_TO
@@ -133,43 +167,91 @@ public class ICLPFileGenerator {
 	
 	private boolean validateParameter(FileValidationParam validateParam) {
 		//Validate file location
-		File isfolder = new File(validateParam.getInputFilePath());
+		File isfolder = new File(validateParam.getOutputFilePath());
 
 		  if(!isfolder.exists()) {
 			  log.error("Folder not persent. Please check your path");
 			  validateParam.setResponseMsg("Folder not persent. Please check your path");
 			  return false;
 		  }
-		  Path path = Path.of(validateParam.getInputFilePath());
+		  Path path = Path.of(validateParam.getOutputFilePath());
 		  if(!Files.isWritable(path)) {
 			  log.error("Not able to create file. Please check folder Permisison");
 			  validateParam.setResponseMsg("Not able to create file. Please check folder Permisison");
 			  return false;
 		  }
+		  
+	/*	//validate tag start and end tag range based on record count
+			try {
+				agency = ValidationController.cscIdTagAgencyMap.get(validateParam.getFromAgency());
+				long tagSerialNoStart = Long.valueOf(agency.getTagSequenceStart());
+				long tagSerialNoEnd = Long.valueOf(agency.getTagSequenceEnd());
+				long totalTagCount = tagSerialNoEnd - tagSerialNoStart;
+				log.info("## tagSerialNoStart :: " + tagSerialNoStart + "\t tagSerialNoEnd ::" + tagSerialNoEnd);
+				if (totalTagCount < validateParam.getRecordCount()) {
+					log.error("## tagSerialNoStart :: " + tagSerialNoStart + "\t tagSerialNoEnd ::" + tagSerialNoEnd);
+					log.error("This Agency ICLP file generation record count should be less than or equal  ::"
+							+ totalTagCount + "\t  beacuse tag start ::" + agency.getTagSequenceStart()
+							+ "\t End range :: " + agency.getTagSequenceEnd());
+					validateParam.setResponseMsg(
+							"This Agency ITAG file generation record count should be less than or equal  ::"
+									+ totalTagCount + "\t  beacuse tag start ::" + agency.getTagSequenceStart()
+									+ "\t End range :: " + agency.getTagSequenceEnd());
+					return false;
+				}
+			} catch (Exception e) {
+				e.printStackTrace();
+				validateParam.setResponseMsg("Invalid tag rage validation failed. Please cehck log");
+				return false;
+			} */
 		return true;
 	}
 
 private String getICLPHeader(FileValidationParam validateParam) {
 		
 		fileCreateDateandTime = getUTCDateandTime();
+		log.info("fileCreateDateandTime ::"+fileCreateDateandTime);
+		fileCreateDateandTime = validateParam.getFileDate()+fileCreateDateandTime.substring(fileCreateDateandTime.indexOf("T"),fileCreateDateandTime.length());
+		log.info("After append fileCreateDateandTime ::"+fileCreateDateandTime);
 		//Set file name to class variable
 		filename =  validateParam.getFromAgency() +"_"+ fileCreateDateandTime.replaceAll("[-T:Z]", "")+IAGConstants.ICLP_FILE_EXTENSION;
 		StringBuilder itagHeader = new StringBuilder();
+		//Header count need to take based below all Map value tag range
+		long recordcount = 0;
+		for (Map.Entry<String, AgencyEntity> entry : ValidationController.cscIdTagAgencyMap.entrySet()) {
+			AgencyEntity agEntity = entry.getValue();
+			System.out.println("Key: " + entry.getKey() + ", Value: " + entry.getValue());
+		/*	recordcount = recordcount
+					+ (Integer.parseInt(agEntity.getTagSequenceEnd()) - Integer.parseInt(agEntity.getTagSequenceStart())) ;*/
+			long tagRangeCount = (Integer.parseInt(agEntity.getTagSequenceEnd()) - Integer.parseInt(agEntity.getTagSequenceStart()));
+			log.info("AgencyDataExcelReader.tagValid :: "+AgencyDataExcelReader.tagValid +"\t AgencyDataExcelReader.tagLowBal :: "+AgencyDataExcelReader.tagLowBal +"\t AgencyDataExcelReader.tagZeroNegativeBal :: "+AgencyDataExcelReader.tagZeroNegativeBal);
+			long validCount = (tagRangeCount * AgencyDataExcelReader.tagValid) /100; 
+			long lowbalCount = (tagRangeCount * AgencyDataExcelReader.tagLowBal) /100; 
+			long zeroNegativeCount = (tagRangeCount * AgencyDataExcelReader.tagZeroNegativeBal) /100; 
+			System.out.println("tagRangeCount --- "+tagRangeCount);
+			log.info("Tag Valid count --- "+validCount +"\t lowbalCount -- "+lowbalCount +"\t tagZeroNegativeBal -- "+zeroNegativeCount);
+			recordcount = recordcount + validCount + lowbalCount;// +zeroNegativeCount;
+		}
+		log.info("Record count ::" +recordcount);
+		validateParam.setRecordCount(recordcount);
 		this.agency = ValidationController.cscIdTagAgencyMap.get(validateParam.getFromAgency());
-		this.tagSequenceStart = Integer.parseInt(agency.getTagSequenceStart());
-		this.tagSequenceEnd = Integer.parseInt(agency.getTagSequenceEnd());
+		if(this.agency == null) {
+			validateParam.setResponseMsg("Please check agency configuation");
+			return "invalidAgency";
+		}
+		//this.tagSequenceStart = Integer.parseInt(agency.getTagSequenceStart());
+		//this.tagSequenceEnd = Integer.parseInt(agency.getTagSequenceEnd());
 		itagHeader.append(IAGConstants.ICLP_FILE_TYPE);
 		itagHeader.append(CommonUtil.formatStringLeftPad(agency.getVersionNumber(),8,'0'));
 		itagHeader.append(validateParam.getFromAgency());
 		itagHeader.append(CommonUtil.formatStringLeftPad(fileCreateDateandTime,20,'0'));
-		itagHeader.append(CommonUtil.formatStringLeftPad(String.valueOf(validateParam.getRecordCount()),10,'0'));
+		itagHeader.append(CommonUtil.formatStringLeftPad(String.valueOf(recordcount),10,'0'));
 		return itagHeader.toString();
 	}
 	
 	private String getUTCDateandTime() {
 		try {
 			DateTime dateTime = new DateTime().withZone(DateTimeZone.UTC);
-			System.out.println("heasertime ::" + dateTime.toString("yyyy-MM-dd'T'HH:mm:ss'Z'"));
 			return dateTime.toString("yyyy-MM-dd'T'HH:mm:ss'Z'");
 		} catch (DateTimeParseException e) {
 			e.printStackTrace();
@@ -195,4 +277,12 @@ private String getICLPHeader(FileValidationParam validateParam) {
 	
 	}
 	
+	public static void main (String arg[]) {
+		int perCount = 0;
+		int totalCount = 12;
+		int percentage =10;
+		 perCount = (totalCount * percentage)/100;
+		System.out.println("result ::"+perCount);
+		
+	}
 }

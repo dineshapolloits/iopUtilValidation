@@ -4,8 +4,8 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.Writer;
-import java.nio.file.Files;
-import java.nio.file.Path;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
 import java.util.Map;
 
@@ -30,24 +30,28 @@ import net.lingala.zip4j.model.enums.CompressionMethod;
 
 @Slf4j
 @Component
-public class ITAGFileGenerator {
-	
+public class ITGUFileGenerator {
+
 	private String filename = "";
 	private String fileCreateDateandTime = "";
 	long tagSequenceStart = 0;
 	int tagSequenceEnd = 0;
 	AgencyEntity agency;
+	
 	@Autowired
 	CommonUtil commonUtil;
-	public boolean itagGen(FileValidationParam validateParam) {
-
+	
+	public boolean itguGen(FileValidationParam validateParam) {
+		
 		if (!commonUtil.validateInfoFileGenParameter(validateParam)) {
 			return false;
 		}
-		String Header = getITAGHeader(validateParam);
+		
+		String Header = getITGUHeader(validateParam);
 		log.info("ITAG file name ::"+filename);
 		log.info("ITAG Header :: " + Header);
-		if(Header.length() != 46 ) {
+		
+		if(Header.length() != 66 ) {
 			return false;
 		}
 		FileWriter writer;
@@ -57,75 +61,58 @@ public class ITAGFileGenerator {
 			System.out.print("Writing record raw... ");
 			writeDetails(validateParam, Header, writer);
 			
-			String zipFilename = moveToZipFile(filePath,validateParam);
+			String zipFilename = commonUtil.moveToZipFile(filePath,validateParam);
 			log.info("ITAG Zip file name :: "+zipFilename);
-			validateParam.setResponseMsg("ITAG file created ::\t "+zipFilename);
+			validateParam.setResponseMsg("ITGU file created ::\t "+zipFilename);
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
-			validateParam.setResponseMsg("ITAG file creation issue. Please check logs");
+			validateParam.setResponseMsg("ITGU file creation issue. Please check logs");
 			log.error("ITAG file creation issue. Please check logs");
 			e.printStackTrace();
 			return false;
 		}
-
+		
 		return true;
 	}
 	
-	private String moveToZipFile(String filePath,FileValidationParam validateParam) {
-		File file = new File(filePath);
-		ZipParameters parameters = new ZipParameters();
-		parameters.setCompressionMethod(CompressionMethod.DEFLATE);
-		parameters.setCompressionLevel(CompressionLevel.ULTRA);
-
-		String zipFileName = file.getName().replace(".", "_") + ".ZIP";
-		String zipFilePath = file.getParent() + "/" + zipFileName;
-
-		ZipFile zipFile = new ZipFile(zipFilePath);
-		try {
-			zipFile.addFile(file, parameters);
-		} catch (ZipException e) {
-			validateParam.setResponseMsg("Exception in ZIP file creation");
-			log.error("Exception in ZIP file creation");
-			e.printStackTrace();
-		}
-		file.delete();
-		return zipFileName;
-		
-	}
-
 	private void writeDetails(FileValidationParam validateParam, String header, Writer writer)
 			throws IOException {
 		long start = System.currentTimeMillis();
 		try {
 			writer.write(header);
 			writer.write(System.lineSeparator());
-		/*	for (int count = 1; count <= validateParam.getRecordCount(); count++) {
-				writer.write(getITAGDetailRecord(validateParam));
-				writer.write(System.lineSeparator());
-			}*/
-			
+		
 			for (Map.Entry<String, AgencyEntity> entry : ValidationController.cscIdTagAgencyMap.entrySet()) {
 				AgencyEntity agEntity = entry.getValue();
 				System.out.println("Key: " + entry.getKey() + ", Value: " + entry.getValue());
 				long tagRangeCount = (Integer.parseInt(agEntity.getTagSequenceEnd()) - Integer.parseInt(agEntity.getTagSequenceStart()));
-				log.info("AgencyDataExcelReader.tagValid --- "+AgencyDataExcelReader.tagValid +"\t AgencyDataExcelReader.tagLowBal -- "+AgencyDataExcelReader.tagLowBal +"\t AgencyDataExcelReader.tagZeroNegativeBal -- "+AgencyDataExcelReader.tagZeroNegativeBal);
-				long validCount = (tagRangeCount * AgencyDataExcelReader.tagValid) /100; 
+				log.info("AgencyDataExcelReader.tagValid --- " + AgencyDataExcelReader.tagValid
+						+ "\t AgencyDataExcelReader.tagLowBal -- " + AgencyDataExcelReader.tagLowBal
+						+ "\t AgencyDataExcelReader.tagZeroNegativeBal -- " + AgencyDataExcelReader.tagZeroNegativeBal
+						+ "\t AgencyDataExcelReader.tagInvalidBal -- " + AgencyDataExcelReader.tagInvalidBal);
+				long validCount = (tagRangeCount * (AgencyDataExcelReader.tagValid - AgencyDataExcelReader.tagInvalidBal)) /100; 
 				long lowbalCount = (tagRangeCount * AgencyDataExcelReader.tagLowBal) /100; 
 				long zeroNegativeCount = (tagRangeCount * AgencyDataExcelReader.tagZeroNegativeBal) /100; 
+				long invaidCount = (tagRangeCount * AgencyDataExcelReader.tagInvalidBal) / 100;
 				log.info("tagRangeCount ## "+tagRangeCount);
-				log.info("Tag Valid count ## "+validCount +"\t lowbalCount ## "+lowbalCount +"\t zeroNegativeCount ## "+zeroNegativeCount);
+				log.info("Tag Valid count ## " + validCount + "\t lowbalCount ## " + lowbalCount
+						+ "\t zeroNegativeCount ## " + zeroNegativeCount +"\t invaidCount ## "+invaidCount);
 				this.tagSequenceStart = Integer.parseInt(agEntity.getTagSequenceStart());
 				log.info("agEntity.getTagAgencyID() ::"+agEntity.getTagAgencyID() +"\t length ::"+agEntity.getTagAgencyID().trim().length());
 				for (long count = 1; count <= validCount; count++) {
-					writer.write(getITAGDetailRecord(validateParam,"1",agEntity.getTagAgencyID().trim()));
+					writer.write(getITGUDetailRecord(validateParam,"1",agEntity.getTagAgencyID().trim()));
 					writer.write(System.lineSeparator());
 				}
 				for (long count = 1; count <= lowbalCount; count++) {
-					writer.write(getITAGDetailRecord(validateParam,"2",agEntity.getTagAgencyID().trim()));
+					writer.write(getITGUDetailRecord(validateParam,"2",agEntity.getTagAgencyID().trim()));
 					writer.write(System.lineSeparator());
 				}
 				for (long count = 1; count <= zeroNegativeCount; count++) {
-					writer.write(getITAGDetailRecord(validateParam,"3",agEntity.getTagAgencyID().trim()));
+					writer.write(getITGUDetailRecord(validateParam,"3",agEntity.getTagAgencyID().trim()));
+					writer.write(System.lineSeparator());
+				}
+				for (long count = 1; count <= invaidCount; count++) {
+					writer.write(getITGUDetailRecord(validateParam,"4",agEntity.getTagAgencyID().trim()));
 					writer.write(System.lineSeparator());
 				}
 			}
@@ -138,11 +125,10 @@ public class ITAGFileGenerator {
 		}
 		resetGlobalValue();
 		long end = System.currentTimeMillis();
-		System.out.println((end - start) / 1000f + " seconds");
+		log.info("File Writing Over all time ::"+(end - start) / 1000f + " seconds");
 	}
-
-
-	private String getITAGDetailRecord(FileValidationParam validateParam,String tagStatus,String tagAgencyId) {
+	
+	private String getITGUDetailRecord(FileValidationParam validateParam,String tagStatus,String tagAgencyId) {
 		StringBuilder itagDetail = new StringBuilder();
 		itagDetail.append(CommonUtil.formatStringLeftPad(tagAgencyId,4,'0')); // Tag_Agnecny_ID
 		itagDetail.append(CommonUtil.formatStringLeftPad(String.valueOf(tagSequenceStart),10,'0'));
@@ -158,49 +144,61 @@ public class ITAGFileGenerator {
 		tagSequenceStart++;
 		return itagDetail.toString();
 	}
+	
+	private String getITGUHeader(FileValidationParam validateParam) {
 
-	private String getITAGHeader(FileValidationParam validateParam) {
-		
 		fileCreateDateandTime = getUTCDateandTime();
-		log.info("fileCreateDateandTime ::"+fileCreateDateandTime);
-		fileCreateDateandTime = validateParam.getFileDate()+fileCreateDateandTime.substring(fileCreateDateandTime.indexOf("T"),fileCreateDateandTime.length());
-		log.info("After append fileCreateDateandTime ::"+fileCreateDateandTime);
-		//Set file name to class variable
-		filename =  validateParam.getFromAgency() +"_"+ fileCreateDateandTime.replaceAll("[-T:Z]", "")+IAGConstants.ITAG_FILE_EXTENSION;
+		log.info("fileCreateDateandTime ::" + fileCreateDateandTime);
+		fileCreateDateandTime = validateParam.getFileDate()
+				+ fileCreateDateandTime.substring(fileCreateDateandTime.indexOf("T"), fileCreateDateandTime.length());
+		log.info("After append fileCreateDateandTime ::" + fileCreateDateandTime);
+		// Set file name to class variable
+		filename = validateParam.getFromAgency() + "_" + fileCreateDateandTime.replaceAll("[-T:Z]", "")
+				+ IAGConstants.ITGU_FILE_EXTENSION;
 		StringBuilder itagHeader = new StringBuilder();
 		this.agency = ValidationController.cscIdTagAgencyMap.get(validateParam.getFromAgency());
-		//this.tagSequenceStart = Integer.parseInt(agency.getTagSequenceStart());
-		//this.tagSequenceEnd = Integer.parseInt(agency.getTagSequenceEnd());
 		if(this.agency == null) {
 			validateParam.setResponseMsg("Please check agency configuation");
 			return "invalidAgency";
 		}
+		
 		long recordcount = 0;
-		log.info("AgencyDataExcelReader.tagValid :: "+AgencyDataExcelReader.tagValid +"\t AgencyDataExcelReader.tagLowBal :: "+AgencyDataExcelReader.tagLowBal +"\t AgencyDataExcelReader.tagZeroNegativeBal :: "+AgencyDataExcelReader.tagZeroNegativeBal);
+		log.info("AgencyDataExcelReader.tagValid :: "
+				+ (AgencyDataExcelReader.tagValid - AgencyDataExcelReader.tagInvalidBal)
+				+ "\t AgencyDataExcelReader.tagLowBal :: " + AgencyDataExcelReader.tagLowBal
+				+ "\t AgencyDataExcelReader.tagZeroNegativeBal :: " + AgencyDataExcelReader.tagZeroNegativeBal
+				+ "\t AgencyDataExcelReader.tagInvalidBal :: " + AgencyDataExcelReader.tagInvalidBal);
 		for (Map.Entry<String, AgencyEntity> entry : ValidationController.cscIdTagAgencyMap.entrySet()) {
 			AgencyEntity agEntity = entry.getValue();
 			System.out.println("Key: " + entry.getKey() + ", Value: " + entry.getValue());
-		/*	recordcount = recordcount
-					+ (Integer.parseInt(agEntity.getTagSequenceEnd()) - Integer.parseInt(agEntity.getTagSequenceStart())) ;*/
-			long tagRangeCount = (Integer.parseInt(agEntity.getTagSequenceEnd()) - Integer.parseInt(agEntity.getTagSequenceStart()));
-			long validCount = (tagRangeCount * AgencyDataExcelReader.tagValid) /100; 
-			long lowbalCount = (tagRangeCount * AgencyDataExcelReader.tagLowBal) /100; 
-			long zeroNegativeCount = (tagRangeCount * AgencyDataExcelReader.tagZeroNegativeBal) /100; 
-			log.info("tagRangeCount --- "+tagRangeCount);
-			log.info("Tag Valid count :: "+validCount +"\t lowbalCount :: "+lowbalCount +"\t zeroNegativeCount :: "+zeroNegativeCount);
-			recordcount = recordcount + validCount + lowbalCount +zeroNegativeCount;
+			/*
+			 * recordcount = recordcount + (Integer.parseInt(agEntity.getTagSequenceEnd()) -
+			 * Integer.parseInt(agEntity.getTagSequenceStart())) ;
+			 */
+			long tagRangeCount = (Integer.parseInt(agEntity.getTagSequenceEnd())
+					- Integer.parseInt(agEntity.getTagSequenceStart()));
+			long validCount = (tagRangeCount * (AgencyDataExcelReader.tagValid - AgencyDataExcelReader.tagInvalidBal))
+					/ 100;
+			long lowbalCount = (tagRangeCount * AgencyDataExcelReader.tagLowBal) / 100;
+			long zeroNegativeCount = (tagRangeCount * AgencyDataExcelReader.tagZeroNegativeBal) / 100;
+			long invaidCount = (tagRangeCount * AgencyDataExcelReader.tagInvalidBal) / 100;
+			log.info("tagRangeCount --- " + tagRangeCount);
+			log.info("Tag Valid count :: " + validCount + "\t lowbalCount :: " + lowbalCount
+					+ "\t zeroNegativeCount :: " + zeroNegativeCount + "\t invaidCount ::" + invaidCount);
+			recordcount = recordcount + validCount + lowbalCount + zeroNegativeCount + invaidCount;
 		}
-		log.info("Record count ::" +recordcount);
+		log.info("Record count ::" + recordcount);
 		validateParam.setRecordCount(recordcount);
-		
-		itagHeader.append(IAGConstants.ITAG_FILE_TYPE);
-		itagHeader.append(CommonUtil.formatStringLeftPad(agency.getVersionNumber(),8,'0'));
+
+		itagHeader.append(IAGConstants.ITGU_FILE_TYPE);
+		itagHeader.append(CommonUtil.formatStringLeftPad(agency.getVersionNumber(), 8, '0'));
 		itagHeader.append(validateParam.getFromAgency());
-		itagHeader.append(CommonUtil.formatStringLeftPad(fileCreateDateandTime,20,'0'));
-		itagHeader.append(CommonUtil.formatStringLeftPad(String.valueOf(recordcount),10,'0'));
+		itagHeader.append(CommonUtil.formatStringLeftPad(fileCreateDateandTime, 20, '0'));
+		itagHeader.append(CommonUtil.formatStringLeftPad(getPreviousDateUTCFormat(fileCreateDateandTime), 20, '0')); //PREV_FILE_DATE_TIME
+		itagHeader.append(CommonUtil.formatStringLeftPad(String.valueOf(recordcount), 10, '0'));
 		return itagHeader.toString();
 	}
-	
+
 	private String getUTCDateandTime() {
 		try {
 			DateTime dateTime = new DateTime().withZone(DateTimeZone.UTC);
@@ -210,11 +208,29 @@ public class ITAGFileGenerator {
 			return null;
 		}
 	}
-	
+
 	private void resetGlobalValue() {
 		filename = "";
 		fileCreateDateandTime = "";
 		tagSequenceStart = 0;
 		tagSequenceEnd = 0;
 	}
+	
+	private String getPreviousDateUTCFormat(String date) {
+		DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ssX");
+		try {
+		// Parse the current date string
+		LocalDateTime currentDate = LocalDateTime.parse(date, formatter);
+		// Subtract one day to get the previous date
+		LocalDateTime previousDate = currentDate.minusDays(1);
+		System.out.println("Previous: " + previousDate.toString());
+		return previousDate.toString()+"Z";
+		}catch (Exception e) {
+			log.error("Exception in getPreviousDateUTCFormat ::"+date);
+			e.printStackTrace();
+			return fileCreateDateandTime;
+		}
+		
+	}
+
 }

@@ -3,6 +3,7 @@ package com.apolloits.util;
 import org.springframework.stereotype.Component;
 
 import com.apolloits.util.modal.IagAckFile;
+import com.apolloits.util.utility.CommonUtil;
 
 import java.io.File;
 import java.io.FileWriter;
@@ -16,11 +17,11 @@ import java.time.format.DateTimeFormatter;
 public class IagAckFileMapper {
 
 
-    public IagAckFile mapToIagAckFile(String fileName, String returnCode, String ackFilePath, String toAgencyId) {
+    public IagAckFile mapToIagAckFile(String fileName, String returnCode, String ackFilePath, String toAgencyId,String fromAgencyId,String iagVersion) {
         IagAckFile iagAckFile = new IagAckFile();
         iagAckFile.setFileType("ACK ");
-        iagAckFile.setFileVersion("01.60.02");
-        iagAckFile.setFromAgencyId("0034");
+        iagAckFile.setFileVersion(iagVersion);
+        iagAckFile.setFromAgencyId(fromAgencyId);
         iagAckFile.setToAgencyId(toAgencyId);
         iagAckFile.setOrigFileName(CommonUtil.formatStringRightPad(fileName, 50, ' '));
         iagAckFile.setFileCreationDate(convertDateTimeToOffset(Instant.now().toString()));
@@ -42,6 +43,7 @@ public class IagAckFileMapper {
             fileWriter.write(iagAckFile.getOrigFileName());
             fileWriter.write(iagAckFile.getFileCreationDate());
             fileWriter.write(iagAckFile.getReturnCode());
+            fileWriter.write("\n");
             fileWriter.close();
         } catch (IOException e) {
             e.printStackTrace();

@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>List Active Item</title>
+    <link href=
+"https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" 
+        rel="stylesheet"
+        integrity=
+"sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" 
+        crossorigin="anonymous">
+</head>
+<style> .jumbotron .btn {
+    color:#FFFFFF; 
+    padding: 5px !important;
+    font-size: 12px !important; 
+    margin-left:20px;
+}
+.jumbotron label {
+    font-size:12px;    
+}
+
+.img-user{
+    height:120px;
+    width:120px;
+margin-right:20px;
+}
+
+.prj-name{
+    font-weight:bold;
+    color:#5bc0de;
+}
+
+.user-item img, .user-item h3 {
+    display:inline-block;    
+}
+ 
+.jumbotron .btn .user-item h3 a{
+    color:#5bc0de; 
+    padding: 5px !important;
+    font-size: 12px !important; 
+}
+</style>
+<body>
+	<link href="https://getbootstrap.com/examples/jumbotron-narrow/jumbotron-narrow.css" rel="stylesheet">
+	<link rel="stylesheet" type="text/css" href="//netdna.bootstrapcdn.com/font-awesome/4.0.3/css/font-awesome.min.css">
+	<div class="container bootstrap snippets bootdey">
+	  <div class="header">
+	    <h3 class="text-muted prj-name">
+	        <span class="fa fa-users fa-2x"></span>
+	        List of  InterOperability Hubs
+	    </h3>
+		<div align="right">
+						<a th:href="@{/Logout}" class="btn btn-primary ">Logout</a>
+						</div>
+	  </div>
+
+	  <div class="jumbotron" style="min-height:400px;height:auto;">
+	    <ul class="list-group">
+	        <li class="list-group-item user-item text-left">
+	            <img class="img-circle img-user img-thumbnail " src="https://www.sourcena.com/wp-content/uploads/2019/11/EZ-Pass-Image-Post-685x514.jpg">
+	            <h3>
+	                <a th:href="@{/AgencyList}">EZIOP</a><br>
+	            </h3>     
+	        </li>
+	        <li class="list-group-item user-item text-left">
+	            <img class="img-circle img-user  img-thumbnail" src="https://static.wixstatic.com/media/131b6a_32b54c00c9b14faf9bbcfa647e1b973c~mv2.jpg/v1/fill/w_354,h_468,al_c,q_80,usm_0.66_1.00_0.01,enc_auto/sunpass%20and%20FTP.jpg">
+	            <h3>
+	                <a href="#">SEIOP</a><br>
+	            </h3>  
+	        </li>
+	        <li class="list-group-item user-item text-left">
+	            <img class="img-circle img-user  img-thumbnail" src="https://bootdey.com/img/Content/avatar/avatar6.png">
+	            <h3>
+	                <a href="#">CUIOP</a><br>
+	            </h3>  
+	        </li>
+			<li class="list-group-item user-item text-left">
+			    <img class="img-circle img-user img-thumbnail " src="https://bootdey.com/img/Content/avatar/avatar3.png">
+			    <h3>
+			        <a href="#">NIOP</a><br>
+			    </h3>     
+			</li>
+			<li class="list-group-item user-item text-left">
+			    <img class="img-circle img-user  img-thumbnail" src="https://bootdey.com/img/Content/avatar/avatar2.png">
+			    <h3>
+			        <a href="#">CTOC</a><br>
+			    </h3>  
+			</li>
+			
+	    </ul>
+	  </div>
+	  
+	</div>         
+</body>
+
+</html>

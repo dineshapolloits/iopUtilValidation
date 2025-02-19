@@ -72,7 +72,14 @@
 							             <span class="glyphicon glyphicon-calendar"></span>
 							           </span>
 							         </div>
-						</p> 
+						</p>
+						
+						<p> <b>IAG Version</b> <select th:field="*{version}" class="form-control mb-4 col-4">
+								<option value="NONE">----Select IAG Version----</option>
+								<option th:value="01.60.02" th:text="01.60.02"></option>
+								<option th:value="01.60.03" th:text="01.60.03"></option>
+							</select>
+						</p>
 			<p><b>File Generation Path</b>
 				<input type="text" th:field="*{outputFilePath}" id="fileGenPath" placeholder="File Generation Path" class="form-control mb-4 col-4" required>
 			</p>

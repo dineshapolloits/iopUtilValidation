@@ -274,6 +274,12 @@ public class ValidationController {
 			model.addAttribute("result", "Invalid File Date.\t  Please select valid date ");
 			return false;
 		}
+		
+		if(validateParam.getVersion().equals("NONE")) {
+			validateParam.setResponseMsg("<b>Please select IAG version</b>");
+			model.addAttribute("result", "Please select IAG version");
+			return false;
+		}
 
 		return true;
 	}

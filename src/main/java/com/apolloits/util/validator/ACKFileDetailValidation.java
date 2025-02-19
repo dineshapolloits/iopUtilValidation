@@ -116,15 +116,15 @@ public class ACKFileDetailValidation {
 
 			String fileRowData = br.readLine();
 			if(fileRowData== null ||  fileRowData.length() != 92 ) {
-				controller.getErrorMsglist().add(new ErrorMsgDetail(HEADER_RECORD_TYPE, "Header Length",
-						"Invalid header length \t <b>Header Row::</b>" + fileRowData));
+				controller.getErrorMsglist().add(new ErrorMsgDetail(DETAIL_RECORD_TYPE, "Detail Length",
+						"Invalid detail length \t <b>Detail Row::</b>" + fileRowData));
 				return;
 			}
 			
 			// FILE_TYPE
 			if (!fileRowData.substring(0, 4).trim().equals(IAGConstants.ACK_FILE_TYPE)) {
 				controller.getErrorMsglist()
-						.add(new ErrorMsgDetail(HEADER_RECORD_TYPE, "FILE_TYPE", "File Type should be ACK ::\t "
+						.add(new ErrorMsgDetail(DETAIL_RECORD_TYPE, "FILE_TYPE", "File Type should be ACK ::\t "
 								+ fileRowData.substring(0, 4) + " \t ::<b> Header Row::</b>\t " + fileRowData));
 			}
 			
@@ -134,14 +134,14 @@ public class ACKFileDetailValidation {
 					//.equals(ValidationController.cscIdTagAgencyMap.get(fileRowData.substring(12, 16)).getVersionNumber())
 					.equals(validateParam.getVersion())
 					) {
-				addErrorMsg(HEADER_RECORD_TYPE, "VERSION",
+				addErrorMsg(DETAIL_RECORD_TYPE, "VERSION",
 						"IAG Version not matched ::\t " + fileRowData.substring(4, 12) + " \t ::<b> Header Row ::</b>\t " + fileRowData);
 			}
 			
 			// FROM_AGENCY_ID //CHAR(4)
 			if (!fileRowData.substring(12, 16).matches(IAGConstants.AGENCY_ID_FORMAT)
 					|| !AgencyDataExcelReader.agencyCode.contains(fileRowData.substring(12, 16))) {
-				addErrorMsg(HEADER_RECORD_TYPE, "FROM_AGENCY_ID",
+				addErrorMsg(DETAIL_RECORD_TYPE, "FROM_AGENCY_ID",
 						"From Agency ID not match with configuration. Please check Agency list \t ::"
 								+ fileRowData.substring(12, 16));
 
@@ -151,7 +151,7 @@ public class ACKFileDetailValidation {
 
 			if (!fileRowData.substring(16, 20).matches(IAGConstants.AGENCY_ID_FORMAT)
 					|| !AgencyDataExcelReader.agencyCode.contains(fileRowData.substring(16, 20))) {
-				addErrorMsg(HEADER_RECORD_TYPE, "TO_AGENCY_ID",
+				addErrorMsg(DETAIL_RECORD_TYPE, "TO_AGENCY_ID",
 						"To Agency ID not match with configuration. Please check Agency list \t ::"
 								+ fileRowData.substring(16, 20));
 
@@ -161,28 +161,28 @@ public class ACKFileDetailValidation {
 			String origFileName=ackFileName.substring(ackFileName.indexOf("_")+1, ackFileName.lastIndexOf("_"))+"."+ackFileName.substring(ackFileName.lastIndexOf("_")+1).replace(".ACK","");
 			log.info("origFileName ::\t"+origFileName);
 			if (!fileRowData.substring(20, 70).trim().equals(origFileName)) {
-				addErrorMsg(HEADER_RECORD_TYPE, "ORIG_FILE_NAME_TYPE",
-						"ack file name not match with deatil \t ::"
+				addErrorMsg(DETAIL_RECORD_TYPE, "ORIG_FILE_NAME_TYPE",
+						"ack file name not match with detail \t ::"
 								+ fileRowData.substring(20, 70).trim());
 			}
 			// FILE_DATE_TIME CHAR(20) Format: YYYY-MM-DDThh:mm:ssZ
 			String headerfileDateandTime = fileRowData.substring(70, 90);
 			if (!headerfileDateandTime.matches(IAGConstants.FILE_DATE_TIME_FORMAT)) {
 
-				addErrorMsg(HEADER_RECORD_TYPE, "FILE_DATE_TIME",
+				addErrorMsg(DETAIL_RECORD_TYPE, "FILE_DATE_TIME",
 						" date and time format is invalid. Format should be YYYY-MM-DDThh:mm:ssZ  \t ::"
 								+ headerfileDateandTime);
 			} else {
 				// Check if the date and time are valid
 				if (!commonUtil.isValidDateTimeInDetail(headerfileDateandTime)) {
-					addErrorMsg(HEADER_RECORD_TYPE, "FILE_DATE_TIME",
+					addErrorMsg(DETAIL_RECORD_TYPE, "FILE_DATE_TIME",
 							" Invalid date and time. Please check(YYYY-MM-DDThh:mm:ssZ)   \t ::" + headerfileDateandTime);
 				}
 			}
 			
 			// RETURN_CODE CHAR(2)
 			if (!fileRowData.substring(90, 92).matches("00|01|02|03|04|05|06|07")) {
-				addErrorMsg(HEADER_RECORD_TYPE, "RETURN_CODE",
+				addErrorMsg(DETAIL_RECORD_TYPE, "RETURN_CODE",
 						"Value should be 00|01|02|03|04|05|06|07 ::\t "
 								+ fileRowData.substring(90, 92));
 			}

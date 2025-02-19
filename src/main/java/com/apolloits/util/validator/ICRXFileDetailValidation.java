@@ -131,8 +131,6 @@ public class ICRXFileDetailValidation {
 							log.info("noOfRecords ::" + noOfRecords + " :: " + fileRowData);
 							if (noOfRecords == 0) {
 								// Validate Header record
-								headerCount = Long.parseLong(fileRowData.substring(40, 48));
-								
 								if (!validateIcrxHeader(fileRowData, validateParam, fileName)) {
 									// create ACK file
 									ackCode = "01";
@@ -144,6 +142,10 @@ public class ICRXFileDetailValidation {
 									log.info("Only file name and header validation");
 									return true;
 								}
+								if(!fileRowData.substring(40, 48).matches(IAGConstants.ICTX_FILE_NUM_FORMAT)) {
+									return false;
+								}
+								headerCount = Long.parseLong(fileRowData.substring(40, 48));
 							} else {
 								validateIcrxDetail(fileRowData, validateParam, fileName, noOfRecords);
 									

@@ -63,6 +63,8 @@ public class ITAGFileDetailValidation {
         		 log.error("From Agency code not match with file Name");
         		 //validateParam.setResponseMsg("From Agency code "+validateParam.getFromAgency()+" not match with file Name ::"+inputItagZipFile.getName());
         		 controller.getErrorMsglist().add(new ErrorMsgDetail(FILE_RECORD_TYPE,"From Agency","From Agency code "+validateParam.getFromAgency()+" not match with file Name ::"+inputItagZipFile.getName()));
+        		 ackFileName = validateParam.getToAgency() + "_" + inputItagZipFile.getName().replace(".ZIP", "") + IAGConstants.ACK_FILE_EXTENSION;
+        		 iagAckMapper.mapToIagAckFile(inputItagZipFile.getName(), "07", validateParam.getOutputFilePath()+File.separator+ackFileName, validateParam.getFromAgency(),validateParam.getToAgency(),validateParam.getVersion());
         		 return false;
         	 }
         	 

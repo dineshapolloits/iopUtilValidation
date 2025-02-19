@@ -1017,6 +1017,11 @@ private static AgencyDataExcelReader appConfig;
 			returnFlage= false;
 			e.printStackTrace();
 		}
+		if(!returnFlage) {
+			String ackFileName = validateParam.getToAgency() + "_" + fileName.replace(".ZIP", "") + IAGConstants.ACK_FILE_EXTENSION;
+			log.info("Transaction ZIP file validation is failed ackFileName ::"+ackFileName);
+			iagAckMapper.mapToIagAckFile(fileName, "07", validateParam.getOutputFilePath()+File.separator+ackFileName, validateParam.getFromAgency(),validateParam.getToAgency(),validateParam.getVersion());
+		}
 		return returnFlage;
 	}
 	

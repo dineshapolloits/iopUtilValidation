@@ -235,8 +235,8 @@ public class ITGUFileDetailValidation {
         		// || !headerVersion.equals(ValidationController.cscIdTagAgencyMap.get(fromAgencyId).getVersionNumber())
         		 || !headerVersion.equals(validateParam.getVersion())
         		 ) {
-        	 log.error("FAILED Reason:: Invalid header, version format is incorrect - " + headerVersion + "\t excepted version ::"+ValidationController.cscIdTagAgencyMap.get(fromAgencyId).getVersionNumber());
-        	 addErrorMsg(HEADER_RECORD_TYPE,"IAG Version", "Version format is incorrect - " + headerVersion + "\t excepted version ::"+ValidationController.cscIdTagAgencyMap.get(fromAgencyId).getVersionNumber());
+        	 log.error("FAILED Reason:: Invalid header, version format is incorrect - " + headerVersion + "\t excepted version ::"+validateParam.getVersion());
+        	 addErrorMsg(HEADER_RECORD_TYPE,"IAG Version", "Version format is incorrect - " + headerVersion + "\t excepted version ::"+validateParam.getVersion());
         	 invalidHeaderRecord = true;
          }
          

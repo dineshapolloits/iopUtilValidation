@@ -386,7 +386,12 @@ public boolean validateIctxDetail(String fileRowData, FileValidationParam valida
     	invalidRecord = true;
         addErrorMsg(DETAIL_RECORD_TYPE, "ETC_LIC_STATE",
 				" Invalid format \t ::"+ licState + "\t " + lineNo);
-    }
+    }else if (!licState.equals("**") && !agDataExcel.getPlateStateSet().contains(licState)) {
+		log.info("Invalid State ,Please check your State configuration - invalid state - "+licState +" Row ::"+fileRowData +lineNo);
+		//validateParam.setResponseMsg("Invalid ICLP detail,Please check your State configuration - invalid state - "+licState +" Row ::"+fileRowData +lineNo);
+		controller.getErrorMsglist().add(new ErrorMsgDetail(DETAIL_RECORD_TYPE,"ETC_LIC_STATE","Invalid Lic_state  - "+licState +" Row ::"+fileRowData+ lineNo));
+		invalidRecord = true;;
+	}
     
     // ETC_LIC_NUMBER CHAR(10) 
     String etcLicNo = fileRowData.substring(99, 109);
@@ -403,6 +408,17 @@ public boolean validateIctxDetail(String fileRowData, FileValidationParam valida
         addErrorMsg(DETAIL_RECORD_TYPE, "ETC_LIC_TYPE",
 				" Invalid format \t ::"+ etcLicType + "\t " + lineNo);
     }
+    String licStateType =(licState.trim())+(etcLicType.trim());
+	//System.out.println("licStateType :::"+licStateType);
+	log.info("IsPlateType :: "+ agDataExcel.getPlateStateTypeSet().contains(licStateType));
+	//System.out.println("LIC_State and type ::"+agDataExcel.getPlateStateTypeSet().toString()); 
+	if(!etcLicType.matches("[\\*]{30}") &&
+			!agDataExcel.getPlateStateTypeSet().contains(licStateType)) {
+		log.error("Invalid LicStateType detail,Please check your State and plateType Configuration - invalid Lic_Type - "+etcLicType +" Row ::"+fileRowData+ lineNo);
+		//validateParam.setResponseMsg("Invalid ICLP detail,Please check your State and plateType Configuration - invalid Lic_Type - "+licType +" Row ::"+fileRowData+ lineNo);
+		controller.getErrorMsglist().add(new ErrorMsgDetail(DETAIL_RECORD_TYPE,"LicStateType","Invalid Lic_Type - "+etcLicType +" Row ::"+fileRowData+ lineNo));
+		invalidRecord = true;
+	}
     
     // ETC_CLASS_CHARGED CHAR(3) .
     if (!fileRowData.substring(139, 142).matches("[A-Z 0-9]{1,3}")) {

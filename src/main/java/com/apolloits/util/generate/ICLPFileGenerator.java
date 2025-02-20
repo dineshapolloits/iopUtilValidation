@@ -242,7 +242,7 @@ private String getICLPHeader(FileValidationParam validateParam) {
 		//this.tagSequenceStart = Integer.parseInt(agency.getTagSequenceStart());
 		//this.tagSequenceEnd = Integer.parseInt(agency.getTagSequenceEnd());
 		itagHeader.append(IAGConstants.ICLP_FILE_TYPE);
-		itagHeader.append(CommonUtil.formatStringLeftPad(agency.getVersionNumber(),8,'0'));
+		itagHeader.append(CommonUtil.formatStringLeftPad(validateParam.getVersion(),8,'0'));
 		itagHeader.append(validateParam.getFromAgency());
 		itagHeader.append(CommonUtil.formatStringLeftPad(fileCreateDateandTime,20,'0'));
 		itagHeader.append(CommonUtil.formatStringLeftPad(String.valueOf(recordcount),10,'0'));

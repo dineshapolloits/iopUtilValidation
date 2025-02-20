@@ -143,7 +143,7 @@ public class ITXCFileGenerator {
 		this.agency = ValidationController.cscIdTagAgencyMap.get(validateParam.getFromAgency());
 		Header header = new Header();
 		header.setFileType(IAGConstants.ITXC_FILE_TYPE);
-		header.setVersion(agency.getVersionNumber());
+		header.setVersion(validateParam.getVersion());
 		header.setFromAgencyId(validateParam.getFromAgency());
 		header.setFileDateTime(fileCreateDateandTime);
 		header.setToAgencyId(validateParam.getToAgency());

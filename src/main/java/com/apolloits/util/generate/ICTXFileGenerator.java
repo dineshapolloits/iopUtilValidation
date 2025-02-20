@@ -298,7 +298,7 @@ public class ICTXFileGenerator {
 		this.agency = ValidationController.cscIdTagAgencyMap.get(validateParam.getFromAgency());
 		Header header = new Header();
 		header.setFileType(IAGConstants.ICTX_FILE_TYPE);
-		header.setVersion(agency.getVersionNumber());
+		header.setVersion(validateParam.getVersion());
 		header.setFromAgencyId(validateParam.getFromAgency());
 		header.setFileDateTime(fileCreateDateandTime);
 		header.setToAgencyId(validateParam.getToAgency());

@@ -116,7 +116,7 @@ public class IRXCFileGenerator {
 		this.agency = ValidationController.cscIdTagAgencyMap.get(validateParam.getFromAgency());
 		Header header = new Header();
 		header.setFileType(validateParam.getFileType());
-		header.setVersion(agency.getVersionNumber());
+		header.setVersion(validateParam.getVersion());
 		header.setFromAgencyId(validateParam.getFromAgency());
 		header.setFileDateTime(fileCreateDateandTime);
 		header.setToAgencyId(validateParam.getToAgency());

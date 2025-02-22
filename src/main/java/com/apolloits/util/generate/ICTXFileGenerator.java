@@ -54,6 +54,9 @@ public class ICTXFileGenerator {
 		}
 		
 		ictxTemplateList = getICTXTemplateExcel(validateParam);
+		if(ictxTemplateList == null || ictxTemplateList.size()==0) {
+			return false;
+		}
 		String Header = getICTXHeader(validateParam,ictxTemplateList);
 		log.info("ICTX Header :: " + Header);
 		writeDetails(validateParam,Header,ictxTemplateList);
@@ -135,7 +138,7 @@ public class ICTXFileGenerator {
 			Workbook workbook = new XSSFWorkbook(is);
 			log.info("Number of sheets : " + workbook.getNumberOfSheets());
 
-			ictxTemplateList = excelToICTXList(workbook.getSheet(ICTX_SHEET));
+			ictxTemplateList = excelToICTXList(workbook.getSheet(ICTX_SHEET),validateParam);
 
 		} catch (Exception e) {
 			validateParam.setResponseMsg("File not generated Please check input excel data");
@@ -146,7 +149,7 @@ public class ICTXFileGenerator {
 		return ictxTemplateList;
 	}
 
-	private List<ICTXTemplate> excelToICTXList(Sheet sheet) {
+	private List<ICTXTemplate> excelToICTXList(Sheet sheet,FileValidationParam validateParam) {
    	 log.info("Inside ****************** excelToICTXList()");
         try {
        	
@@ -278,7 +281,11 @@ public class ICTXFileGenerator {
        	   throw new IopTranslatorException("ICTX input data not loaded");
           }
           
-        }catch (Exception e) {
+        }catch (NullPointerException e) {
+           	log.error("NullPointerException:: ******************** ICTX Sheet");
+    		e.printStackTrace();
+    		validateParam.setResponseMsg("Please give correct name.Sheet name should be ICTX.");
+    	}catch (Exception e) {
        	log.error("Exception:: ******************** ICTX Sheet");
 			e.printStackTrace();
 		}

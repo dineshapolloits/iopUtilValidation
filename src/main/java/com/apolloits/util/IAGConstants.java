@@ -82,7 +82,7 @@ public class IAGConstants {
     
     public static final String ITGU_DTL_TAG_STATUS = "[1-4]{1}";
     
-    public static final String TRAN_ZIP_FILE_NAME_FORMAT = "\\d{4}_\\d{4}_\\d{14}_[A-Z]{4}.[A-Za-z]{3}";
+    public static final String TRAN_ZIP_FILE_NAME_FORMAT = "\\d{4}_\\d{4}_\\d{14}_[A-Z]{4}\\.[A-Za-z]{3}";
     public static final String INFO_ZIP_FILE_NAME_FORMAT = "\\d{4}_\\d{14}_[A-Z]{4}.[A-Za-z]{3}";
     public static final String INFO_ACK_FILE_NAME_FORMAT = "\\d{4}_\\d{4}_\\d{14}_[A-Z]{4}.[A-Za-z]{3}";
     

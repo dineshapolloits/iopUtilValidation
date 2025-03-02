@@ -19,14 +19,17 @@ import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.stereotype.Component;
 
 import com.apolloits.util.IopTranslatorException;
 import com.apolloits.util.modal.AgencyEntity;
+import com.apolloits.util.modal.NiopAgencyEntity;
 import com.apolloits.util.modal.PlateTypeEntity;
 import com.apolloits.util.modal.UtilityParamEntity;
 import com.apolloits.util.service.DatabaseLogger;
+import com.apolloits.util.utility.CommonUtil;
 
 import jakarta.annotation.PostConstruct;
 import lombok.Getter;
@@ -41,6 +44,8 @@ public class AgencyDataExcelReader {
 	DatabaseLogger dbLog;
 	
 	private List<AgencyEntity> agList;
+	
+	private List<NiopAgencyEntity> niopAgList;
 	
 	public static HashSet<String> agencyCode;
 	public static HashSet<String> tagAgencyCode;
@@ -62,6 +67,10 @@ public class AgencyDataExcelReader {
 	
 	@Value("${excel.data}")
 	String dataPath;
+	
+	@Value("${excel.data.niop}")
+	String niopDataPath;
+	
      //C:\Users\dselvaraj\git\iopUtilValidation\src\main\resources\Utlity Table.xlsx
      @PostConstruct
      public void init() throws IopTranslatorException {
@@ -81,6 +90,16 @@ public class AgencyDataExcelReader {
 				loadPlateTypefromExcel(workbook.getSheet(PlateType_SHEET));
 				//After all sheet read close workbook
 				 workbook.close();
+				 
+				 //NIOP Utility Excel load
+				 
+				 log.info("NIOP Excel data path localtion form property file ::"+niopDataPath);
+					FileInputStream niopIs = new FileInputStream(niopDataPath);
+					Workbook niopWorkbook = new XSSFWorkbook(niopIs);
+					log.info("NIOP Number of sheets : " + niopWorkbook.getNumberOfSheets());
+					
+					excelToNiopAgencyList(niopWorkbook.getSheet(AgencyListing_SHEET));
+				 
 				} catch (IOException e) {
 					log.error("init exception in excel reader");
 					e.printStackTrace();
@@ -91,7 +110,109 @@ public class AgencyDataExcelReader {
     	 
      }
      
-     public void excelToAgencyList(Sheet sheet) {
+     private void excelToNiopAgencyList(Sheet sheet) {
+    	 log.info("Inside NIOP****************** excelToNiopAgencyList()");
+    	 CommonUtil commonUtil = new CommonUtil();
+         try {
+        	
+           Iterator<Row> rows = sheet.iterator();
+           List<NiopAgencyEntity> agList = new ArrayList<NiopAgencyEntity>();
+           int rowNumber = 0;
+           while (rows.hasNext()) {
+             Row currentRow = rows.next();
+             // skip header
+             if (rowNumber == 0) {
+               rowNumber++;
+               continue;
+             }
+             Iterator<Cell> cellsInRow = currentRow.iterator();
+             NiopAgencyEntity agency = new NiopAgencyEntity();
+             int cellIdx = 0;
+             while (cellsInRow.hasNext()) {
+               Cell currentCell = cellsInRow.next();
+               switch (cellIdx) {
+               case 0:
+            	   agency.setHomeAgency((int) Math.round(currentCell.getNumericCellValue()));
+            	   System.out.println("case 0::"+currentCell.getNumericCellValue());
+                 break;
+               case 1:
+                   agency.setAwayAgency((int) Math.round(currentCell.getNumericCellValue()));
+                   System.out.println("case 1::"+currentCell.getNumericCellValue());
+                 break;
+               case 2:
+                   agency.setCSCID(commonUtil.getStringFormatCell(currentCell));
+                   System.out.println("case 2::"+agency.getCSCID());
+                 break;
+               case 3:
+                 agency.setCSCName(commonUtil.getStringFormatCell(currentCell));
+                 System.out.println("case 3::"+currentCell.getStringCellValue());
+                 break;
+               case 4:
+                   agency.setCSCAgencyShortName(commonUtil.getStringFormatCell(currentCell));
+                   System.out.println("case 4::"+currentCell.getStringCellValue());
+                   break;
+               case 5:
+                   agency.setVersionNumber(commonUtil.getStringFormatCell(currentCell));
+                   System.out.println("case 5::"+agency.getVersionNumber());
+                   break;
+               case 6:
+                   agency.setHomeAgencyID(commonUtil.getStringFormatCell(currentCell));
+                   System.out.println("case 6::"+agency.getHomeAgencyID());
+                   break;
+               case 7:
+                   agency.setTagAgencyID(commonUtil.getStringFormatCell(currentCell));
+                   System.out.println("case 7::"+currentCell.getStringCellValue());
+                   break;
+               case 8:
+                   agency.setTagSequenceStart(commonUtil.getStringFormatCell(currentCell));
+                   System.out.println("case 8::"+currentCell.getStringCellValue());
+                   break;
+               case 9:
+                   agency.setTagSequenceEnd(commonUtil.getStringFormatCell(currentCell));
+                   System.out.println("case 9::"+currentCell.getStringCellValue());
+                   break;
+               case 10:
+            	   agency.setBTVL((int)currentCell.getNumericCellValue());
+                   System.out.println("case 10::"+currentCell.getNumericCellValue());
+                   break;
+              /* case 11:
+                   agency.setICLP((int) Math.round(currentCell.getNumericCellValue()));
+                   System.out.println("case 11::"+currentCell.getNumericCellValue());
+                   break;*/
+               case 11:
+                   agency.setHubName(commonUtil.getStringFormatCell(currentCell));
+                   System.out.println("case 11::"+currentCell.getStringCellValue());
+                   break;
+               case 12:
+                   agency.setHubId((int) currentCell.getNumericCellValue());
+                   System.out.println("case 12::"+agency.getHubId());
+                   break;
+               default:
+            	 //  System.out.println("Default:: ********************");
+                 break;
+               }
+               cellIdx++;
+             }
+             agList.add(agency);
+           }
+          
+           if(agList != null && agList.size()>0) {
+           dbLog.saveNiopAgencyList(agList);
+           log.info("@@@@ Agency List loaded sucessfully:: ********************");
+           }else {
+        	   throw new IopTranslatorException("Agency data not loaded");
+           }
+           this.niopAgList = agList;
+          
+           
+         }catch (Exception e) {
+        	log.error("NIOP Exception:: ******************** UtilityAgencyListing_SHEET");
+			e.printStackTrace();
+		}
+       
+	}
+
+	public void excelToAgencyList(Sheet sheet) {
     	 log.info("Inside ****************** excelToAgencyList()");
          try {
         	

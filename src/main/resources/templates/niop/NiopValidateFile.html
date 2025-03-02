@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+<meta charset="ISO-8859-1">
+<title>IOP Util Validate Files</title>
+<link rel="stylesheet"
+	href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css"
+	integrity="sha384-MCw98/SFnGE8fJT3GXwEOngsV7Zt27NXFoaoApmYm81iuXoPkFOJwJ8ERdknLPMO"
+	crossorigin="anonymous">
+<style>
+	.table-wrapper {
+	  max-height: 300px;
+	  overflow: auto;
+	  display:inline-block;
+	}
+</style>
+</head>
+<body>
+	<div class="container">
+		<h1>IOP Util Validate Files</h1>
+		<div align="right">
+				<a th:href="@{/Logout}" class="btn btn-primary link-danger">Logout</a>
+				</div>
+		<hr>
+		<h2>Validation Parameter</h2>
+
+		<form action="#" th:action="@{/ValidateFileNiop}" th:object="${fileValidationParam}"
+			method="POST" >
+			<div class="row">
+			<p class="col-md-6">	<b>File Type</b>		<select th:field="*{fileType}" class="form-control">
+			    <option th:value="BTVL" th:text="BTVL"></option>
+				<option th:value="STRAN" th:text="STRAN"></option>
+			    <option th:value="SRECON" th:text="SRECON"></option>
+				<option th:value="SCORR" th:text="SCORR"></option>
+				<option th:value="ACK" th:text="ACK"></option>
+			</select>
+			</p>
+			<p class="col-md-6">	<b>Validate Type</b>		<select th:field="*{validateType}" class="form-control">
+						    <option th:value="all" th:text="All"></option>
+						    <option th:value="filename" th:text="File-Name"></option>
+							<option th:value="header" th:text="Header"></option>
+						</select>
+						</p>
+						</div>
+		<div class="row">	
+			<p class="col-md-6"><b>From Agency Code</b>
+							<select th:field="*{fromAgency}" class="form-control">
+							     <option value="NONE">----Select Agency Code----</option>
+							     <option th:each="entry : ${homeAgencyMap.entrySet()}" th:value="${entry.key}" th:text="${entry.value}">
+							     </option>
+							  </select>
+						</p> 			
+		<!--	<p class="col-md-6"><b>From Agency Code</b>
+				<input type="text" th:field="*{fromAgency}" placeholder="From agency code" class="form-control " minlength="4" maxlength="4">
+			</p>
+			
+			<p class="col-md-6"><b>To Agency Code</b>
+							<input type="text" th:field="*{toAgency}" placeholder="From agency code" class="form-control " minlength="4" maxlength="4">
+						</p>  -->
+		 	<p class="col-md-6"><b>To Agency Code</b>
+				<select th:field="*{toAgency}" class="form-control">
+				     <option value="NONE">----Select Agency Code----</option>
+				     <option th:each="entry : ${homeAgencyMap.entrySet()}" th:value="${entry.key}" th:text="${entry.value}">
+				     </option>
+				  </select>
+			</p> 
+			
+			</div>
+			<div class="row">
+			<p class="col-md-6"><b>File Input Path</b>
+								<input type="text" th:field="*{inputFilePath}" placeholder="input file path" class="form-control">
+							</p>
+			<p class="col-md-6"><b>ACK Output Path</b>
+				<input type="text" th:field="*{outputFilePath}" placeholder="Ack output file path" class="form-control">
+			</p>
+			
+			</div>
+			<p class="col-md-6">
+						<button type="submit" class="btn btn-info btn-lg  ">Validate</button>
+						</p>
+		</form>
+
+		<hr>
+		<!-- <p th:text="|Result :: ${now}!|" /> -->
+		<p><b>Result: </b><label th:utext="${result}"></label></p>
+		<div class="table-responsive table-wrapper">
+		<table class="table table-bordered table-striped border-2">
+		    <thead>
+		      <tr>
+		        <th style="width:1px; white-space:nowrap;">#</th>
+				<th style="width:130px;">Record Type</th>
+		        <th style="width:200px;">Field Name</th>
+		        <th>Error message</th>
+		      </tr>
+		    </thead>
+		    <tbody>
+		      <tr th:each="error, iterStat : ${errorMsgList}">
+		        <td th:text="${iterStat.index+1}"></td>
+				<td th:text="${error.fileType}"></td>
+		        <td th:text="${error.fieldName}"></td>
+		        <td th:utext="${error.errorMsg}"></td>
+		      </tr>
+		    </tbody>
+		  </table>
+		  </div>
+		<a th:href="@{/AgencyList}">Back to Agency Configuration</a>
+	</div>
+</body>
+</html>

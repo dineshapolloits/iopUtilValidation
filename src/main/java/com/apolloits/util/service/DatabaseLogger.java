@@ -10,9 +10,11 @@ import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import com.apolloits.util.modal.AgencyEntity;
+import com.apolloits.util.modal.NiopAgencyEntity;
 import com.apolloits.util.modal.PlateTypeEntity;
 import com.apolloits.util.modal.UtilityParamEntity;
 import com.apolloits.util.repository.AgencyRepository;
+import com.apolloits.util.repository.NiopAgencyRepository;
 import com.apolloits.util.repository.PlateTypeRepository;
 import com.apolloits.util.repository.UtilParamRepository;
 
@@ -28,8 +30,15 @@ public class DatabaseLogger {
 	@Autowired
 	PlateTypeRepository plateTypeRepo;
 	
+	@Autowired
+	NiopAgencyRepository niopAgencyRepo;
+	
 	public void saveAgencyList(List<AgencyEntity> agencyList) {
 		agencyRepo.saveAll(agencyList);
+	}
+	
+	public void saveNiopAgencyList(List<NiopAgencyEntity> agencyList) {
+		niopAgencyRepo.saveAll(agencyList);
 	}
 	public List<AgencyEntity> getAllAgencyList() {
         return agencyRepo.findAll();
@@ -64,4 +73,12 @@ public class DatabaseLogger {
 		return map;
 	}
 	
+	public Map<String, String> getNiopCscAgencyIdandShortNamebymap() {
+		List<NiopAgencyEntity> agencyList = niopAgencyRepo.findAll(Sort.by(Sort.Direction.ASC, "CSCID"));
+		 Map<String, String> map = new LinkedHashMap<>();
+		 for (NiopAgencyEntity agencyEntity : agencyList) {
+			 map.put(agencyEntity.getCSCID(), agencyEntity.getCSCID()+"-"+agencyEntity.getCSCAgencyShortName());
+		}
+		return map;
+	}
 }

@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+<meta charset="ISO-8859-1">
+<title>Agnecy List</title>
+<link rel="stylesheet"
+	href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css"
+	integrity="sha384-MCw98/SFnGE8fJT3GXwEOngsV7Zt27NXFoaoApmYm81iuXoPkFOJwJ8ERdknLPMO"
+	crossorigin="anonymous">
+</head>
+<body>
+<div class="container-fluid" align="center">
+
+<h4>Agency Configuration</h4>
+<a th:href="@{/ValidateNiop}" class="btn btn-primary btn-lg mb-3 " >Validate NIOP Files</a>
+<a th:href="@{/GenerateNiop}" class="btn btn-primary btn-lg mb-3" >Generate NIOP Files</a>
+<div align="right">
+<a th:href="@{/Logout}" class="btn btn-primary link-danger">Logout</a>
+</div>
+<div align="right">
+<a th:href="@{/hubList}"> Back to List of  InterOperability Hubs</a>
+</div>
+	<table   style="width:80%" border="1" 
+		class = "table table-striped text-nowrap" 	 >
+	<thead>
+<tr>
+	<th>Seq.No</th>
+	<th>HomeAgency</th>
+	<th>AwayAgency</th>
+	<th>CSCID</th>
+	<th >CSCName</th>
+	<th>CSCAgencyShortName</th>
+	<th>VersionNumber</th>
+	<th>HomeAgencyID</th>
+	<th>TagAgencyID</th>
+	<th>TagSequenceStart</th>
+	<th>TagSequenceEnd</th>
+	<th>BTVL</th>
+	<th>HubName</th>
+	<th>HubId</th>
+</tr>
+</thead>
+<tbody>
+<tr th:each="agency:${allAgList}">
+<!--	<td> <a th:href="@{/showFormForUpdate/{id}(id=${agency.AgencyId})}"
+					class="btn btn-primary">Update</a>
+					<a th:href="@{/deleteEmployee/{id}(id=${agency.AgencyId})}"
+					class="btn btn-danger">Delete</a>
+		</td> -->
+		<td th:text="${agency.AgencyId}"></td>
+		<td th:text="${agency.HomeAgency}"></td>
+		<td th:text="${agency.AwayAgency}"></td>
+		<td th:text="${agency.CSCID}"></td>
+		<td th:text="${agency.CSCName}"></td>
+		<td th:text="${agency.CSCAgencyShortName}"></td>
+		<td th:text="${agency.VersionNumber}"></td>
+		<td th:text="${agency.HomeAgencyID}"></td>
+		<td th:text="${agency.TagAgencyID}"></td>
+		<td th:text="${agency.TagSequenceStart}"></td>
+		<td th:text="${agency.TagSequenceEnd}"></td>
+		<td th:text="${agency.BTVL}"></td>
+		<td th:text="${agency.HubName}"></td>
+		<td th:text="${agency.HubId}"></td>
+</tr>
+</tbody>
+</table>
+</div>
+</body>
+</html>

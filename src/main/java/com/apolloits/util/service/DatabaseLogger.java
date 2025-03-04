@@ -73,6 +73,18 @@ public class DatabaseLogger {
 		return map;
 	}
 	
+	public Map<String, NiopAgencyEntity> getNiopCSCIdbyAgencyMap(String AgencyCode) {
+		List<NiopAgencyEntity> cscIdAgencyList =niopAgencyRepo.findByCSCIDforAgency(AgencyCode);
+		
+		Map<String, NiopAgencyEntity> cscIdTagAgencyMap = cscIdAgencyList.stream()
+	            .collect(Collectors.toMap(NiopAgencyEntity::getHomeAgencyID, agency -> agency));
+
+		cscIdTagAgencyMap.forEach((tag, agency) -> 
+	            System.out.println("TagAgencyID: " + tag + ", Tag Start: " + agency.getTagSequenceStart() +"\t END ::"+agency.getTagSequenceEnd()));
+	        
+		return cscIdTagAgencyMap;
+	}
+	
 	public Map<String, String> getNiopCscAgencyIdandShortNamebymap() {
 		List<NiopAgencyEntity> agencyList = niopAgencyRepo.findAll(Sort.by(Sort.Direction.ASC, "CSCID"));
 		 Map<String, String> map = new LinkedHashMap<>();

@@ -15,7 +15,6 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
 
-import com.apolloits.util.IAGConstants;
 import com.apolloits.util.NIOPConstants;
 import com.apolloits.util.modal.ErrorMsgDetail;
 import com.apolloits.util.modal.FileValidationParam;
@@ -86,7 +85,8 @@ public class NiopValidationController {
 		errorMsglist = new ArrayList<>();
 		log.info("NIOP ValidateFile ::"+validateParam.toString());
 		model.addAttribute("homeAgencyMap", dbLog.getNiopCscAgencyIdandShortNamebymap());
-		
+		cscIdTagNiopAgencyMap =  dbLog.getNiopCSCIdbyAgencyMap(validateParam.getFromAgency());
+		System.out.println("Controller :: cscIdTagNiopAgencyMap ::"+cscIdTagNiopAgencyMap);
 		if(!validateNiopUIField(validateParam)) {
 			model.addAttribute("result", validateParam.getResponseMsg());
 			return "niop/NiopValidateFile";
@@ -96,6 +96,15 @@ public class NiopValidationController {
 		if(validateParam.getFileType().equals(NIOPConstants.BTVL_FILE_TYPE)) {
 			fileValidation = btvlValidation.btvlValidation(validateParam);
 			}
+		
+		log.info("getResponseMsg ::"+validateParam.getResponseMsg() +"\t fileValidation ::"+fileValidation);
+		
+		if(!fileValidation || errorMsglist.size()>0) {
+			model.addAttribute("result", "<b>Failed \t</b>"+validateParam.getResponseMsg());
+			model.addAttribute("errorMsgList",errorMsglist);
+		}else {
+			model.addAttribute("result", "Success");
+		}
 		 return "niop/NiopValidateFile";
 	}
 	
@@ -109,8 +118,8 @@ public class NiopValidationController {
 			validateParam.setResponseMsg("<b>Please select To Agency Code </b>");
 			return false;
 		}
-		if(validateParam.getToAgency().equals("NONE")) {
-			validateParam.setResponseMsg("<b>Please select To Agency Code </b>");
+		if(validateParam.getToAgency().equals(validateParam.getFromAgency())) {
+			validateParam.setResponseMsg("<b>From agency and To agency should not be same </b>");
 			return false;
 		}
 		if(validateParam.getInputFilePath()== null || validateParam.getInputFilePath().isEmpty() ) {

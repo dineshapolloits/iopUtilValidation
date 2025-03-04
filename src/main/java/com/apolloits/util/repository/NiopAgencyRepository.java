@@ -14,5 +14,5 @@ import com.apolloits.util.modal.NiopAgencyEntity;
 @Repository
 public interface NiopAgencyRepository extends JpaRepository<NiopAgencyEntity, Integer> {
 	@Query("SELECT ag FROM NiopAgencyEntity ag WHERE ag.CSCID = :CSCID")
-	List<AgencyEntity> findByCSCIDforAgency(@Param("CSCID") String CSCID);
+	List<NiopAgencyEntity> findByCSCIDforAgency(@Param("CSCID") String CSCID);
 }

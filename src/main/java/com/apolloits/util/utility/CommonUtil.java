@@ -49,6 +49,9 @@ import org.springframework.util.FileCopyUtils;
 
 import com.apolloits.util.IAGConstants;
 import com.apolloits.util.IagAckFileMapper;
+import com.apolloits.util.NIOPConstants;
+import com.apolloits.util.NiopAckFileMapper;
+import com.apolloits.util.controller.NiopValidationController;
 import com.apolloits.util.controller.ValidationController;
 import com.apolloits.util.modal.ErrorMsgDetail;
 import com.apolloits.util.modal.FileValidationParam;
@@ -86,6 +89,9 @@ private static AgencyDataExcelReader appConfig;
 	
 	@Autowired
 	private IagAckFileMapper iagAckMapper;
+	@Autowired
+	private NiopAckFileMapper niopAckMapper;
+	
 	
 	@Value("${validate.fileStartYear}")
 	int fileStartYear;
@@ -146,7 +152,8 @@ private static AgencyDataExcelReader appConfig;
 		String fileNameDateTime = "0034_0008_20250119103210.IRXC".substring(10, 24);
 		String headerDate = "2025-02-01T14:16:34Z";
 		System.out.println("fileNameDateTime ::"+fileNameDateTime +"\t headerDate = "+headerDate.replaceAll("[-T:Z]", ""));
-
+		String dateTime ="20250119103210";
+		System.out.println("Teste"+ LocalDateTime.parse(dateTime, java.time.format.DateTimeFormatter.ofPattern(IAGConstants.YYYY_MM_DD_HH_MM_SS)));
 		DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ssX");
 		// Parse the current date string
 		LocalDateTime currentDate = LocalDateTime.parse(headerDate, formatter);
@@ -154,7 +161,61 @@ private static AgencyDataExcelReader appConfig;
 		// Subtract one day to get the previous date
 		LocalDateTime previousDate = currentDate.minusDays(1);
 		System.out.println("Previous: " + previousDate.toString()+"Z");
-		
+		String zipFileName = "-1";
+		System.out.println(zipFileName.matches("\\d{1,9}"));
+	}
+	
+	public String convertFileDateToUTCDateFormat(String inputDate) {
+        // Define the input and output formats
+        DateTimeFormatter inputFormatter = DateTimeFormatter.ofPattern("yyyyMMddHHmmss");
+        DateTimeFormatter outputFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ssX");
+
+        // Parse the input date string to LocalDateTime
+        LocalDateTime dateTime = LocalDateTime.parse(inputDate, inputFormatter);
+
+        // Convert to the desired format with UTC offset
+        return outputFormatter.format(dateTime.atOffset(ZoneOffset.UTC));
+    }
+	
+	public boolean validateNiopBtvlFileName(String fileName,FileValidationParam validateParam) {
+		boolean zipNameValidation = false;
+		String[] fileParams = fileName.split("[_.]");
+		if (fileName != null && fileName.matches(NIOPConstants.BTVL_FILE_NAME_FORMAT)) {
+			System.out.println("validateNiopZIPFileName() ::  fileParams ::"+Arrays.toString(fileParams) +"\t fileParams[0] "+fileParams[0] +"\t HUBID"+NiopValidationController.cscIdTagNiopAgencyMap.get(validateParam.getFromAgency()).getHubId());
+			if(fileParams[1].equals(validateParam.getFromAgency()) && fileParams[0].equals(String.valueOf(NiopValidationController.cscIdTagNiopAgencyMap.get(validateParam.getFromAgency()).getHubId())) && isValidDateTime(fileParams[2]) ) {
+				zipNameValidation =true;
+			}
+		}
+		if(!zipNameValidation) {
+			//Create ACK file name
+			String ackfilename = NiopValidationController.cscIdTagNiopAgencyMap.get(validateParam.getFromAgency()).getHubId() + "_" + validateParam.getFromAgency() + "_" + fileName.substring(0,24) + "_"
+                    +"07" + "_" + NIOPConstants.BTVL_FILE_TYPE + NIOPConstants.ACK_FILE_EXTENSION;
+			log.info("ACK File Name ::"+ackfilename);
+			niopAckMapper.setNiopAckFile(validateParam, "STVL", convertFileDateToUTCDateFormat(fileParams[2]), "07", ackfilename);
+			validateParam.setResponseMsg("File name validation failed");
+		}
+		return zipNameValidation;
+	}
+	
+	
+	public boolean validateNiopBtvlZIPFileName(String fileName,FileValidationParam validateParam) {
+		boolean zipNameValidation = false;
+		String[] fileParams = fileName.split("[_.]");
+		if (fileName != null && fileName.matches(NIOPConstants.BTVL_ZIP_FILE_NAME_FORMAT)) {
+			System.out.println("validateNiopZIPFileName() ::  fileParams ::"+Arrays.toString(fileParams) +"\t fileParams[1] "+fileParams[0] +"\t HUBID"+NiopValidationController.cscIdTagNiopAgencyMap.get(validateParam.getFromAgency()).getHubId());
+			if(fileParams[1].equals(validateParam.getFromAgency()) && fileParams[0].equals(String.valueOf(NiopValidationController.cscIdTagNiopAgencyMap.get(validateParam.getFromAgency()).getHubId())) && isValidDateTime(fileParams[2]) ) {
+				zipNameValidation =true;
+			}
+		}
+		if(!zipNameValidation) {
+			//Create ACK file name
+			String ackfilename = NiopValidationController.cscIdTagNiopAgencyMap.get(validateParam.getFromAgency()).getHubId() + "_" + validateParam.getFromAgency() + "_" + fileName.substring(0,24) + "_"
+                    +"07" + "_" + NIOPConstants.BTVL_FILE_TYPE + NIOPConstants.ACK_FILE_EXTENSION;
+			log.info("ACK File Name ::"+ackfilename);
+			niopAckMapper.setNiopAckFile(validateParam, "STVL", convertFileDateToUTCDateFormat(fileParams[2]), "07", ackfilename);
+			validateParam.setResponseMsg("ZIP File name validation failed");
+		}
+		return zipNameValidation;
 	}
 
 	

@@ -8,6 +8,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.commons.io.FilenameUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -102,6 +103,18 @@ public class NiopValidationController {
 		if(!fileValidation || errorMsglist.size()>0) {
 			model.addAttribute("result", "<b>Failed \t</b>"+validateParam.getResponseMsg());
 			model.addAttribute("errorMsgList",errorMsglist);
+			File testObj = new File(validateParam.getInputFilePath());
+			String exceptionFileName;
+			String fileNameWithOutExt = FilenameUtils.removeExtension(testObj.getName());
+			try {
+				exceptionFileName = validateParam.getOutputFilePath() + File.separator + fileNameWithOutExt
+						+ "_Exception.xls";
+			} catch (Exception e) {
+				e.printStackTrace();
+				log.info("Exception in exceptionFileName :: file name creation ::");
+				exceptionFileName = validateParam.getOutputFilePath() + File.separator + " ACK_exception_.xls";
+			}
+			exListExcelWriter.createExceptionExcel(errorMsglist, exceptionFileName);
 		}else {
 			model.addAttribute("result", "Success");
 		}

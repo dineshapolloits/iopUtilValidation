@@ -1,18 +1,17 @@
 package com.apolloits.util.modal.niop;
 
-import lombok.Data;
+import java.util.List;
 
 import jakarta.xml.bind.annotation.XmlElement;
 import jakarta.xml.bind.annotation.XmlRootElement;
 import jakarta.xml.bind.annotation.XmlType;
 import lombok.Getter;
-import lombok.Setter;
-
-import java.util.List;
 
 @Getter
 @XmlRootElement(name = "TVLTagDetails")
-@XmlType(propOrder = {"homeAgencyId", "tagAgencyId", "tagSerialNumber", "tagStatus", "tagType", "tagClass", "tvlPlateDetails", "tvlAccountDetails"})
+@XmlType(propOrder = {"homeAgencyId", "tagAgencyId", "tagSerialNumber", "tagStatus","discountPlans",
+        "DiscountPlanStartDate","DiscountPlanEndDate",
+        "tagType", "tagClass", "tvlPlateDetails", "tvlAccountDetails"})
 public class TVLTagDetails {
     @XmlElement(name = "HomeAgencyID")
     private String homeAgencyId;
@@ -22,6 +21,12 @@ public class TVLTagDetails {
     private String tagSerialNumber;
     @XmlElement(name = "TagStatus")
     private String tagStatus;
+    @XmlElement(name="Discount Plans")
+    private String discountPlans;
+    @XmlElement(name="Discount Plan Start Date")
+    private String DiscountPlanStartDate;
+    @XmlElement(name="Discount Plan End Date")
+    private String DiscountPlanEndDate;
     @XmlElement(name = "TagType")
     private String tagType;
     @XmlElement(name = "TagClass")

@@ -18,6 +18,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Component;
 
+import com.apolloits.util.controller.NiopValidationController;
 import com.apolloits.util.controller.ValidationController;
 import com.apolloits.util.modal.ErrorMsgDetail;
 
@@ -30,6 +31,10 @@ public class ExceptionListExcelWriter {
 	@Autowired
 	@Lazy
 	ValidationController controller;
+	
+	@Autowired
+	@Lazy
+	NiopValidationController niopController;
 	
 	public void createExceptionExcel(List<ErrorMsgDetail> errorMsglist,String outputFilePath) throws IOException {
 		
@@ -77,7 +82,12 @@ public class ExceptionListExcelWriter {
 	    try (FileOutputStream outputStream = new FileOutputStream(outputFilePath)) {
 	        workbook.write(outputStream);
 	    }catch (FileNotFoundException e) {
-	    	controller.getErrorMsglist().add(new ErrorMsgDetail(FILE_RECORD_TYPE,"ACK","ACK Output Path don't have write access"));
+	    	if(controller.getErrorMsglist() != null ) {
+	    		controller.getErrorMsglist().add(new ErrorMsgDetail(FILE_RECORD_TYPE,"ACK","ACK Output Path don't have write access"));
+	    	}else {
+	    		niopController.getErrorMsglist().add(new ErrorMsgDetail(FILE_RECORD_TYPE,"ACK","ACK Output Path don't have write access"));
+	    	}
+	    	
 			e.printStackTrace();
 			
 		}

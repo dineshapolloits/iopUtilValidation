@@ -42,6 +42,8 @@ public class NiopValidationController {
 	DatabaseLogger dbLog;
 	@Autowired 
 	AgencyDataExcelReader excelreader;
+	public static Map<String, NiopAgencyEntity> allCscIdNiopAgencyMap;
+	
 	public static Map<String, NiopAgencyEntity> cscIdTagNiopAgencyMap;
 	
 	List<ErrorMsgDetail> errorMsglist;
@@ -87,7 +89,8 @@ public class NiopValidationController {
 		log.info("NIOP ValidateFile ::"+validateParam.toString());
 		model.addAttribute("homeAgencyMap", dbLog.getNiopCscAgencyIdandShortNamebymap());
 		cscIdTagNiopAgencyMap =  dbLog.getNiopCSCIdbyAgencyMap(validateParam.getFromAgency());
-		System.out.println("Controller :: cscIdTagNiopAgencyMap ::"+cscIdTagNiopAgencyMap);
+		allCscIdNiopAgencyMap =  dbLog.getAllNiopCSCIdbyAgencyMap();
+		System.out.println("Controller :: allCscIdNiopAgencyMap ::"+allCscIdNiopAgencyMap);
 		if(!validateNiopUIField(validateParam)) {
 			model.addAttribute("result", validateParam.getResponseMsg());
 			return "niop/NiopValidateFile";

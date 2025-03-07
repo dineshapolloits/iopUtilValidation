@@ -3,6 +3,7 @@ package com.apolloits.util.service;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -73,17 +74,29 @@ public class DatabaseLogger {
 		return map;
 	}
 	
+	public Map<String, NiopAgencyEntity> getAllNiopCSCIdbyAgencyMap() {
+		List<NiopAgencyEntity> cscIdAgencyList =niopAgencyRepo.findAll();
+		//(r1, r2) -> r1
+		Map<String, NiopAgencyEntity> cscIdTagAgencyMap = cscIdAgencyList.stream()
+	            .collect(Collectors.toMap(NiopAgencyEntity::getHomeAgencyID, Function.identity(), (first, second) -> first));
+		cscIdTagAgencyMap.forEach((tag, agency) -> 
+        System.out.println("getHomeAgencyID: " + tag + ", Tag Start: " + agency.getTagSequenceStart() +"\t END ::"+agency.getTagSequenceEnd()));
+
+		return cscIdTagAgencyMap;
+	}
+	
 	public Map<String, NiopAgencyEntity> getNiopCSCIdbyAgencyMap(String AgencyCode) {
 		List<NiopAgencyEntity> cscIdAgencyList =niopAgencyRepo.findByCSCIDforAgency(AgencyCode);
 		
 		Map<String, NiopAgencyEntity> cscIdTagAgencyMap = cscIdAgencyList.stream()
-	            .collect(Collectors.toMap(NiopAgencyEntity::getHomeAgencyID, agency -> agency));
+	            .collect(Collectors.toMap(NiopAgencyEntity::getTagAgencyID, agency -> agency));
 
 		cscIdTagAgencyMap.forEach((tag, agency) -> 
 	            System.out.println("TagAgencyID: " + tag + ", Tag Start: " + agency.getTagSequenceStart() +"\t END ::"+agency.getTagSequenceEnd()));
 	        
 		return cscIdTagAgencyMap;
 	}
+	
 	
 	public Map<String, String> getNiopCscAgencyIdandShortNamebymap() {
 		List<NiopAgencyEntity> agencyList = niopAgencyRepo.findAll(Sort.by(Sort.Direction.ASC, "CSCID"));

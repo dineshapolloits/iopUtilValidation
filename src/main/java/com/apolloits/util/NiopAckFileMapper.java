@@ -27,7 +27,7 @@ public class NiopAckFileMapper {
         niopAckFile.setSubmissionType("ACK");
         niopAckFile.setOriginalSubmissionType(fileType);
         niopAckFile.setOriginalSubmissionDateTime(originalSubmissionDateTime);
-        niopAckFile.setNiopHubID(String.valueOf(NiopValidationController.cscIdTagNiopAgencyMap.get(validationParam.getFromAgency()).getHubId()));
+        niopAckFile.setNiopHubID(String.valueOf(NiopValidationController.allCscIdNiopAgencyMap.get(validationParam.getToAgency()).getHubId()));
         niopAckFile.setFromAgencyID(validationParam.getToAgency());
         niopAckFile.setToAgencyID(validationParam.getFromAgency());
         niopAckFile.setAckDateTime(IagAckFileMapper.convertDateTimeToOffset(Instant.now().toString()));

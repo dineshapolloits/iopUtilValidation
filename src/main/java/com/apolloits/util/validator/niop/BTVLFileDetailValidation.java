@@ -17,8 +17,11 @@ import com.apolloits.util.IAGConstants;
 import com.apolloits.util.NIOPConstants;
 import com.apolloits.util.NiopAckFileMapper;
 import com.apolloits.util.controller.NiopValidationController;
+import com.apolloits.util.controller.ValidationController;
+import com.apolloits.util.modal.AgencyEntity;
 import com.apolloits.util.modal.ErrorMsgDetail;
 import com.apolloits.util.modal.FileValidationParam;
+import com.apolloits.util.modal.NiopAgencyEntity;
 import com.apolloits.util.modal.niop.TVLAccountDetails;
 import com.apolloits.util.modal.niop.TVLDetailList;
 import com.apolloits.util.modal.niop.TVLHeader;
@@ -73,7 +76,7 @@ public class BTVLFileDetailValidation {
 				
 			} catch (ZipException e) {
 				e.printStackTrace();
-				ackFileName = NiopValidationController.cscIdTagNiopAgencyMap.get(validateParam.getToAgency()).getHubId() + "_" + validateParam.getFromAgency() + "_" + fileName.split("[.]")[0] + "_" + "07"
+				ackFileName = NiopValidationController.allCscIdNiopAgencyMap.get(validateParam.getToAgency()).getHubId() + "_" + validateParam.getFromAgency() + "_" + fileName.split("[.]")[0] + "_" + "07"
 						+ "_" + NIOPConstants.BTVL_FILE_TYPE + NIOPConstants.ACK_FILE_EXTENSION;
 				log.info("ACK File Name ::" + ackFileName);
 				niopAckMapper.setNiopAckFile(validateParam, "STVL", commonUtil.convertFileDateToUTCDateFormat(fileName.substring(0,24)), "07", ackFileName);
@@ -97,7 +100,7 @@ public class BTVLFileDetailValidation {
 						e.printStackTrace();
 						validateParam.setResponseMsg("Invalid XML file. Please check XML format");
 						log.error("Invalid XML file. Please check XML format");
-						ackFileName = NiopValidationController.cscIdTagNiopAgencyMap.get(validateParam.getToAgency()).getHubId() + "_" + validateParam.getFromAgency() + "_" + fileName.split("[.]")[0] + "_" + "07"
+						ackFileName = NiopValidationController.allCscIdNiopAgencyMap.get(validateParam.getToAgency()).getHubId() + "_" + validateParam.getFromAgency() + "_" + fileName.split("[.]")[0] + "_" + "07"
 								+ "_" + NIOPConstants.BTVL_FILE_TYPE + NIOPConstants.ACK_FILE_EXTENSION;
 						niopAckMapper.setNiopAckFile(validateParam, "STVL", commonUtil.convertFileDateToUTCDateFormat(fileName.substring(0,24)), "07", ackFileName);
 						return false;
@@ -108,7 +111,7 @@ public class BTVLFileDetailValidation {
     			 if(validateParam.getValidateType().equals("header")) {
     				 log.info("Only file name and header validation");
     				 if(headerValidtionFlag) {
-    					 ackFileName = NiopValidationController.cscIdTagNiopAgencyMap.get(validateParam.getFromAgency()).getHubId() + "_" + validateParam.getFromAgency() + "_" + fileName.split("[.]")[0] + "_" + "00"
+    					 ackFileName = NiopValidationController.allCscIdNiopAgencyMap.get(validateParam.getToAgency()).getHubId() + "_" + validateParam.getFromAgency() + "_" + fileName.split("[.]")[0] + "_" + "00"
     								+ "_" + NIOPConstants.BTVL_FILE_TYPE + NIOPConstants.ACK_FILE_EXTENSION;
     					 niopAckMapper.setNiopAckFile(validateParam, "STVL", list.getTvlHeader().getSubmittedDateTime(), "00", ackFileName);
     				 }
@@ -117,12 +120,12 @@ public class BTVLFileDetailValidation {
     			 //start to validate detail records
     			 boolean detailValidtionFlag = detailValidation(list,validateParam,fileName);
     			 if(controller.getErrorMsglist().size()>0 && invalidRecordCount >0) {
-    				 ackFileName = NiopValidationController.cscIdTagNiopAgencyMap.get(validateParam.getFromAgency()).getHubId() + "_" + validateParam.getFromAgency() + "_" + fileName.split("[.]")[0] + "_" + "02"
+    				 ackFileName = NiopValidationController.allCscIdNiopAgencyMap.get(validateParam.getToAgency()).getHubId() + "_" + validateParam.getFromAgency() + "_" + fileName.split("[.]")[0] + "_" + "02"
 								+ "_" + NIOPConstants.BTVL_FILE_TYPE + NIOPConstants.ACK_FILE_EXTENSION;
 						validateParam.setResponseMsg("\t \t <b>ACK file name ::</b> \t "+ackFileName +"\t <b> Invalid detail record count ::</b> \t "+invalidRecordCount);
 						niopAckMapper.setNiopAckFile(validateParam, "STVL", list.getTvlHeader().getSubmittedDateTime(), "02", ackFileName);	
     			 }else {
-    				 ackFileName = NiopValidationController.cscIdTagNiopAgencyMap.get(validateParam.getFromAgency()).getHubId() + "_" + validateParam.getFromAgency() + "_" + fileName.split("[.]")[0] + "_" + "00"
+    				 ackFileName = NiopValidationController.allCscIdNiopAgencyMap.get(validateParam.getToAgency()).getHubId() + "_" + validateParam.getFromAgency() + "_" + fileName.split("[.]")[0] + "_" + "00"
 								+ "_" + NIOPConstants.BTVL_FILE_TYPE + NIOPConstants.ACK_FILE_EXTENSION;
 					 niopAckMapper.setNiopAckFile(validateParam, "STVL", list.getTvlHeader().getSubmittedDateTime(), "00", ackFileName);
     			 }
@@ -146,7 +149,7 @@ public class BTVLFileDetailValidation {
 		//start to validate count of record
 		if(!list.getTvlHeader().getTotalRecordCount().equals(String.valueOf(list.getTvlDetail().get(0).getTvlTagDetails().size()))) {
 			addErrorMsg(HEADER_RECORD_TYPE,"RecordCount"," Invalid Header RecordCount   \t ::"+list.getTvlHeader().getTotalRecordCount()+"\t Detail Count :: \t"+list.getTvlDetail().get(0).getTvlTagDetails().size());
-			String ackFileName = NiopValidationController.cscIdTagNiopAgencyMap.get(validateParam.getFromAgency()).getHubId() + "_" + validateParam.getFromAgency() + "_" + fileName.substring(0,24) + "_" + "01"
+			String ackFileName = NiopValidationController.allCscIdNiopAgencyMap.get(validateParam.getToAgency()).getHubId() + "_" + validateParam.getFromAgency() + "_" + fileName.substring(0,24) + "_" + "01"
 					+ "_" + NIOPConstants.BTVL_FILE_TYPE + NIOPConstants.ACK_FILE_EXTENSION;
 			niopAckMapper.setNiopAckFile(validateParam, "STVL", list.getTvlHeader().getSubmittedDateTime(), "01", ackFileName);
        	 log.error("Header record and detail record count are not matched");
@@ -174,11 +177,11 @@ public class BTVLFileDetailValidation {
 			invalidRecord = true;
 		}
 		
-        if (!pattern.matcher(tvlTagDetails.getTagAgencyId()).matches() //|| !(tvlTagDetails.getTagAgencyId().equals(validateParam.getFromAgency()))  
+        if (!pattern.matcher(tvlTagDetails.getTagAgencyId()).matches() || NiopValidationController.cscIdTagNiopAgencyMap.get(tvlTagDetails.getTagAgencyId()) == null  
         		) {
         	//validateParam.setResponseMsg("Invalid ITAG detail, invalid tag agency ID - "+tagAgencyId +" Row ::"+fileRowData);
         	log.error("Invalid BTVL detail, TagAgencyID - "+tvlTagDetails.getHomeAgencyId() +" TagSerialNumber ::"+tvlTagDetails.getTagSerialNumber());
-        	addErrorMsg(DETAIL_RECORD_TYPE,"Tag Agency ID","Invalid Tag agency ID format \t"+tvlTagDetails.getTagAgencyId() +lineNo);
+        	addErrorMsg(DETAIL_RECORD_TYPE,"Tag Agency ID","Invalid Tag agency ID format or value \t"+tvlTagDetails.getTagAgencyId() +lineNo);
         	invalidRecord=true;
         }
         
@@ -187,6 +190,35 @@ public class BTVLFileDetailValidation {
         	log.error("Invalid BTVL detail, invalid tag serial number - "+tvlTagDetails.getTagSerialNumber());
         	addErrorMsg(DETAIL_RECORD_TYPE,"Tag Serial Number","Invalid Tag serial number format \t"+tvlTagDetails.getTagSerialNumber());
         	invalidRecord=true;
+        }else {
+        	try {
+        		NiopAgencyEntity agEntity = NiopValidationController.cscIdTagNiopAgencyMap.get(tvlTagDetails.getTagAgencyId());
+        		if(agEntity != null) {
+    			long tagSerialNoStart = Long.valueOf(agEntity.getTagSequenceStart());
+    			long tagSerialNoEnd = Long.valueOf(agEntity.getTagSequenceEnd());
+    			long tagSerialNoLong = Long.valueOf(tvlTagDetails.getTagSerialNumber());
+    			log.info("## tagSerialNoLong ::" + tagSerialNoLong + "\t tagSerialNoStart :: " + tagSerialNoStart
+    					+ "\t tagSerialNoEnd ::" + tagSerialNoEnd);
+    			
+    			if (!(tagSerialNoStart < tagSerialNoEnd && tagSerialNoStart <= tagSerialNoLong
+    					&& tagSerialNoEnd >= tagSerialNoLong)) {
+    				log.error("## tagSerialNoLong ::" + tagSerialNoLong + "\t tagSerialNoStart :: " + tagSerialNoStart
+    						+ "\t tagSerialNoEnd ::" + tagSerialNoEnd);
+    				log.error("Invalid Tag Serial Number range   - " + tagSerialNoLong);
+    				addErrorMsg(DETAIL_RECORD_TYPE,"Tag Serial Number", "Invalid TAG_SERIAL_NUMBER range   - " + tvlTagDetails.getTagSerialNumber());
+    				invalidRecord=true;
+    			}
+        		}else {
+        			log.error("Invalid BTVL detail, invalid tag serial number range - "+tvlTagDetails.getTagSerialNumber());
+                	addErrorMsg(DETAIL_RECORD_TYPE,"Tag Serial Number","Invalid Tag serial number Range or Tag Agency ID \t"+tvlTagDetails.getTagSerialNumber());
+        		}
+			} catch (Exception e) {
+				e.printStackTrace();
+				addErrorMsg(DETAIL_RECORD_TYPE,"Tag Serial Number","Invalid Tag Agency ID for TAG_SERIAL_NUMBER range from excel or file  - " + lineNo);
+				//validateParam.setResponseMsg("Invalid TAG_SERIAL_NUMBER format from excel or file  - " + fileRowData);
+				invalidRecord=true;
+			}
+        	
         }
         
         pattern = Pattern.compile(NIOPConstants.BTVL_DTL_TAG_STATUS);
@@ -198,12 +230,12 @@ public class BTVLFileDetailValidation {
         
         //3 discount fields Plans,start date and end date -- need to add 
         
-        pattern = Pattern.compile(NIOPConstants.BTVL_DTL_TAG_STATUS);
+     /*   pattern = Pattern.compile(NIOPConstants.BTVL_DTL_TAG_STATUS);
         if (!pattern.matcher(tvlTagDetails.getTagStatus()).matches()) { 
         	log.error("Invalid BTVL detail, Tag Status - "+tvlTagDetails.getTagStatus()+lineNo);
         	addErrorMsg(DETAIL_RECORD_TYPE,"Tag Status","Invalid Tag Status-"+tvlTagDetails.getTagStatus()+lineNo);
         	invalidRecord=true;
-        }
+        } */
         
         pattern = Pattern.compile(NIOPConstants.BTVL_DTL_TAG_TYPE);
         if (tvlTagDetails.getTagType() != null && !pattern.matcher(tvlTagDetails.getTagType()).matches()) { 
@@ -247,16 +279,25 @@ public class BTVLFileDetailValidation {
                 	invalidRecord=true;
         		}
         		pattern = Pattern.compile(NIOPConstants.UTC_DATE_TIME_FORMAT);
-        		if(tvlPlateDet.getPlateEffectiveFrom() != null && !pattern.matcher(tvlPlateDet.getPlateEffectiveFrom()).matches()) {
-        			log.error("Invalid BTVL detail, License Plate Effective From - "+tvlPlateDet.getPlateEffectiveFrom()+lineNo);
-                	addErrorMsg(DETAIL_RECORD_TYPE,"License Plate Effective From","Invalid License Plate Effective From-"+tvlPlateDet.getPlateEffectiveFrom()+lineNo);
-                	invalidRecord=true;
-        		}
+				if (tvlPlateDet.getPlateEffectiveFrom() != null
+						&& !pattern.matcher(tvlPlateDet.getPlateEffectiveFrom()).matches()) {
+					log.error("Invalid BTVL detail, License Plate Effective From format - "
+							+ tvlPlateDet.getPlateEffectiveFrom() + lineNo);
+					addErrorMsg(DETAIL_RECORD_TYPE, "License Plate Effective From format",
+							"Invalid License Plate Effective From-" + tvlPlateDet.getPlateEffectiveFrom() + lineNo);
+					invalidRecord = true;
+				}else if (!commonUtil.isValidDateTimeInDetail(tvlPlateDet.getPlateEffectiveFrom())) {
+					log.error("Invalid BTVL detail, License Plate Effective From - "
+							+ tvlPlateDet.getPlateEffectiveFrom() + lineNo);
+					addErrorMsg(DETAIL_RECORD_TYPE, "License Plate Effective From",
+							"Invalid License Plate Effective From-" + tvlPlateDet.getPlateEffectiveFrom() + lineNo);
+					invalidRecord = true;
+				}
         		
         		pattern = Pattern.compile(NIOPConstants.UTC_DATE_TIME_FORMAT);
         		if(tvlPlateDet.getPlateEffectiveTo() != null && !pattern.matcher(tvlPlateDet.getPlateEffectiveTo()).matches()) {
-        			log.error("Invalid BTVL detail, License Plate Effective From - "+tvlPlateDet.getPlateEffectiveTo()+lineNo);
-                	addErrorMsg(DETAIL_RECORD_TYPE,"License Plate Effective From","Invalid License Plate Effective From-"+tvlPlateDet.getPlateEffectiveTo()+lineNo);
+        			log.error("Invalid BTVL detail, License Plate Effective To format- "+tvlPlateDet.getPlateEffectiveTo()+lineNo);
+                	addErrorMsg(DETAIL_RECORD_TYPE,"License Plate Effective To","Invalid License Plate Effective To format-"+tvlPlateDet.getPlateEffectiveTo()+lineNo);
                 	invalidRecord=true;
         		}
         		
@@ -306,9 +347,9 @@ public class BTVLFileDetailValidation {
         }
 		
 		if (!tvlHeader.getSSIOPHubIdNumber().matches("\\d{4}")
-				|| NiopValidationController.cscIdTagNiopAgencyMap.get(validateParam.getFromAgency()) == null
+				|| NiopValidationController.allCscIdNiopAgencyMap.get(validateParam.getFromAgency()) == null
 				|| !tvlHeader.getSSIOPHubIdNumber().equals(
-						String.valueOf(NiopValidationController.cscIdTagNiopAgencyMap.get(validateParam.getFromAgency()).getHubId()))) {
+						String.valueOf(NiopValidationController.allCscIdNiopAgencyMap.get(validateParam.getFromAgency()).getHubId()))) {
 			addErrorMsg(HEADER_RECORD_TYPE, "SSIOPHubID",
 					" Invalid SSIOPHUBID   \t ::" + tvlHeader.getSSIOPHubIdNumber());
 			log.error("Header validation failed, Invalid SSIOPHUBID  :: " + tvlHeader.getSSIOPHubIdNumber());
@@ -339,10 +380,9 @@ public class BTVLFileDetailValidation {
             log.error("Header validation failed, Invalid RecordCount  :: " +tvlHeader.getTotalRecordCount());
             invalidHeaderRecord = true;
         }
-		log.info("Detail :: cscIdTagNiopAgencyMap ::"+NiopValidationController.cscIdTagNiopAgencyMap);
         
 		if(invalidHeaderRecord) {
-			String ackFileName = NiopValidationController.cscIdTagNiopAgencyMap.get(validateParam.getFromAgency()).getHubId() + "_" + validateParam.getFromAgency() + "_" + fileName.split("[.]")[0] + "_" + "01"
+			String ackFileName = NiopValidationController.allCscIdNiopAgencyMap.get(validateParam.getToAgency()).getHubId() + "_" + validateParam.getFromAgency() + "_" + fileName.split("[.]")[0] + "_" + "01"
 					+ "_" + NIOPConstants.BTVL_FILE_TYPE + NIOPConstants.ACK_FILE_EXTENSION;
 			niopAckMapper.setNiopAckFile(validateParam, "STVL", commonUtil.convertFileDateToUTCDateFormat(fileName.substring(10,24)), "01", ackFileName);
        	 return false;

@@ -16,7 +16,7 @@ public class NIOPConstants {
 	 public static final String BTVL_DTL_TAG_SERIAL_NO = "\\d{1,10}";
 	 public static final String BTVL_DTL_TAG_STATUS = "[V,Z,I]{1}";
 	 public static final String BTVL_DTL_TAG_TYPE = "[S,L,F,G,T]{1}";
-	 public static final String BTVL_DTL_PLATE_COUNTRY = "[US,CA,MX,-]{1,2}";
+	 public static final String BTVL_DTL_PLATE_COUNTRY = "^(US|CA|MX|-)$";
 	 public static final String BTVL_DTL_PLATE_STATE_FORMAT = "[A-Z]{1,2}";
 	 public static final String BTVL_DTL_PLATE_NUMBER_FORMAT = "[A-Z 0-9]{1,15}";
 	 public static final String BTVL_DTL_PLATE_TYPE_FORMAT = "[A-Z 0-9]{1,30}";

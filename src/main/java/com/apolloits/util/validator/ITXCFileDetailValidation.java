@@ -8,6 +8,8 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -124,6 +126,8 @@ public boolean itxcValidation(FileValidationParam validateParam) throws IOExcept
 					String ackCode="00";
 					String itxcFileNum="";
 					ictxfileValidation.invalidRecordCount = 0;
+					HashSet<String> tagSet = new HashSet<>();
+					HashMap<String, Integer> duplicateTagMap = new HashMap<>();
 					while ((fileRowData = br.readLine()) != null) {
 						log.info(noOfRecords + " :: " + fileRowData);
 						if(noOfRecords == 0) {
@@ -153,7 +157,7 @@ public boolean itxcValidation(FileValidationParam validateParam) throws IOExcept
 							itxcFileNum = fileRowData.substring(48, 60); //ITCX file sequence no for ictxTemplate excel creation
 							itxcTempList = new LinkedList<ITXCTemplate>();
 						}else {
-							if(!validateItxcDetail(fileRowData,validateParam,noOfRecords)) {
+							if(!validateItxcDetail(fileRowData,validateParam,noOfRecords,tagSet,duplicateTagMap)) {
 								//validateParam.setResponseMsg(validateParam.getResponseMsg() +"\t    Line No::"+noOfRecords);
 								iagAckMapper.mapToIagAckFile(fileName, "02", validateParam.getOutputFilePath()+File.separator+ackFileName, fileName.substring(0, 4),validateParam.getToAgency(),validateParam.getVersion());
 								//return false;
@@ -161,6 +165,10 @@ public boolean itxcValidation(FileValidationParam validateParam) throws IOExcept
 								addITXCTemplate(fileRowData.substring(2),itxcFileNum,fileRowData.substring(0, 2)); //This method add ITXCtemplate value in list
 						}
 						noOfRecords++;
+					}
+					log.info("duplicateTagMap ::"+ duplicateTagMap);
+					if (duplicateTagMap.size() > 0) {
+						addErrorMsg(DETAIL_RECORD_TYPE, "ETC_TRX_SERIAL_NUM", " Duplicate <b> ETC_TRX_SERIAL_NUM :: </b>" + duplicateTagMap);
 					}
 					log.info("ictxfileValidation.invalidRecordCount :: = "+ictxfileValidation.invalidRecordCount);
 					if((noOfRecords-1) != headerCount ) {
@@ -240,7 +248,7 @@ private void addITXCTemplate(String fileRowData, String ictxFileNum,String corrR
 
 
 private boolean validateItxcDetail(String fileRowData, FileValidationParam validateParam,
-		long rowNo) {
+		long rowNo,HashSet<String> tagSet,HashMap<String, Integer> duplicateTagMap) {
 	String lineNo = "\t <b> Row ::</b>"+fileRowData +"\t <b>Line No::<b> \t"+rowNo;
 	
 	// Record count 204
@@ -255,7 +263,7 @@ private boolean validateItxcDetail(String fileRowData, FileValidationParam valid
 						+ fileRowData.substring(0, 2) + "\t " + lineNo);
     	ictxfileValidation.invalidRecordCount ++;
     }
-    	ictxfileValidation.validateIctxDetail(fileRowData.substring(2),validateParam,rowNo);
+    	ictxfileValidation.validateIctxDetail(fileRowData.substring(2),validateParam,rowNo,tagSet,duplicateTagMap);
     	
 	return true;
 }

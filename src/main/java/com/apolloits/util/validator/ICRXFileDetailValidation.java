@@ -142,7 +142,7 @@ public class ICRXFileDetailValidation {
 									log.info("Only file name and header validation");
 									return true;
 								}
-								if(!fileRowData.substring(40, 48).matches(IAGConstants.ICTX_FILE_NUM_FORMAT)) {
+								if(!fileRowData.substring(40, 48).matches(IAGConstants.TRAN_RECORD_COUNT_FORMAT)) {
 									return false;
 								}
 								headerCount = Long.parseLong(fileRowData.substring(40, 48));

@@ -12,6 +12,8 @@ import java.io.InputStreamReader;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Arrays;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -132,6 +134,8 @@ public boolean ictxValidation(FileValidationParam validateParam) throws IOExcept
 					long headerCount =0l;
 					String ackCode="00";
 					String ictxFileNum="000000000000";
+					HashSet<String> tagSet = new HashSet<>();
+					HashMap<String, Integer> duplicateTagMap = new HashMap<>();
 					while ((fileRowData = br.readLine()) != null) {
 						log.info(noOfRecords + " :: " + fileRowData);
 						if(noOfRecords == 0) {
@@ -155,7 +159,7 @@ public boolean ictxValidation(FileValidationParam validateParam) throws IOExcept
 							//ictxFileNum = fileRowData.substring(48, 60); //ICTX file sequence no for ictxTemplate excel creation
 							ictxTempList = new LinkedList<ICTXTemplate>();
 						}else {
-							if(!validateIctxDetail(fileRowData,validateParam,noOfRecords)) {
+							if(!validateIctxDetail(fileRowData,validateParam,noOfRecords,tagSet,duplicateTagMap)) {
 								//validateParam.setResponseMsg(validateParam.getResponseMsg() +"\t    Line No::"+noOfRecords);
 								//iagAckMapper.mapToIagAckFile(fileName, "02", validateParam.getOutputFilePath()+File.separator+ackFileName, fileName.substring(0, 4),validateParam.getToAgency());
 								//return false;
@@ -163,6 +167,10 @@ public boolean ictxValidation(FileValidationParam validateParam) throws IOExcept
 							addICTXTemplate(fileRowData,ictxFileNum); //This method add ICTXtemplate value in list
 						}
 						noOfRecords++;
+					}
+					
+					if (duplicateTagMap.size() > 0) {
+						addErrorMsg(DETAIL_RECORD_TYPE, "ETC_TRX_SERIAL_NUM", "<b> ETC_TRX_SERIAL_NUM :: </b>" + duplicateTagMap);
 					}
 					if((noOfRecords-1) != headerCount ) {
 						log.error("Header count("+headerCount+") and detail count not matching ::\t"+noOfRecords);
@@ -181,7 +189,6 @@ public boolean ictxValidation(FileValidationParam validateParam) throws IOExcept
 							invalidRecordCount++;
 						}
 					}
-					
 					log.info("ictxTempList size ::" + ictxTempList.size() +"\t invalidRecordCount = "+invalidRecordCount);
 					String ackcode = "00";
 					if(controller.getErrorMsglist().size()>0 && invalidRecordCount>0) {
@@ -213,6 +220,26 @@ public boolean ictxValidation(FileValidationParam validateParam) throws IOExcept
 		 
 		 return true;
 }
+
+private void validateDuplicateEtcTrxSerialNo(String etcTrxSerialNo, HashSet<String> tagSet,
+		HashMap<String, Integer> duplicateTagMap) {
+
+	log.info("etcTrxSerialNo ::"+etcTrxSerialNo);
+
+	if (!tagSet.add(etcTrxSerialNo)) {
+		if (duplicateTagMap.containsKey(etcTrxSerialNo)) {
+			duplicateTagMap.put(etcTrxSerialNo, duplicateTagMap.get(etcTrxSerialNo).intValue() + 1);
+		} else {
+			duplicateTagMap.put(etcTrxSerialNo, 1);
+		}
+		invalidRecordCount++;
+	}
+	log.info("Duplicate ETC_TRX_SERIAL_NUM Map ::" + duplicateTagMap);
+	log.info("set size :::" + tagSet.size());
+	log.info("Invalid record count ::" + invalidRecordCount);
+
+}
+
 
 /**
  * @author DK
@@ -250,7 +277,7 @@ private void addICTXTemplate(String fileRowData, String ictxFileNum) {
 	}
 }
 
-public boolean validateIctxDetail(String fileRowData, FileValidationParam validateParam, long rowNo) {
+public boolean validateIctxDetail(String fileRowData, FileValidationParam validateParam, long rowNo,HashSet<String> tagSet,HashMap<String, Integer> duplicateTagMap) {
 	boolean invalidRecord = false;
 	String lineNo = "\t <b>Row ::</b>"+fileRowData +"\t <b>Line No::</b>"+rowNo;
 	// If detail record length is not matched. not validating other fields 
@@ -264,6 +291,10 @@ public boolean validateIctxDetail(String fileRowData, FileValidationParam valida
     	invalidRecord = true;
         addErrorMsg(DETAIL_RECORD_TYPE,"ETC_TRX_SERIAL_NUM","Format not matched Values: 00000000000000000000 – 99999999999999999999 ::\t "+fileRowData.substring(0, 20)+"\t "+lineNo);
     }
+    
+	// Check duplicate etc trx serial number
+	validateDuplicateEtcTrxSerialNo(fileRowData.substring(0, 20), tagSet, duplicateTagMap);
+    
 	
 	// ETC_REVENUE_DATE CHAR(8) Format: YYYYMMDD
 	if (!fileRowData.substring(20, 28).matches("\\d{8}")) {
@@ -414,9 +445,9 @@ public boolean validateIctxDetail(String fileRowData, FileValidationParam valida
 	//System.out.println("LIC_State and type ::"+agDataExcel.getPlateStateTypeSet().toString()); 
 	if(!etcLicType.matches("[\\*]{30}") &&
 			!agDataExcel.getPlateStateTypeSet().contains(licStateType)) {
-		log.error("Invalid LicStateType detail,Please check your State and plateType Configuration - invalid Lic_Type - "+etcLicType +" Row ::"+fileRowData+ lineNo);
+		log.error("Invalid LicStateType detail,Please check your State and plateType Configuration - invalid Lic_Type - "+etcLicType + lineNo);
 		//validateParam.setResponseMsg("Invalid ICLP detail,Please check your State and plateType Configuration - invalid Lic_Type - "+licType +" Row ::"+fileRowData+ lineNo);
-		controller.getErrorMsglist().add(new ErrorMsgDetail(DETAIL_RECORD_TYPE,"LicStateType","Invalid Lic_Type - "+etcLicType +" Row ::"+fileRowData+ lineNo));
+		controller.getErrorMsglist().add(new ErrorMsgDetail(DETAIL_RECORD_TYPE,"ETC_LIC_TYPE","Invalid Lic_Type - "+etcLicType + lineNo));
 		invalidRecord = true;
 	}
     
@@ -490,6 +521,7 @@ public boolean validateIctxDetail(String fileRowData, FileValidationParam valida
         addErrorMsg(DETAIL_RECORD_TYPE, "ETC_TOLL_AMOUNT",
 				" Values: 000000000 ($0000000.00) – 000499999 ($0004999.99). \t  Invalid Format  \t ::"+ fileRowData.substring(192, 201) + "\t " + lineNo);
     }
+    
     if(invalidRecord) {
     	invalidRecordCount++;
     }

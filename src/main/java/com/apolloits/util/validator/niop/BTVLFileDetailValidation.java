@@ -310,7 +310,7 @@ public class BTVLFileDetailValidation {
 					addErrorMsg(DETAIL_RECORD_TYPE, "License Plate Effective From format",
 							"Invalid License Plate Effective From-" + tvlPlateDet.getPlateEffectiveFrom() + lineNo);
 					invalidRecord = true;
-				}else if (!commonUtil.isValidDateTimeInDetail(tvlPlateDet.getPlateEffectiveFrom())) {
+				}else if (tvlPlateDet.getPlateEffectiveTo() != null && !commonUtil.isValidDateTimeInDetail(tvlPlateDet.getPlateEffectiveFrom())) {
 					log.error("Invalid BTVL detail, License Plate Effective From - "
 							+ tvlPlateDet.getPlateEffectiveFrom() + lineNo);
 					addErrorMsg(DETAIL_RECORD_TYPE, "License Plate Effective From",
@@ -323,7 +323,7 @@ public class BTVLFileDetailValidation {
         			log.error("Invalid BTVL detail, License Plate Effective To format- "+tvlPlateDet.getPlateEffectiveTo()+lineNo);
                 	addErrorMsg(DETAIL_RECORD_TYPE,"License Plate Effective To","Invalid License Plate Effective To format-"+tvlPlateDet.getPlateEffectiveTo()+lineNo);
                 	invalidRecord=true;
-        		}else if (!commonUtil.isValidDateTimeInDetail(tvlPlateDet.getPlateEffectiveTo())) {
+        		}else if (tvlPlateDet.getPlateEffectiveTo() != null && !commonUtil.isValidDateTimeInDetail(tvlPlateDet.getPlateEffectiveTo())) {
 					log.error("Invalid BTVL detail, License Plate Effective To - "
 							+ tvlPlateDet.getPlateEffectiveTo() + lineNo);
 					addErrorMsg(DETAIL_RECORD_TYPE, "License Plate Effective To",

@@ -179,7 +179,7 @@ private static AgencyDataExcelReader appConfig;
 	public boolean validateNiopBtvlFileName(String fileName,FileValidationParam validateParam) {
 		boolean zipNameValidation = false;
 		String[] fileParams = fileName.split("[_.]");
-		if (fileName != null && fileName.matches(NIOPConstants.BTVL_FILE_NAME_FORMAT)) {
+		if (fileName != null && fileName.matches("\\d{4}_\\d{4}_\\d{14}\\.(?i)"+validateParam.getFileType())) {
 			System.out.println("validateNiopZIPFileName() ::  fileParams ::"+Arrays.toString(fileParams) +"\t fileParams[0] "+fileParams[0] +"\t HUBID"+NiopValidationController.allCscIdNiopAgencyMap.get(validateParam.getToAgency()).getHubId());
 			if(fileParams[1].equals(validateParam.getFromAgency()) && fileParams[0].equals(String.valueOf(NiopValidationController.allCscIdNiopAgencyMap.get(validateParam.getToAgency()).getHubId())) && isValidDateTime(fileParams[2]) ) {
 				zipNameValidation =true;
@@ -188,7 +188,7 @@ private static AgencyDataExcelReader appConfig;
 		if(!zipNameValidation) {
 			//Create ACK file name
 			String ackfilename = NiopValidationController.allCscIdNiopAgencyMap.get(validateParam.getToAgency()).getHubId() + "_" + validateParam.getFromAgency() + "_" + fileName.substring(0,24) + "_"
-                    +"07" + "_" + NIOPConstants.BTVL_FILE_TYPE + NIOPConstants.ACK_FILE_EXTENSION;
+                    +"07" + "_" + validateParam.getFileType() + NIOPConstants.ACK_FILE_EXTENSION;
 			log.info("ACK File Name ::"+ackfilename);
 			niopAckMapper.setNiopAckFile(validateParam, "STVL", convertFileDateToUTCDateFormat(fileParams[2]), "07", ackfilename);
 			validateParam.setResponseMsg("File name validation failed");
@@ -197,10 +197,10 @@ private static AgencyDataExcelReader appConfig;
 	}
 	
 	
-	public boolean validateNiopBtvlZIPFileName(String fileName,FileValidationParam validateParam) {
+	public boolean validateNiopTvlZIPFileName(String fileName,FileValidationParam validateParam) {
 		boolean zipNameValidation = false;
 		String[] fileParams = fileName.split("[_.]");
-		if (fileName != null && fileName.matches(NIOPConstants.BTVL_ZIP_FILE_NAME_FORMAT)) {
+		if (fileName != null && fileName.matches("\\d{4}_\\d{4}_\\d{14}\\_"+validateParam.getFileType()+"\\.(?i)zip")) {
 			System.out.println("validateNiopZIPFileName() ::  fileParams ::"+Arrays.toString(fileParams) +"\t fileParams[1] "+fileParams[0] +"\t HUBID"+NiopValidationController.allCscIdNiopAgencyMap.get(validateParam.getToAgency()).getHubId());
 			if(fileParams[1].equals(validateParam.getFromAgency()) && fileParams[0].equals(String.valueOf(NiopValidationController.allCscIdNiopAgencyMap.get(validateParam.getToAgency()).getHubId())) && isValidDateTime(fileParams[2]) ) {
 				zipNameValidation =true;
@@ -209,7 +209,7 @@ private static AgencyDataExcelReader appConfig;
 		if(!zipNameValidation) {
 			//Create ACK file name
 			String ackfilename = NiopValidationController.allCscIdNiopAgencyMap.get(validateParam.getToAgency()).getHubId() + "_" + validateParam.getFromAgency() + "_" + fileName.substring(0,24) + "_"
-                    +"07" + "_" + NIOPConstants.BTVL_FILE_TYPE + NIOPConstants.ACK_FILE_EXTENSION;
+                    +"07" + "_" + validateParam.getFileType() + NIOPConstants.ACK_FILE_EXTENSION;
 			log.info("ACK File Name ::"+ackfilename);
 			niopAckMapper.setNiopAckFile(validateParam, "STVL", convertFileDateToUTCDateFormat(fileParams[2]), "07", ackfilename);
 			validateParam.setResponseMsg("ZIP File name validation failed");

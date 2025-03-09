@@ -3,6 +3,7 @@ package com.apolloits.util;
 public class NIOPConstants {
 
 	 public static final String BTVL_FILE_TYPE = "BTVL";
+	 public static final String DTVL_FILE_TYPE = "DTVL";
 	 
 	 public static final String BTVL_FILE_EXTENSION = ".BTVL";
 	 public static final String ACK_FILE_EXTENSION = ".ACK";
@@ -22,4 +23,5 @@ public class NIOPConstants {
 	 public static final String BTVL_DTL_PLATE_TYPE_FORMAT = "[A-Z 0-9]{1,30}";
 	 public static final String BTVL_DTL_FLEET_INDICATOR_FORMAT = "[Y,N]{1}";
 	 public static final String BTVL_DTL_ACCOUNT_NUMBER_FORMAT = "[A-Z 0-9]{1,50}";
+	 public static final String BTVL_DTL_DISCOUNT_PLAN_FORMAT = "[A-Z 0-9]{1,12}";
 }

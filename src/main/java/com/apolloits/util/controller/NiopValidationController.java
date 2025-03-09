@@ -97,9 +97,18 @@ public class NiopValidationController {
 		}
 		boolean fileValidation = false ;
 		validateParam.setResponseMsg("\t Contact Administrator");
-		if(validateParam.getFileType().equals(NIOPConstants.BTVL_FILE_TYPE)) {
-			fileValidation = btvlValidation.btvlValidation(validateParam);
-			}
+		/*if(validateParam.getFileType().equals(NIOPConstants.BTVL_FILE_TYPE) || validateParam.getFileType().equals(NIOPConstants.DTVL_FILE_TYPE)) {
+			fileValidation = btvlValidation.btvlValidation(validateParam,validateParam.getFileType());
+			}*/
+		
+		switch (validateParam.getFileType()) {
+		case NIOPConstants.BTVL_FILE_TYPE:
+		case NIOPConstants.DTVL_FILE_TYPE:
+			fileValidation = btvlValidation.btvlValidation(validateParam, validateParam.getFileType());
+			break;
+		default:
+			validateParam.setResponseMsg("\t Please select correct file type");
+		}
 		
 		log.info("getResponseMsg ::"+validateParam.getResponseMsg() +"\t fileValidation ::"+fileValidation);
 		
@@ -145,7 +154,7 @@ public class NiopValidationController {
 			File inputItagZipFile = new File(validateParam.getInputFilePath());
 			if (!inputItagZipFile.exists()) {
 				errorMsglist.add(new ErrorMsgDetail(FILE_RECORD_TYPE,"File","Input file not Found"));
-				 //validateParam.setResponseMsg("FAILED Reason::  ZIP file not found");
+				 validateParam.setResponseMsg("FAILED Reason::  ZIP file not found");
 				 log.error("FAILED Reason::  ZIP file not found");
 				 return false;
 	         }

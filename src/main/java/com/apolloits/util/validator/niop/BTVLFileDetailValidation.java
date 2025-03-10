@@ -2,7 +2,7 @@ package com.apolloits.util.validator.niop;
 
 import static com.apolloits.util.IAGConstants.DETAIL_RECORD_TYPE;
 import static com.apolloits.util.IAGConstants.HEADER_RECORD_TYPE;
-
+import static com.apolloits.util.IAGConstants.FILE_RECORD_TYPE;
 import java.io.File;
 import java.io.IOException;
 import java.util.List;
@@ -71,10 +71,10 @@ public class BTVLFileDetailValidation {
 				
 			} catch (ZipException e) {
 				e.printStackTrace();
-				ackFileName = NiopValidationController.allCscIdNiopAgencyMap.get(validateParam.getToAgency()).getHubId() + "_" + validateParam.getFromAgency() + "_" + fileName.split("[.]")[0] + "_" + "07"
+				ackFileName = NiopValidationController.allCscIdNiopAgencyMap.get(validateParam.getToAgency()).getHubId() + "_" + validateParam.getToAgency() + "_" + fileName.split("[.]")[0] + "_" + "07"
 						+ "_" + tvlType + NIOPConstants.ACK_FILE_EXTENSION;
 				log.info("ACK File Name ::" + ackFileName);
-				niopAckMapper.setNiopAckFile(validateParam, "STVL", commonUtil.convertFileDateToUTCDateFormat(fileName.substring(0,24)), "07", ackFileName);
+				niopAckMapper.setNiopAckFile(validateParam, "STVL", commonUtil.convertFileDateToUTCDateFormat(fileName.substring(10,24)), "07", ackFileName);
 				 validateParam.setResponseMsg("FAILED Reason:: ZIP file extraction failed");
         		 return false;
 			}
@@ -95,9 +95,11 @@ public class BTVLFileDetailValidation {
 						e.printStackTrace();
 						validateParam.setResponseMsg("Invalid XML file. Please check XML format");
 						log.error("Invalid XML file. Please check XML format");
-						ackFileName = NiopValidationController.allCscIdNiopAgencyMap.get(validateParam.getToAgency()).getHubId() + "_" + validateParam.getFromAgency() + "_" + fileName.split("[.]")[0] + "_" + "07"
+						ackFileName = NiopValidationController.allCscIdNiopAgencyMap.get(validateParam.getToAgency()).getHubId() + "_" + validateParam.getToAgency() + "_" + fileName.split("[.]")[0] + "_" + "07"
 								+ "_" + tvlType + NIOPConstants.ACK_FILE_EXTENSION;
-						niopAckMapper.setNiopAckFile(validateParam, "STVL", commonUtil.convertFileDateToUTCDateFormat(fileName.substring(0,24)), "07", ackFileName);
+						addErrorMsg(FILE_RECORD_TYPE,"Format"," Invalid XML format   ");						
+						niopAckMapper.setNiopAckFile(validateParam, "STVL", commonUtil.convertFileDateToUTCDateFormat(fileName.substring(10,24)), "07", ackFileName);
+						
 						return false;
 					}
     			 
@@ -106,7 +108,7 @@ public class BTVLFileDetailValidation {
     			 if(validateParam.getValidateType().equals("header")) {
     				 log.info("Only file name and header validation");
     				 if(headerValidtionFlag) {
-    					 ackFileName = NiopValidationController.allCscIdNiopAgencyMap.get(validateParam.getToAgency()).getHubId() + "_" + validateParam.getFromAgency() + "_" + fileName.split("[.]")[0] + "_" + "00"
+    					 ackFileName = NiopValidationController.allCscIdNiopAgencyMap.get(validateParam.getToAgency()).getHubId() + "_" + validateParam.getToAgency() + "_" + fileName.split("[.]")[0] + "_" + "00"
     								+ "_" + tvlType + NIOPConstants.ACK_FILE_EXTENSION;
     					 niopAckMapper.setNiopAckFile(validateParam, "STVL", list.getTvlHeader().getSubmittedDateTime(), "00", ackFileName);
     				 }
@@ -115,12 +117,12 @@ public class BTVLFileDetailValidation {
     			 //start to validate detail records
     			 boolean detailValidtionFlag = detailValidation(list,validateParam,fileName);
     			 if(controller.getErrorMsglist().size()>0 && invalidRecordCount >0) {
-    				 ackFileName = NiopValidationController.allCscIdNiopAgencyMap.get(validateParam.getToAgency()).getHubId() + "_" + validateParam.getFromAgency() + "_" + fileName.split("[.]")[0] + "_" + "02"
+    				 ackFileName = NiopValidationController.allCscIdNiopAgencyMap.get(validateParam.getToAgency()).getHubId() + "_" + validateParam.getToAgency() + "_" + fileName.split("[.]")[0] + "_" + "02"
 								+ "_" + tvlType + NIOPConstants.ACK_FILE_EXTENSION;
 						validateParam.setResponseMsg("\t \t <b>ACK file name ::</b> \t "+ackFileName +"\t <b> Invalid detail record count ::</b> \t "+invalidRecordCount);
 						niopAckMapper.setNiopAckFile(validateParam, "STVL", list.getTvlHeader().getSubmittedDateTime(), "02", ackFileName);	
     			 }else if(controller.getErrorMsglist().size() == 0 && invalidRecordCount == 0) {
-    				 ackFileName = NiopValidationController.allCscIdNiopAgencyMap.get(validateParam.getToAgency()).getHubId() + "_" + validateParam.getFromAgency() + "_" + fileName.split("[.]")[0] + "_" + "00"
+    				 ackFileName = NiopValidationController.allCscIdNiopAgencyMap.get(validateParam.getToAgency()).getHubId() + "_" + validateParam.getToAgency() + "_" + fileName.split("[.]")[0] + "_" + "00"
 								+ "_" + tvlType + NIOPConstants.ACK_FILE_EXTENSION;
 					 niopAckMapper.setNiopAckFile(validateParam, "STVL", list.getTvlHeader().getSubmittedDateTime(), "00", ackFileName);
 					 //validateParam.setResponseMsg("\t <b>ACK file Name :</b>"+ackFileName);
@@ -144,7 +146,7 @@ public class BTVLFileDetailValidation {
 		//start to validate count of record
 		if(!list.getTvlHeader().getTotalRecordCount().equals(String.valueOf(list.getTvlDetail().get(0).getTvlTagDetails().size()))) {
 			addErrorMsg(HEADER_RECORD_TYPE,"RecordCount"," Invalid Header RecordCount   \t ::"+list.getTvlHeader().getTotalRecordCount()+"\t Detail Count :: \t"+list.getTvlDetail().get(0).getTvlTagDetails().size());
-			String ackFileName = NiopValidationController.allCscIdNiopAgencyMap.get(validateParam.getToAgency()).getHubId() + "_" + validateParam.getFromAgency() + "_" + fileName.substring(0,24) + "_" + "01"
+			String ackFileName = NiopValidationController.allCscIdNiopAgencyMap.get(validateParam.getToAgency()).getHubId() + "_" + validateParam.getToAgency() + "_" + fileName.substring(0,24) + "_" + "01"
 					+ "_" + NIOPConstants.BTVL_FILE_TYPE + NIOPConstants.ACK_FILE_EXTENSION;
 			niopAckMapper.setNiopAckFile(validateParam, "STVL", list.getTvlHeader().getSubmittedDateTime(), "01", ackFileName);
        	 log.error("Header record and detail record count are not matched");
@@ -370,7 +372,7 @@ public class BTVLFileDetailValidation {
         	invalidHeaderRecord = true;
         }
 		
-		if (!(tvlHeader.getSubmittedDateTime().length() == 20) &&
+		if (!(tvlHeader.getSubmittedDateTime().length() == 20) ||
                 !(tvlHeader.getSubmittedDateTime().matches("\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}Z"))) {
         	addErrorMsg(HEADER_RECORD_TYPE,"SubmissionDateTime"," Invalid SubmissionDateTime   \t ::"+tvlHeader.getSubmittedDateTime());
         	log.error("Invalid SubmissionDateTime   \t ::"+tvlHeader.getSubmittedDateTime());
@@ -420,7 +422,7 @@ public class BTVLFileDetailValidation {
         }
         
 		if(invalidHeaderRecord) {
-			String ackFileName = NiopValidationController.allCscIdNiopAgencyMap.get(validateParam.getToAgency()).getHubId() + "_" + validateParam.getFromAgency() + "_" + fileName.split("[.]")[0] + "_" + "07"
+			String ackFileName = NiopValidationController.allCscIdNiopAgencyMap.get(validateParam.getToAgency()).getHubId() + "_" + validateParam.getToAgency() + "_" + fileName.split("[.]")[0] + "_" + "07"
 					+ "_" + NIOPConstants.BTVL_FILE_TYPE + NIOPConstants.ACK_FILE_EXTENSION;
 			niopAckMapper.setNiopAckFile(validateParam, "STVL", commonUtil.convertFileDateToUTCDateFormat(fileName.substring(10,24)), "07", ackFileName);
        	 return false;

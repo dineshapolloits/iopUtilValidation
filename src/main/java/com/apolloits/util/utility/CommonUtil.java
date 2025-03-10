@@ -161,7 +161,8 @@ private static AgencyDataExcelReader appConfig;
 		// Subtract one day to get the previous date
 		LocalDateTime previousDate = currentDate.minusDays(1);
 		System.out.println("Previous: " + previousDate.toString()+"Z");
-		String zipFileName = "-1";
+		String zipFileName = "2025-03-06T01:02:09T";
+		System.out.println("Date Regx::"+zipFileName.matches("\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}Z"));
 	}
 	
 	public String convertFileDateToUTCDateFormat(String inputDate) {
@@ -187,7 +188,7 @@ private static AgencyDataExcelReader appConfig;
 		}
 		if(!zipNameValidation) {
 			//Create ACK file name
-			String ackfilename = NiopValidationController.allCscIdNiopAgencyMap.get(validateParam.getToAgency()).getHubId() + "_" + validateParam.getFromAgency() + "_" + fileName.substring(0,24) + "_"
+			String ackfilename = NiopValidationController.allCscIdNiopAgencyMap.get(validateParam.getToAgency()).getHubId() + "_" + validateParam.getToAgency() + "_" + fileName.substring(0,24) + "_"
                     +"07" + "_" + validateParam.getFileType() + NIOPConstants.ACK_FILE_EXTENSION;
 			log.info("ACK File Name ::"+ackfilename);
 			niopAckMapper.setNiopAckFile(validateParam, "STVL", convertFileDateToUTCDateFormat(fileParams[2]), "07", ackfilename);
@@ -208,7 +209,7 @@ private static AgencyDataExcelReader appConfig;
 		}
 		if(!zipNameValidation) {
 			//Create ACK file name
-			String ackfilename = NiopValidationController.allCscIdNiopAgencyMap.get(validateParam.getToAgency()).getHubId() + "_" + validateParam.getFromAgency() + "_" + fileName.substring(0,24) + "_"
+			String ackfilename = NiopValidationController.allCscIdNiopAgencyMap.get(validateParam.getToAgency()).getHubId() + "_" + validateParam.getToAgency() + "_" + fileName.substring(0,24) + "_"
                     +"07" + "_" + validateParam.getFileType() + NIOPConstants.ACK_FILE_EXTENSION;
 			log.info("ACK File Name ::"+ackfilename);
 			niopAckMapper.setNiopAckFile(validateParam, "STVL", convertFileDateToUTCDateFormat(fileParams[2]), "07", ackfilename);

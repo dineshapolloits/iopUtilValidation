@@ -24,6 +24,7 @@ import com.apolloits.util.reader.AgencyDataExcelReader;
 import com.apolloits.util.service.DatabaseLogger;
 import com.apolloits.util.utility.CommonUtil;
 import com.apolloits.util.validator.niop.BTVLFileDetailValidation;
+import com.apolloits.util.validator.niop.STRANFileDetailValidation;
 import com.apolloits.util.writer.ExceptionListExcelWriter;
 
 import jakarta.servlet.http.HttpSession;
@@ -56,6 +57,9 @@ public class NiopValidationController {
 	
 	@Autowired
 	BTVLFileDetailValidation btvlValidation;
+	
+	@Autowired
+	STRANFileDetailValidation stranValidation;
 	
 	@GetMapping("/NiopAgencyList")
 	public String loadNiopUtilPage(Model model,HttpSession session) {
@@ -106,6 +110,9 @@ public class NiopValidationController {
 		case NIOPConstants.DTVL_FILE_TYPE:
 			fileValidation = btvlValidation.btvlValidation(validateParam, validateParam.getFileType());
 			break;
+		case NIOPConstants.STRAN_FILE_TYPE:
+			fileValidation = stranValidation.starnValidation(validateParam);
+			break;
 		default:
 			validateParam.setResponseMsg("\t Please select correct file type");
 		}
@@ -115,6 +122,7 @@ public class NiopValidationController {
 		if(!fileValidation || errorMsglist.size()>0) {
 			model.addAttribute("result", "<b>Failed \t</b>"+validateParam.getResponseMsg());
 			model.addAttribute("errorMsgList",errorMsglist);
+			if(errorMsglist.size()>0) {
 			File testObj = new File(validateParam.getInputFilePath());
 			String exceptionFileName;
 			String fileNameWithOutExt = FilenameUtils.removeExtension(testObj.getName());
@@ -127,6 +135,7 @@ public class NiopValidationController {
 				exceptionFileName = validateParam.getOutputFilePath() + File.separator + " ACK_exception_.xls";
 			}
 			exListExcelWriter.createExceptionExcel(errorMsglist, exceptionFileName);
+		}
 		}else {
 			model.addAttribute("result", "Success");
 		}

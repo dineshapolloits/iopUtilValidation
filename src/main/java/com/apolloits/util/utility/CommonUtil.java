@@ -161,9 +161,65 @@ private static AgencyDataExcelReader appConfig;
 		// Subtract one day to get the previous date
 		LocalDateTime previousDate = currentDate.minusDays(1);
 		System.out.println("Previous: " + previousDate.toString()+"Z");
-		String zipFileName = "2025-03-06T01:02:09T";
-		System.out.println("Date Regx::"+zipFileName.matches("\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}Z"));
+		String zipFileName = "9003_0034_0033_20241022020004.SCORR";
+		String[] fileParams = zipFileName.split("[_.]");
+		System.out.println("fileParams ::"+Arrays.toString(fileParams) );
+		System.out.println(zipFileName.substring(15,29)); //9003_0034_9003_0034_0033_20241022020004_00_STRAN.ACK
+		System.out.println("Date Regx::"+zipFileName.matches("\\d{4}_\\d{4}_\\d{4}_\\d{14}\\.STRAN"));
 	}
+	
+	public boolean validateNiopTranFileName(String fileName,FileValidationParam validateParam) {
+		boolean zipNameValidation = false;
+		String[] fileParams = fileName.split("[_.]");
+		if (fileName != null && fileName.matches("\\d{4}_\\d{4}_\\d{4}_\\d{14}\\."+validateParam.getFileType())) {
+			System.out.println("validateNiopTranFileName() ::  fileParams ::"+Arrays.toString(fileParams) +"\t fileParams[0] "+fileParams[0] +"\t HUBID"+NiopValidationController.allCscIdNiopAgencyMap.get(validateParam.getToAgency()).getHubId());
+			if (fileParams[1].equals(validateParam.getFromAgency())
+					&& fileParams[2].equals(validateParam.getToAgency())
+					&& fileParams[0].equals(String.valueOf(
+							NiopValidationController.allCscIdNiopAgencyMap.get(validateParam.getToAgency()).getHubId()))
+					&& isValidDateTime(fileParams[3])) {
+				zipNameValidation = true;
+			}
+		}
+		if(!zipNameValidation) {
+			//Create ACK file name
+			String ackfilename = NiopValidationController.allCscIdNiopAgencyMap.get(validateParam.getToAgency()).getHubId() + "_" + validateParam.getToAgency() + "_" + fileName.substring(0,29) + "_"
+                    +"07" + "_" + validateParam.getFileType() + NIOPConstants.ACK_FILE_EXTENSION;
+			log.info("ACK File Name ::"+ackfilename);
+			niopAckMapper.setNiopAckFile(validateParam, validateParam.getFileType(), convertFileDateToUTCDateFormat(fileParams[3]), "07", ackfilename);
+			validateParam.setResponseMsg("File name validation failed");
+		}
+		return zipNameValidation;
+	}
+	
+	
+	public boolean validateNiopTranZIPFileName(String zipFileName,FileValidationParam validateParam) {
+		boolean zipNameValidation = false;
+		String[] fileParams = zipFileName.split("[_.]");
+		if (zipFileName != null && zipFileName
+				.matches("\\d{4}_\\d{4}_\\d{4}_\\d{14}\\_" + validateParam.getFileType() + "\\.(?i)zip")) {
+			System.out.println("validateNiopZIPFileName() ::  fileParams ::" + Arrays.toString(fileParams)
+					+ "\t fileParams[1] " + fileParams[0] + "\t HUBID"
+					+ NiopValidationController.allCscIdNiopAgencyMap.get(validateParam.getToAgency()).getHubId());
+			if (fileParams[1].equals(validateParam.getFromAgency())
+					&& fileParams[2].equals(validateParam.getToAgency())
+					&& fileParams[0].equals(String.valueOf(
+							NiopValidationController.allCscIdNiopAgencyMap.get(validateParam.getToAgency()).getHubId()))
+					&& isValidDateTime(fileParams[3])) {
+				zipNameValidation = true;
+			}
+		}
+		if(!zipNameValidation) {
+			//Create ACK file name
+			String ackfilename = NiopValidationController.allCscIdNiopAgencyMap.get(validateParam.getToAgency()).getHubId() + "_" + validateParam.getToAgency() + "_" + zipFileName.substring(0,29) + "_"
+                    +"07" + "_" + validateParam.getFileType() + NIOPConstants.ACK_FILE_EXTENSION;
+			log.info("ACK File Name ::"+ackfilename);
+			niopAckMapper.setNiopAckFile(validateParam, validateParam.getFileType(), convertFileDateToUTCDateFormat(fileParams[3]), "07", ackfilename);
+			validateParam.setResponseMsg("ZIP File name validation failed");
+		}
+		return zipNameValidation;
+	}
+	
 	
 	public String convertFileDateToUTCDateFormat(String inputDate) {
         // Define the input and output formats

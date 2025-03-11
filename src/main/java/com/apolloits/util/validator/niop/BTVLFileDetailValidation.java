@@ -137,7 +137,7 @@ public class BTVLFileDetailValidation {
 		 }
        
          long end = System.currentTimeMillis();
- 		System.out.println((end - start) / 1000f + " seconds");
+         log.info("File processing time :: "+(end - start) / 1000f + " seconds");
 		return true;
 	}
 
@@ -147,7 +147,7 @@ public class BTVLFileDetailValidation {
 		if(!list.getTvlHeader().getTotalRecordCount().equals(String.valueOf(list.getTvlDetail().get(0).getTvlTagDetails().size()))) {
 			addErrorMsg(HEADER_RECORD_TYPE,"RecordCount"," Invalid Header RecordCount   \t ::"+list.getTvlHeader().getTotalRecordCount()+"\t Detail Count :: \t"+list.getTvlDetail().get(0).getTvlTagDetails().size());
 			String ackFileName = NiopValidationController.allCscIdNiopAgencyMap.get(validateParam.getToAgency()).getHubId() + "_" + validateParam.getToAgency() + "_" + fileName.substring(0,24) + "_" + "01"
-					+ "_" + NIOPConstants.BTVL_FILE_TYPE + NIOPConstants.ACK_FILE_EXTENSION;
+					+ "_" + validateParam.getFileType() + NIOPConstants.ACK_FILE_EXTENSION;
 			niopAckMapper.setNiopAckFile(validateParam, "STVL", list.getTvlHeader().getSubmittedDateTime(), "01", ackFileName);
        	 log.error("Header record and detail record count are not matched");
 			return false;
@@ -379,7 +379,7 @@ public class BTVLFileDetailValidation {
         	invalidHeaderRecord = true;
         }
 		
-		if (!tvlHeader.getSSIOPHubIdNumber().matches("\\d{4}")
+		if (!tvlHeader.getSSIOPHubIdNumber().matches(NIOPConstants.AGENCY_ID_FORMAT)
 				|| NiopValidationController.allCscIdNiopAgencyMap.get(validateParam.getFromAgency()) == null
 				|| !tvlHeader.getSSIOPHubIdNumber().equals(
 						String.valueOf(NiopValidationController.allCscIdNiopAgencyMap.get(validateParam.getFromAgency()).getHubId()))) {
@@ -389,7 +389,7 @@ public class BTVLFileDetailValidation {
 			invalidHeaderRecord = true;
 		}
 		
-		if(!tvlHeader.getHomeAgencyIdNumber().matches("\\d{4}") || !tvlHeader.getHomeAgencyIdNumber().equals(validateParam.getFromAgency())){
+		if(!tvlHeader.getHomeAgencyIdNumber().matches(NIOPConstants.AGENCY_ID_FORMAT) || !tvlHeader.getHomeAgencyIdNumber().equals(validateParam.getFromAgency())){
 			addErrorMsg(HEADER_RECORD_TYPE,"HomeAgencyID"," Invalid HomeAgencyID   \t ::"+tvlHeader.getHomeAgencyIdNumber());
             log.error("Header validation failed, Invalid HomeAgencyID  :: " +tvlHeader.getHomeAgencyIdNumber());
             invalidHeaderRecord = true;
@@ -415,7 +415,7 @@ public class BTVLFileDetailValidation {
             invalidHeaderRecord = true;
         }
 		
-		if(!tvlHeader.getTotalRecordCount().matches("\\d{1,10}")){
+		if(!tvlHeader.getTotalRecordCount().matches(NIOPConstants.TXN_RECORD_COUNT_FORMAT)){
 			addErrorMsg(HEADER_RECORD_TYPE,"RecordCount"," Invalid RecordCount   \t ::"+tvlHeader.getTotalRecordCount());
             log.error("Header validation failed, Invalid RecordCount  :: " +tvlHeader.getTotalRecordCount());
             invalidHeaderRecord = true;
@@ -423,7 +423,7 @@ public class BTVLFileDetailValidation {
         
 		if(invalidHeaderRecord) {
 			String ackFileName = NiopValidationController.allCscIdNiopAgencyMap.get(validateParam.getToAgency()).getHubId() + "_" + validateParam.getToAgency() + "_" + fileName.split("[.]")[0] + "_" + "07"
-					+ "_" + NIOPConstants.BTVL_FILE_TYPE + NIOPConstants.ACK_FILE_EXTENSION;
+					+ "_" + validateParam.getFileType() + NIOPConstants.ACK_FILE_EXTENSION;
 			niopAckMapper.setNiopAckFile(validateParam, "STVL", commonUtil.convertFileDateToUTCDateFormat(fileName.substring(10,24)), "07", ackFileName);
        	 return false;
         }

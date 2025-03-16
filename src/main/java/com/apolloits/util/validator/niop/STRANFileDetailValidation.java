@@ -503,6 +503,16 @@ public class STRANFileDetailValidation {
 					"Invalid Exit Date/Time w/TZ - " + transactionRecord.getExitDateTimeTZ() + lineNo);
 			invalidRecord = true;
 		}
+		
+		//Entry Date/Time w/TZ
+		pattern = Pattern.compile(NIOPConstants.TXN_UTC_TIME_ZONE_FORMAT);
+		if(transactionRecord.getEntryDateTimeTZ() !=null && !pattern.matcher(transactionRecord.getEntryDateTimeTZ()).matches()) {
+			log.error("Invalid STRAN detail, Entry Date/Time w/TZ - " + transactionRecord.getEntryDateTimeTZ() + lineNo);
+			addErrorMsg(DETAIL_RECORD_TYPE, "Entry Date/Time w/TZ",
+					"Invalid Entry Date/Time w/TZ - " + transactionRecord.getEntryDateTimeTZ() + lineNo);
+			invalidRecord = true;
+		}
+		
 		if(invalidRecord) {
 			transactionRecord.setPostingDisposition("T");
 			invalidRecordCount++;

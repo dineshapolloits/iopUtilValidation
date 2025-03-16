@@ -6,6 +6,8 @@ import static com.apolloits.util.IAGConstants.HEADER_RECORD_TYPE;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.regex.Pattern;
 
@@ -174,14 +176,40 @@ public class SRECONFileDetailValidation {
        	 	log.error("Header record and detail record count are not matched");
 			return false;
 		}
-		
+		HashSet<String> trxSerialIdSet = new HashSet<>();
+		HashMap<String, Integer> duplicateTrxSerialIdMap = new HashMap<>();
 		List<ReconciliationRecord> reconRecord = reconData.getReconciliationDetail().getReconRecordList();
 		log.info("getTransactionDetail size ::"+reconData.getReconciliationDetail().getReconRecordList().size());
 		
 		for(int count=0; count<reconRecord.size();count++) {
 			validateRecord(reconRecord.get(count),validateParam,fileName);
+			validateDuplicateTrxSerialNo(reconRecord.get(count).getTxnReferenceID()+"-"+reconRecord.get(count).getAdjustmentCount(),trxSerialIdSet,duplicateTrxSerialIdMap);// Find duplicate Transaction serial number
+		}
+		
+		log.info("duplicateTrxSerialIdMap ::"+ duplicateTrxSerialIdMap);
+		if (duplicateTrxSerialIdMap.size() > 0) {
+			addErrorMsg(DETAIL_RECORD_TYPE, "Txn Reference ID", " Duplicate <b> Txn Reference ID :: </b>" + duplicateTrxSerialIdMap);
 		}
 		return false;
+	}
+	
+	private void validateDuplicateTrxSerialNo(String txnReferenceID, HashSet<String> tagSet,
+			HashMap<String, Integer> duplicateTagMap) {
+
+		log.info("txnReferenceID ::"+txnReferenceID);
+
+		if (!tagSet.add(txnReferenceID)) {
+			if (duplicateTagMap.containsKey(txnReferenceID)) {
+				duplicateTagMap.put(txnReferenceID, duplicateTagMap.get(txnReferenceID).intValue() + 1);
+			} else {
+				duplicateTagMap.put(txnReferenceID, 1);
+			}
+			invalidRecordCount++;
+		}
+		log.info("Duplicate TxnReferenceID Map ::" + duplicateTagMap);
+		log.info("set size :::" + tagSet.size());
+		log.info("Invalid record count ::" + invalidRecordCount);
+
 	}
 	
 	private boolean validateRecord(ReconciliationRecord reconRecord, FileValidationParam validateParam,

@@ -7,6 +7,8 @@ import static com.apolloits.util.IAGConstants.HEADER_RECORD_TYPE;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.regex.Pattern;
 
@@ -21,6 +23,7 @@ import com.apolloits.util.controller.NiopValidationController;
 import com.apolloits.util.modal.ErrorMsgDetail;
 import com.apolloits.util.modal.FileValidationParam;
 import com.apolloits.util.modal.ICTXTemplate;
+import com.apolloits.util.modal.NiopAgencyEntity;
 import com.apolloits.util.modal.niop.stran.EntryData;
 import com.apolloits.util.modal.niop.stran.PlateInfo;
 import com.apolloits.util.modal.niop.stran.TagInfo;
@@ -169,17 +172,42 @@ public class STRANFileDetailValidation {
        	 	log.error("Header record and detail record count are not matched");
 			return false;
 		}
-		
+		HashSet<String> trxSerialIdSet = new HashSet<>();
+		HashMap<String, Integer> duplicateTrxSerialIdMap = new HashMap<>();
 		List<TransactionRecord> tranRecord = tranData.getTransactionDetail().getTransactionRecord();
 		log.info("getTransactionDetail size ::"+tranData.getTransactionDetail().getTransactionRecord().size());
 		for(int count=0; count<tranRecord.size();count++) {
 			validateRecord(tranRecord.get(count),validateParam,fileName);
+			validateDuplicateTrxSerialNo(tranRecord.get(count).getTxnReferenceID(),trxSerialIdSet,duplicateTrxSerialIdMap);// Find duplicate Transaction serial number
 			tranRecord.get(count).setTxnDataSeqNo(tranData.getTransactionHeader().getTxnDataSeqNo());
 			stranTempList.add(tranRecord.get(count));
 			System.out.println("count:: \t"+count +"tranRecord ::"+ tranRecord.get(count));
 		}
 		log.info("stranTempList Size ::"+stranTempList.size());
+		log.info("duplicateTrxSerialIdMap ::"+ duplicateTrxSerialIdMap);
+		if (duplicateTrxSerialIdMap.size() > 0) {
+			addErrorMsg(DETAIL_RECORD_TYPE, "Txn Reference ID", " Duplicate <b> Txn Reference ID :: </b>" + duplicateTrxSerialIdMap);
+		}
 		return false;
+	}
+	
+	private void validateDuplicateTrxSerialNo(String txnReferenceID, HashSet<String> tagSet,
+			HashMap<String, Integer> duplicateTagMap) {
+
+		log.info("txnReferenceID ::"+txnReferenceID);
+
+		if (!tagSet.add(txnReferenceID)) {
+			if (duplicateTagMap.containsKey(txnReferenceID)) {
+				duplicateTagMap.put(txnReferenceID, duplicateTagMap.get(txnReferenceID).intValue() + 1);
+			} else {
+				duplicateTagMap.put(txnReferenceID, 1);
+			}
+			invalidRecordCount++;
+		}
+		log.info("Duplicate TxnReferenceID Map ::" + duplicateTagMap);
+		log.info("set size :::" + tagSet.size());
+		log.info("Invalid record count ::" + invalidRecordCount);
+
 	}
 
 	private boolean validateRecord(TransactionRecord transactionRecord, FileValidationParam validateParam,
@@ -332,6 +360,37 @@ public class STRANFileDetailValidation {
 				log.error("Invalid STRAN detail, Invalid Tag Serial No - " + tagInfo.getTagSerialNo() + lineNo);
 				addErrorMsg(DETAIL_RECORD_TYPE, "Tag Serial Number", "Invalid Tag Serial No  - " + tagInfo.getTagSerialNo() + lineNo);
 				invalidRecord = true;
+			}else {
+
+	        	try {
+	        		NiopAgencyEntity agEntity = NiopValidationController.cscIdTagNiopAgencyMap.get(tagInfo.getTagAgencyID());
+	        		if(agEntity != null) {
+	    			long tagSerialNoStart = Long.valueOf(agEntity.getTagSequenceStart());
+	    			long tagSerialNoEnd = Long.valueOf(agEntity.getTagSequenceEnd());
+	    			long tagSerialNoLong = Long.valueOf(tagInfo.getTagSerialNo());
+	    			log.info("## tagSerialNoLong ::" + tagSerialNoLong + "\t tagSerialNoStart :: " + tagSerialNoStart
+	    					+ "\t tagSerialNoEnd ::" + tagSerialNoEnd);
+	    			
+	    			if (!(tagSerialNoStart < tagSerialNoEnd && tagSerialNoStart <= tagSerialNoLong
+	    					&& tagSerialNoEnd >= tagSerialNoLong)) {
+	    				log.error("## tagSerialNoLong ::" + tagSerialNoLong + "\t tagSerialNoStart :: " + tagSerialNoStart
+	    						+ "\t tagSerialNoEnd ::" + tagSerialNoEnd);
+	    				log.error("Invalid Tag Serial Number range   - " + tagSerialNoLong);
+	    				addErrorMsg(DETAIL_RECORD_TYPE,"Tag Serial Number", "Invalid TAG_SERIAL_NUMBER range   - " + tagInfo.getTagSerialNo());
+	    				invalidRecord=true;
+	    			}
+	        		}else {
+	        			log.error("Invalid STRAN detail, invalid tag serial number range - "+tagInfo.getTagSerialNo());
+	                	addErrorMsg(DETAIL_RECORD_TYPE,"Tag Serial Number","Invalid Tag serial number Range or Tag Agency ID \t"+tagInfo.getTagSerialNo());
+	        		}
+				} catch (Exception e) {
+					e.printStackTrace();
+					addErrorMsg(DETAIL_RECORD_TYPE,"Tag Serial Number","Invalid Tag Agency ID for TAG_SERIAL_NUMBER range from excel or file  - " + lineNo);
+					//validateParam.setResponseMsg("Invalid TAG_SERIAL_NUMBER format from excel or file  - " + fileRowData);
+					invalidRecord=true;
+				}
+	        	
+	        
 			}
 			
 			pattern = Pattern.compile(NIOPConstants.BTVL_DTL_TAG_STATUS);

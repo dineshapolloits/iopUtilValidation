@@ -149,6 +149,20 @@ public class NiopValidationController {
 		 return "niop/NiopValidateFile";
 	}
 	
+	@GetMapping("/GenerateNiop")
+    public String Generate(Model model,HttpSession session) {
+		
+		if(session.getAttribute("MySession") == null) {
+			return "redirect:/Logout";
+		}
+		
+		FileValidationParam fileValidationParam = new FileValidationParam();
+		fileValidationParam.setFileDate(CommonUtil.getCurrentDateAndTime());
+        model.addAttribute("fileValidationParam", fileValidationParam);
+        model.addAttribute("homeAgencyMap", dbLog.getNiopCscAgencyIdandShortNamebymap());
+        return "niop/NiopGenerateFile";
+    }
+	
 	private boolean validateNiopUIField(FileValidationParam validateParam) {
 		//validate IAG version
 		if(validateParam.getFromAgency().equals("NONE")) {

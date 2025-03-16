@@ -6,6 +6,7 @@ import static com.apolloits.util.IAGConstants.HEADER_RECORD_TYPE;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Pattern;
 
@@ -19,6 +20,7 @@ import com.apolloits.util.NiopAckFileMapper;
 import com.apolloits.util.controller.NiopValidationController;
 import com.apolloits.util.modal.ErrorMsgDetail;
 import com.apolloits.util.modal.FileValidationParam;
+import com.apolloits.util.modal.ICTXTemplate;
 import com.apolloits.util.modal.niop.stran.EntryData;
 import com.apolloits.util.modal.niop.stran.PlateInfo;
 import com.apolloits.util.modal.niop.stran.TagInfo;
@@ -26,6 +28,7 @@ import com.apolloits.util.modal.niop.stran.TransactionData;
 import com.apolloits.util.modal.niop.stran.TransactionHeader;
 import com.apolloits.util.modal.niop.stran.TransactionRecord;
 import com.apolloits.util.utility.CommonUtil;
+import com.apolloits.util.writer.niop.STRANTemplateValidationExcelWriter;
 
 import jakarta.xml.bind.JAXBContext;
 import jakarta.xml.bind.JAXBException;
@@ -48,7 +51,12 @@ public class STRANFileDetailValidation {
 	@Lazy
 	NiopValidationController controller;
 	
+	@Autowired
+	STRANTemplateValidationExcelWriter strantempExcel;
+	
 	int invalidRecordCount = 0;
+	
+	List<TransactionRecord> stranTempList;
 	
 	public boolean starnValidation(FileValidationParam validateParam) throws IOException, JAXBException {
 		log.info("Inside STRANValidation started :"+validateParam.getInputFilePath());
@@ -56,6 +64,7 @@ public class STRANFileDetailValidation {
 		 String ackFileName = null;
 		 long start = System.currentTimeMillis();
 		 File file = new File(validateParam.getInputFilePath());
+		 stranTempList = new ArrayList<>();
 		 if(commonUtil.validateNiopTranZIPFileName(file.getName(),validateParam)) {
 			 
 			 log.info("Zip file name validaton true");
@@ -133,6 +142,11 @@ public class STRANFileDetailValidation {
 				 niopAckMapper.setNiopAckFile(validateParam, validateParam.getFileType(), tranData.getTransactionHeader().getSubmissionDateTime(), "00", ackFileName);
 				 //validateParam.setResponseMsg("\t <b>ACK file Name :</b>"+ackFileName);
 			 }
+			 //below condition for creating STRAN excel template
+			 if(stranTempList.size() >0) {
+				 String ictxTempExcelFileName =validateParam.getOutputFilePath()+File.separator+FilenameUtils.removeExtension(fileName)+"_STRANTemplate.xlsx";
+				 strantempExcel.createStranTemplateExcel(stranTempList, ictxTempExcelFileName, validateParam);
+			 }
 			 
 		 }else {
 			 log.error("ZIP file validation failed");
@@ -160,8 +174,11 @@ public class STRANFileDetailValidation {
 		log.info("getTransactionDetail size ::"+tranData.getTransactionDetail().getTransactionRecord().size());
 		for(int count=0; count<tranRecord.size();count++) {
 			validateRecord(tranRecord.get(count),validateParam,fileName);
+			tranRecord.get(count).setTxnDataSeqNo(tranData.getTransactionHeader().getTxnDataSeqNo());
+			stranTempList.add(tranRecord.get(count));
+			System.out.println("count:: \t"+count +"tranRecord ::"+ tranRecord.get(count));
 		}
-		
+		log.info("stranTempList Size ::"+stranTempList.size());
 		return false;
 	}
 
@@ -428,6 +445,7 @@ public class STRANFileDetailValidation {
 			invalidRecord = true;
 		}
 		if(invalidRecord) {
+			transactionRecord.setPostingDisposition("T");
 			invalidRecordCount++;
 		}
         

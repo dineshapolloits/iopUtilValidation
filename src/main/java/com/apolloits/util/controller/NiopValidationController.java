@@ -24,6 +24,7 @@ import com.apolloits.util.reader.AgencyDataExcelReader;
 import com.apolloits.util.service.DatabaseLogger;
 import com.apolloits.util.utility.CommonUtil;
 import com.apolloits.util.validator.niop.BTVLFileDetailValidation;
+import com.apolloits.util.validator.niop.SRECONFileDetailValidation;
 import com.apolloits.util.validator.niop.STRANFileDetailValidation;
 import com.apolloits.util.writer.ExceptionListExcelWriter;
 
@@ -60,6 +61,9 @@ public class NiopValidationController {
 	
 	@Autowired
 	STRANFileDetailValidation stranValidation;
+	
+	@Autowired
+	SRECONFileDetailValidation sreconValidation;
 	
 	@GetMapping("/NiopAgencyList")
 	public String loadNiopUtilPage(Model model,HttpSession session) {
@@ -112,6 +116,9 @@ public class NiopValidationController {
 			break;
 		case NIOPConstants.STRAN_FILE_TYPE:
 			fileValidation = stranValidation.starnValidation(validateParam);
+			break;
+		case NIOPConstants.SRECON_FILE_TYPE:
+			fileValidation = sreconValidation.sreconValidation(validateParam);
 			break;
 		default:
 			validateParam.setResponseMsg("\t Please select correct file type");

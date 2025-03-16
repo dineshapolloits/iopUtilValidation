@@ -64,6 +64,18 @@ public class TransactionRecord {
 	private String exitDateTimeTZ;
 	@XmlElement(name = "EntryDateTimeTZ")
 	private String entryDateTimeTZ;
+	
+	private String postingDisposition;
+	private String txnDataSeqNo;
+	
+	public void setTxnDataSeqNo(String txnDataSeqNo) {
+		this.txnDataSeqNo = txnDataSeqNo;
+	}
+
+	public void setPostingDisposition(String postingDisposition) {
+		this.postingDisposition = postingDisposition;
+	}
+
 	@Override
 	public String toString() {
 		return "TransactionRecord [recordType=" + recordType + ", txnReferenceID=" + txnReferenceID + ", exitDateTime="
@@ -73,10 +85,8 @@ public class TransactionRecord {
 				+ ", tollAmount=" + tollAmount + ", discountPlanType=" + discountPlanType + ", plateInfo=" + plateInfo
 				+ ", vehicleClassAdj=" + vehicleClassAdj + ", systemMatchInd=" + systemMatchInd + ", spare1=" + spare1
 				+ ", spare2=" + spare2 + ", spare3=" + spare3 + ", spare4=" + spare4 + ", spare5=" + spare5
-				+ ", exitDateTimeTZ=" + exitDateTimeTZ + ", entryDateTimeTZ=" + entryDateTimeTZ + "]";
+				+ ", exitDateTimeTZ=" + exitDateTimeTZ + ", entryDateTimeTZ=" + entryDateTimeTZ
+				+ ", postingDisposition=" + postingDisposition + ", txnDataSeqNo=" + txnDataSeqNo + "]";
 	}
-	
-	
-	
-	
+
 }

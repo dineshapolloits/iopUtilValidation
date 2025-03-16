@@ -5,6 +5,7 @@ public class NIOPConstants {
 	 public static final String BTVL_FILE_TYPE = "BTVL";
 	 public static final String DTVL_FILE_TYPE = "DTVL";
 	 public static final String STRAN_FILE_TYPE = "STRAN";
+	 public static final String SRECON_FILE_TYPE = "SRECON";
 	 
 	 public static final String BTVL_FILE_EXTENSION = ".BTVL";
 	 public static final String ACK_FILE_EXTENSION = ".ACK";
@@ -13,6 +14,9 @@ public class NIOPConstants {
 	 public static final String UTC_DATE_TIME_FORMAT = "\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}Z";
 	 public static final String UTC_DATE_REGEX = 
 	            "^\\d{4}-(0[1-9]|1[0-2])-(0[1-9]|[12]\\d|3[01])T(0[0-9]|1\\d|2[0-3]):([0-5]\\d):([0-5]\\d)Z$";
+	 
+	 public static final String UTC_DATE_YEAR_REGEX = 
+	            "^(20[01][0-9]|20[2-9][0-9]|21[0-9]{2})-(0[1-9]|1[0-2])-(0[1-9]|[12]\\d|3[01])T(0[0-9]|1\\d|2[0-3]):([0-5]\\d):([0-5]\\d)Z$"; // Matches years from 2000 to 2199.
 	 
 	 public static final String BTVL_ZIP_FILE_NAME_FORMAT = "\\d{4}_\\d{4}_\\d{14}\\_BTVL\\.(?i)zip";
 	 public static final String BTVL_FILE_NAME_FORMAT = "\\d{4}_\\d{4}_\\d{14}\\.(?i)BTVL";
@@ -44,4 +48,10 @@ public class NIOPConstants {
 	 public static final String TXN_SPARE1_FORMAT = "[0-1 ]{1}"; //Spare 1
 	 public static final String TXN_UTC_TIME_ZONE_FORMAT = 
 	            "^(\\d{4})-(\\d{2})-(\\d{2})T(\\d{2}):(\\d{2}):(\\d{2})([+-])(\\d{2}):(\\d{2})$";
+	 
+	 public static final String RECON_ADJ_RESUBMIT_COUNT_FORMAT = "\\d{1,3}"; //Adjustment Count && Resubmit Count
+	 public static final String RECON_POSTING_DISPOSITION_VALUE = "[P,D,I,N,S,T,C,O]{1}"; //Posting Disposition
+	 public static final String RECON_FLAT_PERCENTAGE_FEE_FORMAT = "\\d{1,9}"; // Transaction Flat Fee && Transaction Percentage Fee
+	 public static final String RECON_SPARE_FORMAT = "[A-Z 0-9]{1,10}"; //Spare 1-5
+	 public static final String RECON_TOLL_AMOUNT =  "^-\\d{1,9}$|^\\d{1,9}$";
 }

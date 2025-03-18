@@ -166,7 +166,7 @@ public class STRANFileDetailValidation {
 		log.info("Detail Validation started :: "+fileName);
 		if(!tranData.getTransactionHeader().getRecordCount().equals(String.valueOf(tranData.getTransactionDetail().getTransactionRecord().size()))) {
 			addErrorMsg(HEADER_RECORD_TYPE,"RecordCount"," Invalid Header RecordCount   \t ::"+tranData.getTransactionHeader().getRecordCount()+"\t Detail Count :: \t"+tranData.getTransactionDetail().getTransactionRecord().size());
-			String ackFileName = NiopValidationController.allCscIdNiopAgencyMap.get(validateParam.getToAgency()).getHubId() + "_" + validateParam.getToAgency() + "_" + fileName.substring(0,24) + "_" + "01"
+			String ackFileName = NiopValidationController.allCscIdNiopAgencyMap.get(validateParam.getToAgency()).getHubId() + "_" + validateParam.getToAgency() + "_" + fileName.substring(0,29) + "_" + "01"
 					+ "_" + validateParam.getFileType() + NIOPConstants.ACK_FILE_EXTENSION;
 			niopAckMapper.setNiopAckFile(validateParam, validateParam.getFileType(), tranData.getTransactionHeader().getSubmissionDateTime(), "01", ackFileName);
        	 	log.error("Header record and detail record count are not matched");

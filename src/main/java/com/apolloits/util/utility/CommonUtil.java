@@ -239,16 +239,20 @@ private static AgencyDataExcelReader appConfig;
 	
 	
 	public String convertFileDateToUTCDateFormat(String inputDate) {
-        // Define the input and output formats
-        DateTimeFormatter inputFormatter = DateTimeFormatter.ofPattern("yyyyMMddHHmmss");
-        DateTimeFormatter outputFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ssX");
+		// Define the input and output formats
+		DateTimeFormatter inputFormatter = DateTimeFormatter.ofPattern("yyyyMMddHHmmss");
+		DateTimeFormatter outputFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ssX");
 
-        // Parse the input date string to LocalDateTime
-        LocalDateTime dateTime = LocalDateTime.parse(inputDate, inputFormatter);
+		try {
+			LocalDateTime dateTime = LocalDateTime.parse(inputDate, inputFormatter);
+			// Convert to the desired format with UTC offset
+			return outputFormatter.format(dateTime.atOffset(ZoneOffset.UTC));
+		} catch (Exception e) {
+			e.printStackTrace();
+			return getUTCDateandTime();
+		}
 
-        // Convert to the desired format with UTC offset
-        return outputFormatter.format(dateTime.atOffset(ZoneOffset.UTC));
-    }
+	}
 	
 	public boolean validateNiopBtvlFileName(String fileName,FileValidationParam validateParam) {
 		boolean zipNameValidation = false;

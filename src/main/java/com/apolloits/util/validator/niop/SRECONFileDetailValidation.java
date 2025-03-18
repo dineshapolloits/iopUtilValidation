@@ -170,7 +170,7 @@ public class SRECONFileDetailValidation {
 		log.info("Detail Validation started :: "+fileName);
 		if(!reconData.getReconciliationHeader().getRecordCount().equals(String.valueOf(reconData.getReconciliationDetail().getReconRecordList().size()))) {
 			addErrorMsg(HEADER_RECORD_TYPE,"RecordCount"," Invalid Header RecordCount   \t ::"+reconData.getReconciliationHeader().getRecordCount()+"\t Detail Count :: \t"+reconData.getReconciliationDetail().getReconRecordList().size());
-			String ackFileName = NiopValidationController.allCscIdNiopAgencyMap.get(validateParam.getToAgency()).getHubId() + "_" + validateParam.getToAgency() + "_" + fileName.substring(0,24) + "_" + "01"
+			String ackFileName = NiopValidationController.allCscIdNiopAgencyMap.get(validateParam.getToAgency()).getHubId() + "_" + validateParam.getToAgency() + "_" + fileName.substring(0,29) + "_" + "01"
 					+ "_" + validateParam.getFileType() + NIOPConstants.ACK_FILE_EXTENSION;
 			niopAckMapper.setNiopAckFile(validateParam, validateParam.getFileType(), reconData.getReconciliationHeader().getSubmissionDateTime(), "01", ackFileName);
        	 	log.error("Header record and detail record count are not matched");
@@ -359,7 +359,7 @@ public class SRECONFileDetailValidation {
         }
 		
 		if (!(headerReconData.getSubmissionDateTime().length() == 20) ||
-                !(headerReconData.getSubmissionDateTime().matches("\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}Z"))) {
+                !(headerReconData.getSubmissionDateTime().matches(NIOPConstants.UTC_DATE_YEAR_REGEX))) {
         	addErrorMsg(HEADER_RECORD_TYPE,"SubmissionDateTime"," Invalid SubmissionDateTime   \t ::"+headerReconData.getSubmissionDateTime());
         	log.error("Invalid SubmissionDateTime   \t ::"+headerReconData.getSubmissionDateTime());
         	invalidHeaderRecord = true;

@@ -8,6 +8,7 @@ public class NIOPConstants {
 	 public static final String SRECON_FILE_TYPE = "SRECON";
 	 
 	 public static final String BTVL_FILE_EXTENSION = ".BTVL";
+	 public static final String DTVL_FILE_EXTENSION = ".DTVL";
 	 public static final String ACK_FILE_EXTENSION = ".ACK";
 	 
 	 public static final String AGENCY_ID_FORMAT ="\\d{4}";

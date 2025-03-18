@@ -2,13 +2,18 @@ package com.apolloits.util.modal.niop;
 
 import java.util.List;
 
+import jakarta.xml.bind.annotation.XmlAccessType;
+import jakarta.xml.bind.annotation.XmlAccessorType;
 import jakarta.xml.bind.annotation.XmlElement;
 import jakarta.xml.bind.annotation.XmlRootElement;
 import jakarta.xml.bind.annotation.XmlType;
 import lombok.Getter;
+import lombok.Setter;
 
 @Getter
+@Setter
 @XmlRootElement(name = "TVLTagDetails")
+@XmlAccessorType(XmlAccessType.FIELD)
 @XmlType(propOrder = {"homeAgencyId", "tagAgencyId", "tagSerialNumber", "tagStatus","discountPlans",
         "DiscountPlanStartDate","DiscountPlanEndDate",
         "tagType", "tagClass", "tvlPlateDetails", "tvlAccountDetails"})

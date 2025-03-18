@@ -150,6 +150,22 @@ private static AgencyDataExcelReader appConfig;
 		String zipfileName = "10 *";
 		Pattern pattern = Pattern.compile(IAGConstants.ITAG_TAG_CLASS);
 		String fileNameDateTime = "0034_0008_20250119103210.IRXC".substring(10, 24);
+		String UTC_DATE_REGEX = 
+	            "^\\d{4}-(0[1-9]|1[0-2])-(0[1-9]|[12]\\d|3[01])T(0[0-9]|1\\d|2[0-3]):([0-5]\\d):([0-5]\\d)Z$";
+		String[] testDates = {
+	            "2023-10-15T12:30:00Z", // Valid
+	            "2023-02-41T12:30:00Z", // Invalid (not a leap year)
+	            "2023-13-01T12:30:00Z", // Invalid (month out of range)
+	            "2023-10-15T25:30:00Z", // Invalid (hour out of range)
+	            "2023-10-15T12:60:00Z", // Invalid (minute out of range)
+	            "2023-10-15T12:30:60Z"  // Invalid (second out of range)
+	        };
+
+	        for (String date : testDates) {
+	        	 pattern = Pattern.compile(UTC_DATE_REGEX);
+	            Matcher matcher = pattern.matcher(date);
+	            System.out.println("Date: " + date +" is valid? " + matcher.matches());
+	        }
 		String headerDate = "2025-02-01T14:16:34Z";
 		System.out.println("fileNameDateTime ::"+fileNameDateTime +"\t headerDate = "+headerDate.replaceAll("[-T:Z]", ""));
 		String dateTime ="20250119103210";
@@ -160,7 +176,8 @@ private static AgencyDataExcelReader appConfig;
 
 		// Subtract one day to get the previous date
 		LocalDateTime previousDate = currentDate.minusDays(1);
-		System.out.println("Previous: " + previousDate.toString()+"Z");
+		System.out.println("Previous1: " + "VC01,TC01".contains("TC01"));
+		System.out.println("Previous2: " + "TC01".contains("VC,TC"));
 		String zipFileName = "9003_0034_0033_20241022020004.SCORR";
 		String[] fileParams = zipFileName.split("[_.]");
 		System.out.println("fileParams ::"+Arrays.toString(fileParams) );
@@ -1185,6 +1202,16 @@ private static AgencyDataExcelReader appConfig;
 		}
 
 		return true;
+	}
+	
+	public String getUTCDateandTime() {
+		try {
+			DateTime dateTime = new DateTime().withZone(DateTimeZone.UTC);
+			return dateTime.toString("yyyy-MM-dd'T'HH:mm:ss'Z'");
+		} catch (DateTimeParseException e) {
+			e.printStackTrace();
+			return null;
+		}
 	}
 	
 }

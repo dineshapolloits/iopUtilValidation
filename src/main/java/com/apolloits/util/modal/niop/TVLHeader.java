@@ -1,17 +1,19 @@
 package com.apolloits.util.modal.niop;
 
-import lombok.Data;
+import java.io.Serializable;
 
+import jakarta.xml.bind.annotation.XmlAccessType;
+import jakarta.xml.bind.annotation.XmlAccessorType;
 import jakarta.xml.bind.annotation.XmlElement;
 import jakarta.xml.bind.annotation.XmlRootElement;
 import jakarta.xml.bind.annotation.XmlType;
 import lombok.Getter;
 import lombok.Setter;
 
-import java.io.Serializable;
-
 @Getter
+@Setter
 @XmlRootElement(name = "TVLHeader")
+@XmlAccessorType(XmlAccessType.FIELD)
 @XmlType(propOrder = {"submittedFileType", "submittedDateTime", "SSIOPHubIdNumber", "homeAgencyIdNumber", "bulkInd", "bulkIdentifierValue", "totalRecordCount"})
 public class TVLHeader implements Serializable {
     @XmlElement(name = "SubmissionType")

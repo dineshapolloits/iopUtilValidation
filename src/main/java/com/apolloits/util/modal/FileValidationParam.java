@@ -20,5 +20,7 @@ public class FileValidationParam {
 	
 	private String version;
 	
+	private Long bulkIdentifier;
+	
 	
 }

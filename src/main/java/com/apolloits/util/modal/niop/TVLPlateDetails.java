@@ -2,14 +2,17 @@ package com.apolloits.util.modal.niop;
 
 import jakarta.xml.bind.annotation.XmlType;
 import lombok.Data;
-
+import jakarta.xml.bind.annotation.XmlAccessType;
+import jakarta.xml.bind.annotation.XmlAccessorType;
 import jakarta.xml.bind.annotation.XmlElement;
 import jakarta.xml.bind.annotation.XmlRootElement;
 import lombok.Getter;
 import lombok.Setter;
 
 @Getter
+@Setter
 @XmlRootElement(name = "TVLPlateDetails")
+@XmlAccessorType(XmlAccessType.FIELD)
 @XmlType(propOrder = {"plateCountry", "plateState", "plateNumber", "plateEffectiveFrom", "plateEffectiveTo", "plateType"})
 public class TVLPlateDetails {
 

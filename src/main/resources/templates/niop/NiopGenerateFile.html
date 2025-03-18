@@ -30,10 +30,10 @@
 			method="POST">
 			<p>	<b>File Type</b>		<select th:field="*{fileType}" class="form-control mb-4 col-4" id ="fileType">
 			    <option th:value="BTVL" th:text="BTVL"></option>
-			    <option th:value="DTVL" th:text="DTVL"></option>
+			   <!-- <option th:value="DTVL" th:text="DTVL"></option>
 				<option th:value="STRAN" th:text="STRAN"></option>
 				<option th:value="SRECON" th:text="SRECON"></option>
-				<option th:value="SCORR" th:text="SCORR"></option>
+				<option th:value="SCORR" th:text="SCORR"></option> -->
 			</select>
 			</p>
 			<!-- <p><b>From Agency Code</b>
@@ -70,8 +70,14 @@
 							           </span>
 							         </div>
 						</p>
+						<div id="BulkIdentifier">
+							<p><b>Bulk Identifier</b>
+								<input type="text" th:field="*{bulkIdentifier}" id="bulkIdentifierTxt" pattern="[1-9]{1}[0-9]{0,8}"
+									title="maximum 10 digit number only" placeholder="Input bulkIdentifier number" class="form-control mb-4 col-4">
+							</p>
+						</div>
 			<p><b>File Generation Path</b>
-				<input type="text" th:field="*{outputFilePath}" id="fileGenPath" placeholder="File Generation Path" class="form-control mb-4 col-4" required>
+				<input type="text" th:field="*{outputFilePath}" id="fileGenPath"  placeholder="File Generation Path" class="form-control mb-4 col-4" required>
 			</p>
 			<div id="inputFilePath">
 			<p><b>Input File Path</b>
@@ -105,6 +111,7 @@
 		        // select the div with id "station"
 		        const toAgencyCodeDiv = $('#toAgencyCode');
 				const inputFilePathDiv = $('#inputFilePath');
+				const bulkIdentifierDiv = $('#BulkIdentifier');
 				console.log("advertTypeSelect.val onload :: ",advertTypeSelect.val());
 		        // hide the div initially
 				if((advertTypeSelect.val() !== 'STRAN') && (advertTypeSelect.val() !== 'SRECON')
@@ -112,6 +119,7 @@
 					console.log("advertTypeSelect.val :: ",advertTypeSelect.val());
 		        toAgencyCodeDiv.hide();
 				inputFilePathDiv.hide();
+				bulkIdentifierDiv.show();
 				}
 		        // add change event listener to the advertType dropdown
 		        advertTypeSelect.change(function() {
@@ -120,10 +128,12 @@
 		                // show the div if ONAIR is selected $(this).val() === 'ICTX'
 		                toAgencyCodeDiv.show();
 						inputFilePathDiv.show();
+						bulkIdentifierDiv.hide();
 		            } else {
 		                // hide the div otherwise
 		                toAgencyCodeDiv.hide();
 						inputFilePathDiv.hide();
+						bulkIdentifierDiv.show();
 		            }
 					customReset();
 		        });

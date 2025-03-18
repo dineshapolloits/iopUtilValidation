@@ -16,7 +16,9 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
 
+import com.apolloits.util.IAGConstants;
 import com.apolloits.util.NIOPConstants;
+import com.apolloits.util.generate.niop.TVLFileGenerator;
 import com.apolloits.util.modal.ErrorMsgDetail;
 import com.apolloits.util.modal.FileValidationParam;
 import com.apolloits.util.modal.NiopAgencyEntity;
@@ -65,6 +67,9 @@ public class NiopValidationController {
 	@Autowired
 	SRECONFileDetailValidation sreconValidation;
 	
+	@Autowired
+	TVLFileGenerator tvlGen;
+	
 	@GetMapping("/NiopAgencyList")
 	public String loadNiopUtilPage(Model model,HttpSession session) {
 		
@@ -105,9 +110,7 @@ public class NiopValidationController {
 		}
 		boolean fileValidation = false ;
 		validateParam.setResponseMsg("\t Contact Administrator");
-		/*if(validateParam.getFileType().equals(NIOPConstants.BTVL_FILE_TYPE) || validateParam.getFileType().equals(NIOPConstants.DTVL_FILE_TYPE)) {
-			fileValidation = btvlValidation.btvlValidation(validateParam,validateParam.getFileType());
-			}*/
+		
 		
 		switch (validateParam.getFileType()) {
 		case NIOPConstants.BTVL_FILE_TYPE:
@@ -162,6 +165,33 @@ public class NiopValidationController {
         model.addAttribute("homeAgencyMap", dbLog.getNiopCscAgencyIdandShortNamebymap());
         return "niop/NiopGenerateFile";
     }
+	
+	@PostMapping("/NiopGenerateFile")
+    public String GenerateFile(@ModelAttribute("fileValidationParam") FileValidationParam validateParam,Model model) throws IOException {
+		log.info("GenerateFile ::"+validateParam.toString());
+		boolean fileValidation = false ;
+		validateParam.setResponseMsg("Contact Administrator");
+		 	model.addAttribute("homeAgencyMap", dbLog.getNiopCscAgencyIdandShortNamebymap());
+			
+		 	cscIdTagNiopAgencyMap =  dbLog.getNiopCSCIdbyAgencyMap(validateParam.getFromAgency());
+			allCscIdNiopAgencyMap =  dbLog.getAllNiopCSCIdbyAgencyMap();
+			
+			switch (validateParam.getFileType()) {
+			case NIOPConstants.BTVL_FILE_TYPE:
+				fileValidation = tvlGen.tvlGen(validateParam);
+			break;
+			default:
+				validateParam.setResponseMsg("\t Please select correct file type");
+			}
+				log.info("getResponseMsg ::"+validateParam.getResponseMsg() +"\t fileValidation ::"+fileValidation);
+				log.info("fileValidation.getFileDate ::"+validateParam.getFileDate());
+			if(!fileValidation)
+				model.addAttribute("result", validateParam.getResponseMsg());
+			else
+				model.addAttribute("result", validateParam.getResponseMsg());
+			
+			return "niop/NiopGenerateFile";
+	}
 	
 	private boolean validateNiopUIField(FileValidationParam validateParam) {
 		//validate IAG version

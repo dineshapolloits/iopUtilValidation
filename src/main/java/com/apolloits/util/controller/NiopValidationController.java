@@ -178,6 +178,7 @@ public class NiopValidationController {
 			
 			switch (validateParam.getFileType()) {
 			case NIOPConstants.BTVL_FILE_TYPE:
+			case NIOPConstants.DTVL_FILE_TYPE:
 				fileValidation = tvlGen.tvlGen(validateParam);
 			break;
 			default:

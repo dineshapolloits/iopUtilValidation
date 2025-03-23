@@ -6,10 +6,12 @@ public class NIOPConstants {
 	 public static final String DTVL_FILE_TYPE = "DTVL";
 	 public static final String STRAN_FILE_TYPE = "STRAN";
 	 public static final String SRECON_FILE_TYPE = "SRECON";
+	 public static final String SCORR_FILE_TYPE = "SCORR";
 	 
 	 public static final String BTVL_FILE_EXTENSION = ".BTVL";
 	 public static final String DTVL_FILE_EXTENSION = ".DTVL";
 	 public static final String ACK_FILE_EXTENSION = ".ACK";
+	 public static final String STRAN_FILE_EXTENSION = ".STRAN";
 	 
 	 public static final String AGENCY_ID_FORMAT ="\\d{4}";
 	 public static final String UTC_DATE_TIME_FORMAT = "\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}Z";
@@ -37,8 +39,8 @@ public class NIOPConstants {
 	 public static final String TXN_RECORD_COUNT_FORMAT = "\\d{1,10}";
 	 public static final String TXN_RECORD_TYPE_FORMAT = "^(TB01|TC01|TC02|VB01|VC01|VC02)$";
 	 public static final String TXN_REFERENCE_ID_FORMAT = "\\d{1,20}";
-	 public static final String TXN_FACILITY_ID_FORMAT = "[A-Z 0-9]{1,10}";
-	 public static final String TXN_FACILITY_ID_DESC_FORMAT = "[A-Z 0-9]{1,30}";
+	 public static final String TXN_FACILITY_ID_FORMAT = "[a-zA-Z 0-9]{1,10}";
+	 public static final String TXN_FACILITY_ID_DESC_FORMAT = "[a-zA-Z 0-9]{1,30}";
 	 public static final String TXN_PLAZA_FORMAT = "[A-Z0-9]{1,15}";
 	 public static final String TXN_LANE_FORMAT = "[A-Z0-9]{1,4}";
 	 public static final String TXN_ENTRY_TYPE = "^(TC01|TC02|VC01|VC02)$";
@@ -55,4 +57,10 @@ public class NIOPConstants {
 	 public static final String RECON_FLAT_PERCENTAGE_FEE_FORMAT = "\\d{1,9}"; // Transaction Flat Fee && Transaction Percentage Fee
 	 public static final String RECON_SPARE_FORMAT = "[A-Z 0-9]{1,10}"; //Spare 1-5
 	 public static final String RECON_TOLL_AMOUNT =  "^-\\d{1,9}$|^\\d{1,9}$";
+	 
+	 public static final String CORR_RECORD_TYPE_FORMAT = "^(TB01A|TC01A|TC02A|VB01A|VC01A|VC02A)$";
+	 public static final String CORR_REASON = "[C,I,L,T,O]{1}";
+	 public static final String CORR_RESUBMIT_REASON = "[R,S]{1}";
+	 public static final String CORR_OTHER_REASON = "[A-Z 0-9]{1,255}";
+	 public static final String CORR_RESUBMIT_COUNT_FORMAT = "\\d{1,3}";
 }

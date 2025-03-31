@@ -94,7 +94,7 @@ public class NIOPACKFileDetailValidation {
 		
 		//NIOP Hub ID 
 		if(ackFile.getNiopHubID() == null  || !ackFile.getNiopHubID().equals(String.valueOf(NiopValidationController.allCscIdNiopAgencyMap.get(validateParam.getFromAgency()).getHubId()))) {
-			addErrorMsg(DETAIL_RECORD_TYPE,"Original Submission Date/Time"," Invalid Original Submission Date/Time   \t ::"+ackFile.getNiopHubID());
+			addErrorMsg(DETAIL_RECORD_TYPE,"NIOP Hub ID "," Invalid NIOP Hub ID   \t ::"+ackFile.getNiopHubID());
         	log.error("Invalid Original Submission Date/Time   \t ::"+ackFile.getNiopHubID());
         	invalidRecord = false;
 		}

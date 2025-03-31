@@ -1,13 +1,18 @@
 package com.apolloits.util.modal.niop;
 
+import jakarta.xml.bind.annotation.XmlAccessType;
+import jakarta.xml.bind.annotation.XmlAccessorType;
 import jakarta.xml.bind.annotation.XmlElement;
 import jakarta.xml.bind.annotation.XmlRootElement;
+import lombok.Getter;
 import lombok.Setter;
 
 import java.io.Serializable;
 
 @Setter
+@Getter
 @XmlRootElement(name="Acknowledgement")
+@XmlAccessorType(XmlAccessType.FIELD)
 public class NiopAckFile implements Serializable {
 
     @XmlElement(name="SubmissionType")
@@ -24,12 +29,16 @@ public class NiopAckFile implements Serializable {
     private String toAgencyID;
     @XmlElement(name="AckDateTime")
     private String ackDateTime;
+    @XmlElement(name = "AckReturnCode")
     private String AckReturnCode;
 
-    @XmlElement(name = "AckReturnCode", required = true)
-    public String getAckReturnCode() {
-        return AckReturnCode;
-    }
-
+	@Override
+	public String toString() {
+		return "NiopAckFile [submissionType=" + submissionType + ", originalSubmissionType=" + originalSubmissionType
+				+ ", originalSubmissionDateTime=" + originalSubmissionDateTime + ", niopHubID=" + niopHubID
+				+ ", fromAgencyID=" + fromAgencyID + ", toAgencyID=" + toAgencyID + ", ackDateTime=" + ackDateTime
+				+ ", AckReturnCode=" + AckReturnCode + "]";
+	}
+    
 
 }

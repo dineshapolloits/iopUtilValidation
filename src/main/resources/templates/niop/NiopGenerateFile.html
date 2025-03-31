@@ -32,8 +32,8 @@
 			    <option th:value="BTVL" th:text="BTVL"></option>
 			    <option th:value="DTVL" th:text="DTVL"></option>
 				<option th:value="STRAN" th:text="STRAN"></option>
-				<!--<option th:value="SRECON" th:text="SRECON"></option>
-				<option th:value="SCORR" th:text="SCORR"></option> -->
+				<option th:value="SRECON" th:text="SRECON"></option>
+				<!--<option th:value="SCORR" th:text="SCORR"></option> -->
 			</select>
 			</p>
 			<!-- <p><b>From Agency Code</b>
@@ -115,16 +115,20 @@
 				console.log("advertTypeSelect.val onload :: ",advertTypeSelect.val());
 		        // hide the div initially
 				if((advertTypeSelect.val() !== 'STRAN') && (advertTypeSelect.val() !== 'SRECON')
-				 && (advertTypeSelect.val() !== 'SCCOR' )){
+				 && (advertTypeSelect.val() !== 'SCORR' )){
 					console.log("advertTypeSelect.val :: ",advertTypeSelect.val());
 		        toAgencyCodeDiv.hide();
 				inputFilePathDiv.hide();
 				bulkIdentifierDiv.show();
+				}else{
+					toAgencyCodeDiv.show();
+					inputFilePathDiv.show();
+					bulkIdentifierDiv.hide();
 				}
 		        // add change event listener to the advertType dropdown
 		        advertTypeSelect.change(function() {
 		            if ($(this).val() === 'STRAN' || $(this).val() === 'SRECON' 
-					|| $(this).val() === 'SCCOR' ) {
+					|| $(this).val() === 'SCORR' ) {
 		                // show the div if ONAIR is selected $(this).val() === 'ICTX'
 		                toAgencyCodeDiv.show();
 						inputFilePathDiv.show();
@@ -142,11 +146,12 @@
 			function customReset()
 			{
 			    document.getElementById("fromAgencyCode").value = "NONE";
-			    document.getElementById("toAgencyCode").value = "NONE";
+			    document.getElementById("toAgency").value = "NONE";
 				document.getElementById("fileGenPath").value = "";
 				document.getElementById("inputFilePathTxt").value = "";
 				document.getElementById("fileDate").value = new Date().toISOString().slice(0, 10);
 				document.getElementById("resultlbl").innerHTML="";
+				document.getElementById("bulkIdentifierTxt").value = "";
 			}
 		</script>
 </body>

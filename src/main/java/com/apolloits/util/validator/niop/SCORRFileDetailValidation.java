@@ -31,6 +31,7 @@ import com.apolloits.util.modal.niop.stran.EntryData;
 import com.apolloits.util.modal.niop.stran.PlateInfo;
 import com.apolloits.util.modal.niop.stran.TagInfo;
 import com.apolloits.util.utility.CommonUtil;
+import com.apolloits.util.writer.niop.SCORRTemplateValidationExcelWriter;
 
 import jakarta.xml.bind.JAXBContext;
 import jakarta.xml.bind.JAXBException;
@@ -56,6 +57,9 @@ public class SCORRFileDetailValidation {
 	int invalidRecordCount = 0;
 	
 	List<CorrectionRecord> scorrTempList;
+	
+	@Autowired
+	SCORRTemplateValidationExcelWriter scorrtempExcel;
 	
 	public boolean scorrValidation(FileValidationParam validateParam) throws IOException, JAXBException {
 		invalidRecordCount = 0;
@@ -149,7 +153,11 @@ public class SCORRFileDetailValidation {
 						 niopAckMapper.setNiopAckFile(validateParam, validateParam.getFileType(), scorrFile.getScorrHeader().getSubmissionDateTime(), "00", ackFileName);
 						 //validateParam.setResponseMsg("\t <b>ACK file Name :</b>"+ackFileName);
 					 }
-					 
+					//below condition for creating STRAN excel template
+					 if(scorrTempList.size() >0) {
+						 String scorrTempExcelFileName =validateParam.getOutputFilePath()+File.separator+FilenameUtils.removeExtension(fileName)+"_SCORRTemplate.xlsx";
+						 scorrtempExcel.createScorrTemplateExcel(scorrTempList, scorrTempExcelFileName, validateParam);
+					 }
 	    		 
 	    		 
 			} else {
@@ -157,6 +165,7 @@ public class SCORRFileDetailValidation {
 				return false;
 			}
 
+			
 			long end = System.currentTimeMillis();
 			log.info("File processing time :: " + (end - start) / 1000f + " seconds");
 		
@@ -183,7 +192,7 @@ public class SCORRFileDetailValidation {
 		for(int count=0; count<corrList.size();count++) {
 			validateRecord(corrList.get(count),validateParam,fileName);
 			//validateDuplicateTrxSerialNo(corrList.get(count).getTxnReferenceID(),trxSerialIdSet,duplicateTrxSerialIdMap);// Find duplicate Transaction serial number
-			//corrList.get(count).setTxnDataSeqNo(scorrFile.getScorrHeader().getTxnDataSeqNo());
+			corrList.get(count).setTxnDataSeqNo(scorrFile.getScorrHeader().getTxnDataSeqNo());
 			scorrTempList.add(corrList.get(count));
 			System.out.println("count:: \t"+count +"tranRecord ::"+ corrList.get(count));
 		}
@@ -263,11 +272,12 @@ public class SCORRFileDetailValidation {
 		
 		//validate original Transaction Details. All other fields from the Transaction Data Detail 
 		
-		if(!validateOrginalRecord(correctionRecord.getOriginalTransactionDetail(),validateParam)) {
+		if(validateOrginalRecord(correctionRecord.getOriginalTransactionDetail(),validateParam)) {
 			invalidRecord = true;
 		}
 		
 		if(invalidRecord) {
+			correctionRecord.setPostingDisposition("T");
 			invalidRecordCount++;
 		}
         

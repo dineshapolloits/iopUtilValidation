@@ -18,6 +18,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 
 import com.apolloits.util.IAGConstants;
 import com.apolloits.util.NIOPConstants;
+import com.apolloits.util.generate.niop.SRECONFileGenerator;
 import com.apolloits.util.generate.niop.STRANFileGenerator;
 import com.apolloits.util.generate.niop.TVLFileGenerator;
 import com.apolloits.util.modal.ErrorMsgDetail;
@@ -27,6 +28,7 @@ import com.apolloits.util.reader.AgencyDataExcelReader;
 import com.apolloits.util.service.DatabaseLogger;
 import com.apolloits.util.utility.CommonUtil;
 import com.apolloits.util.validator.niop.BTVLFileDetailValidation;
+import com.apolloits.util.validator.niop.NIOPACKFileDetailValidation;
 import com.apolloits.util.validator.niop.SCORRFileDetailValidation;
 import com.apolloits.util.validator.niop.SRECONFileDetailValidation;
 import com.apolloits.util.validator.niop.STRANFileDetailValidation;
@@ -73,10 +75,16 @@ public class NiopValidationController {
 	SCORRFileDetailValidation scorrValidation;
 	
 	@Autowired
+	NIOPACKFileDetailValidation ackValidation;
+	
+	@Autowired
 	TVLFileGenerator tvlGen;
 	
 	@Autowired
 	STRANFileGenerator stranGen;
+	
+	@Autowired
+	SRECONFileGenerator sreconGen;
 	
 	@GetMapping("/NiopAgencyList")
 	public String loadNiopUtilPage(Model model,HttpSession session) {
@@ -133,6 +141,9 @@ public class NiopValidationController {
 			break;
 		case NIOPConstants.SCORR_FILE_TYPE:
 			fileValidation = scorrValidation.scorrValidation(validateParam);
+			break;
+		case NIOPConstants.ACK_FILE_TYPE:
+			fileValidation = ackValidation.ackValidation(validateParam);
 			break;
 		default:
 			validateParam.setResponseMsg("\t Please select correct file type");
@@ -200,6 +211,15 @@ public class NiopValidationController {
 				}
 				
 			fileValidation =stranGen.stranGen(validateParam);
+			break;
+			case NIOPConstants.SRECON_FILE_TYPE:
+				
+				if(!validateNiopUIField(validateParam)) {
+					model.addAttribute("result", validateParam.getResponseMsg());
+					return "niop/NiopGenerateFile";
+				}
+				
+			fileValidation =sreconGen.sreconGen(validateParam);
 			break;
 			default:
 				validateParam.setResponseMsg("\t Please select correct file type");

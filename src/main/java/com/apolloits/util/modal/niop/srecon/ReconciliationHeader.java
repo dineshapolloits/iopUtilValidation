@@ -2,12 +2,17 @@ package com.apolloits.util.modal.niop.srecon;
 
 import java.io.Serializable;
 
+import jakarta.xml.bind.annotation.XmlAccessType;
+import jakarta.xml.bind.annotation.XmlAccessorType;
 import jakarta.xml.bind.annotation.XmlElement;
 import jakarta.xml.bind.annotation.XmlRootElement;
 import lombok.Getter;
+import lombok.Setter;
 
 @Getter
+@Setter
 @XmlRootElement(name = "ReconciliationHeader")
+@XmlAccessorType(XmlAccessType.FIELD)
 public class ReconciliationHeader implements Serializable {
 	@XmlElement(name = "SubmissionType")
 	private String submissionType;

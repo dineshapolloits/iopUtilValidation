@@ -7,11 +7,13 @@ public class NIOPConstants {
 	 public static final String STRAN_FILE_TYPE = "STRAN";
 	 public static final String SRECON_FILE_TYPE = "SRECON";
 	 public static final String SCORR_FILE_TYPE = "SCORR";
+	 public static final String ACK_FILE_TYPE = "ACK";
 	 
 	 public static final String BTVL_FILE_EXTENSION = ".BTVL";
 	 public static final String DTVL_FILE_EXTENSION = ".DTVL";
 	 public static final String ACK_FILE_EXTENSION = ".ACK";
 	 public static final String STRAN_FILE_EXTENSION = ".STRAN";
+	 public static final String SRECON_FILE_EXTENSION = ".SRECON";
 	 
 	 public static final String AGENCY_ID_FORMAT ="\\d{4}";
 	 public static final String UTC_DATE_TIME_FORMAT = "\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}Z";
@@ -63,4 +65,6 @@ public class NIOPConstants {
 	 public static final String CORR_RESUBMIT_REASON = "[R,S]{1}";
 	 public static final String CORR_OTHER_REASON = "[A-Z 0-9]{1,255}";
 	 public static final String CORR_RESUBMIT_COUNT_FORMAT = "\\d{1,3}";
+	 
+	 public static final String ACK_CODES = "^(00|01|03|04|05|07|10|11|12|13)$";
 }

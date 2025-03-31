@@ -22,7 +22,6 @@ import com.apolloits.util.NiopAckFileMapper;
 import com.apolloits.util.controller.NiopValidationController;
 import com.apolloits.util.modal.ErrorMsgDetail;
 import com.apolloits.util.modal.FileValidationParam;
-import com.apolloits.util.modal.ICTXTemplate;
 import com.apolloits.util.modal.NiopAgencyEntity;
 import com.apolloits.util.modal.niop.stran.EntryData;
 import com.apolloits.util.modal.niop.stran.PlateInfo;

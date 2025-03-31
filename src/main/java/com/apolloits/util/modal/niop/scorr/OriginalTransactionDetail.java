@@ -6,9 +6,12 @@ import com.apolloits.util.modal.niop.stran.TagInfo;
 
 import jakarta.xml.bind.annotation.*;
 import lombok.Getter;
+import lombok.Setter;
 
 @Getter
+@Setter
 @XmlRootElement(name="OriginalTransactionDetail")
+@XmlAccessorType(XmlAccessType.FIELD)
 @XmlType(name = "", propOrder = {
         "recordType",
         "txnReferenceID",

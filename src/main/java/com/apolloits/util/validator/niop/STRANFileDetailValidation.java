@@ -285,10 +285,10 @@ public class STRANFileDetailValidation {
 		}
 		//below entry validation - Required for TC and VC transactions
 		EntryData entryData = transactionRecord.getEntryData();
-		
-		if(entryData != null) {
+		pattern = Pattern.compile(NIOPConstants.TXN_ENTRY_TYPE);
+		if(recordType != null && pattern.matcher(recordType).matches()) {
 			pattern = Pattern.compile(NIOPConstants.TXN_ENTRY_TYPE);
-			if(transactionRecord.getRecordType() != null && (recordType != null && pattern.matcher(recordType).matches())) {
+			if(entryData !=null) {
 				
 				//Entry Date/Time
 				pattern = Pattern.compile(NIOPConstants.UTC_DATE_REGEX);
@@ -336,8 +336,8 @@ public class STRANFileDetailValidation {
 				}
 				
 			} else {
-				log.error("Invalid STRAN detail, Invalid Entry Record Type  - " + recordType + lineNo);
-				addErrorMsg(DETAIL_RECORD_TYPE, "Entry Type", "Invalid Entry Type  - " + recordType + lineNo);
+				log.error("Invalid STRAN detail, Invalid Entry Record Data  - " + recordType + lineNo);
+				addErrorMsg(DETAIL_RECORD_TYPE, "Entry ", "Invalid Entry Data  - " + recordType + lineNo);
 				invalidRecord = true;
 			}
 		}
@@ -474,7 +474,7 @@ public class STRANFileDetailValidation {
 		}
 		//Vehicle Classification Adjustment Flag
 		//pattern = Pattern.compile(NIOPConstants.BTVL_DTL_DISCOUNT_PLAN_FORMAT);
-		if (transactionRecord.getVehicleClassAdj() != null && !"V".equals(transactionRecord.getVehicleClassAdj())) {
+		if (transactionRecord.getVehicleClassAdj() != null && !"A".equals(transactionRecord.getVehicleClassAdj())) {
 			log.error("Invalid STRAN detail, Invalid Vehicle Classification Adjustment Flag - " + transactionRecord.getVehicleClassAdj() + lineNo);
 			addErrorMsg(DETAIL_RECORD_TYPE, "Vehicle Classification Adjustment Flag", "Invalid Vehicle Classification Adjustment Flag  - " + transactionRecord.getVehicleClassAdj() + lineNo);
 			invalidRecord = true;

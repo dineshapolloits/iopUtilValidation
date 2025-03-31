@@ -168,7 +168,7 @@ public class SRECONFileDetailValidation {
 	private boolean detailValidation(ReconciliationData reconData, FileValidationParam validateParam,
 			String fileName) {
 		log.info("Detail Validation started :: "+fileName);
-		if(!reconData.getReconciliationHeader().getRecordCount().equals(String.valueOf(reconData.getReconciliationDetail().getReconRecordList().size()))) {
+		if(!reconData.getReconciliationHeader().getRecordCount().isEmpty()&& !reconData.getReconciliationHeader().getRecordCount().equals(String.valueOf(reconData.getReconciliationDetail().getReconRecordList().size()))) {
 			addErrorMsg(HEADER_RECORD_TYPE,"RecordCount"," Invalid Header RecordCount   \t ::"+reconData.getReconciliationHeader().getRecordCount()+"\t Detail Count :: \t"+reconData.getReconciliationDetail().getReconRecordList().size());
 			String ackFileName = NiopValidationController.allCscIdNiopAgencyMap.get(validateParam.getToAgency()).getHubId() + "_" + validateParam.getToAgency() + "_" + fileName.substring(0,29) + "_" + "01"
 					+ "_" + validateParam.getFileType() + NIOPConstants.ACK_FILE_EXTENSION;

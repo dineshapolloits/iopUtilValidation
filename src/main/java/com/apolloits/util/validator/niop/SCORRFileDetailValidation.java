@@ -362,10 +362,10 @@ public class SCORRFileDetailValidation {
 		}
 		//below entry validation - Required for TC and VC transactions
 		EntryData entryData = transactionRecord.getEntryData();
-		
-		if(entryData != null) {
-			pattern = Pattern.compile(NIOPConstants.TXN_ENTRY_TYPE);
-			if(transactionRecord.getRecordType() != null && (recordType != null && pattern.matcher(recordType).matches())) {
+		pattern = Pattern.compile(NIOPConstants.TXN_ENTRY_TYPE);
+		if(recordType != null  && pattern.matcher(recordType).matches()) {
+			
+			if(entryData!= null) {
 				
 				//Entry Date/Time
 				pattern = Pattern.compile(NIOPConstants.UTC_DATE_REGEX);
@@ -413,8 +413,8 @@ public class SCORRFileDetailValidation {
 				}
 				
 			} else {
-				log.error("Invalid SCORR detail, Invalid Entry Record Type  - " + recordType + lineNo);
-				addErrorMsg(DETAIL_RECORD_TYPE, "Entry Type", "Invalid Entry Type  - " + recordType + lineNo);
+				log.error("Invalid SCORR detail, Invalid Entry Data  - " + recordType + lineNo);
+				addErrorMsg(DETAIL_RECORD_TYPE, "Entry ", "Invalid Entry Data  - " + recordType + lineNo);
 				invalidRecord = true;
 			}
 		}

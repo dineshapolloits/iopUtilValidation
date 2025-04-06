@@ -14,6 +14,7 @@ public class NIOPConstants {
 	 public static final String ACK_FILE_EXTENSION = ".ACK";
 	 public static final String STRAN_FILE_EXTENSION = ".STRAN";
 	 public static final String SRECON_FILE_EXTENSION = ".SRECON";
+	 public static final String SCORR_FILE_EXTENSION = ".SCORR";
 	 
 	 public static final String AGENCY_ID_FORMAT ="\\d{4}";
 	 public static final String UTC_DATE_TIME_FORMAT = "\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}Z";

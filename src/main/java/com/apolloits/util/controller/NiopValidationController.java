@@ -18,6 +18,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 
 import com.apolloits.util.IAGConstants;
 import com.apolloits.util.NIOPConstants;
+import com.apolloits.util.generate.niop.SCORRFileGenerator;
 import com.apolloits.util.generate.niop.SRECONFileGenerator;
 import com.apolloits.util.generate.niop.STRANFileGenerator;
 import com.apolloits.util.generate.niop.TVLFileGenerator;
@@ -85,6 +86,9 @@ public class NiopValidationController {
 	
 	@Autowired
 	SRECONFileGenerator sreconGen;
+	
+	@Autowired
+	SCORRFileGenerator scorrGen;
 	
 	@GetMapping("/NiopAgencyList")
 	public String loadNiopUtilPage(Model model,HttpSession session) {
@@ -220,6 +224,15 @@ public class NiopValidationController {
 				}
 				
 			fileValidation =sreconGen.sreconGen(validateParam);
+			break;
+		case NIOPConstants.SCORR_FILE_TYPE:
+
+			if (!validateNiopUIField(validateParam)) {
+				model.addAttribute("result", validateParam.getResponseMsg());
+				return "niop/NiopGenerateFile";
+			}
+
+			fileValidation = scorrGen.scorrGen(validateParam);
 			break;
 			default:
 				validateParam.setResponseMsg("\t Please select correct file type");

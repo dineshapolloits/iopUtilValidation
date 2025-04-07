@@ -194,95 +194,95 @@ private boolean writeFile(ScorrFile scorrData, FileValidationParam validateParam
           }
           OriginalTransactionDetail oriTranDet = new OriginalTransactionDetail();
           
-          oriTranDet.setRecordType(commonUtil.getStringFormatCell(currentRow.getCell(1,MissingCellPolicy.CREATE_NULL_AS_BLANK)));
-          oriTranDet.setTxnReferenceID(commonUtil.getStringFormatCell(currentRow.getCell(2,MissingCellPolicy.CREATE_NULL_AS_BLANK)));
-          oriTranDet.setExitDateTime(commonUtil.getStringFormatCell(currentRow.getCell(3,MissingCellPolicy.CREATE_NULL_AS_BLANK)));
-          oriTranDet.setFacilityID(commonUtil.getStringFormatCell(currentRow.getCell(4,MissingCellPolicy.CREATE_NULL_AS_BLANK)));
-          oriTranDet.setFacilityDesc(commonUtil.getStringFormatCell(currentRow.getCell(5,MissingCellPolicy.CREATE_NULL_AS_BLANK)));
-          oriTranDet.setExitPlaza(commonUtil.getStringFormatCell(currentRow.getCell(6,MissingCellPolicy.CREATE_NULL_AS_BLANK)));
-          oriTranDet.setExitPlazaDesc(commonUtil.getStringFormatCell(currentRow.getCell(7,MissingCellPolicy.CREATE_NULL_AS_BLANK)));
-          oriTranDet.setExitLane(commonUtil.getStringFormatCell(currentRow.getCell(8,MissingCellPolicy.CREATE_NULL_AS_BLANK)));
+          oriTranDet.setRecordType(commonUtil.getStringFormatCell(currentRow.getCell(9,MissingCellPolicy.CREATE_NULL_AS_BLANK)));
+          oriTranDet.setTxnReferenceID(commonUtil.getStringFormatCell(currentRow.getCell(10,MissingCellPolicy.CREATE_NULL_AS_BLANK)));
+          oriTranDet.setExitDateTime(commonUtil.getStringFormatCell(currentRow.getCell(11,MissingCellPolicy.CREATE_NULL_AS_BLANK)));
+          oriTranDet.setFacilityID(commonUtil.getStringFormatCell(currentRow.getCell(12,MissingCellPolicy.CREATE_NULL_AS_BLANK)));
+          oriTranDet.setFacilityDesc(commonUtil.getStringFormatCell(currentRow.getCell(13,MissingCellPolicy.CREATE_NULL_AS_BLANK)));
+          oriTranDet.setExitPlaza(commonUtil.getStringFormatCell(currentRow.getCell(14,MissingCellPolicy.CREATE_NULL_AS_BLANK)));
+          oriTranDet.setExitPlazaDesc(commonUtil.getStringFormatCell(currentRow.getCell(15,MissingCellPolicy.CREATE_NULL_AS_BLANK)));
+          oriTranDet.setExitLane(commonUtil.getStringFormatCell(currentRow.getCell(16,MissingCellPolicy.CREATE_NULL_AS_BLANK)));
           
-         String entryDateTime = commonUtil.getStringFormatCell(currentRow.getCell(9,MissingCellPolicy.CREATE_NULL_AS_BLANK));
+         String entryDateTime = commonUtil.getStringFormatCell(currentRow.getCell(17,MissingCellPolicy.CREATE_NULL_AS_BLANK));
           if(entryDateTime != null && !entryDateTime.isEmpty()) {
           	log.info("Entry detail found");
       	   EntryData entryData = new EntryData();
       	   entryData.EntryDateTime = entryDateTime;
-      	   entryData.setEntryPlaza(commonUtil.getStringFormatCell(currentRow.getCell(10,MissingCellPolicy.CREATE_NULL_AS_BLANK)));
-      	   entryData.setEntryPlazaDesc(commonUtil.getStringFormatCell(currentRow.getCell(11,MissingCellPolicy.CREATE_NULL_AS_BLANK)));
-      	   entryData.setEntryLane(commonUtil.getStringFormatCell(currentRow.getCell(12,MissingCellPolicy.CREATE_NULL_AS_BLANK)));
+      	   entryData.setEntryPlaza(commonUtil.getStringFormatCell(currentRow.getCell(18,MissingCellPolicy.CREATE_NULL_AS_BLANK)));
+      	   entryData.setEntryPlazaDesc(commonUtil.getStringFormatCell(currentRow.getCell(19,MissingCellPolicy.CREATE_NULL_AS_BLANK)));
+      	   entryData.setEntryLane(commonUtil.getStringFormatCell(currentRow.getCell(20,MissingCellPolicy.CREATE_NULL_AS_BLANK)));
       	 oriTranDet.setEntryData(entryData);
           }
           TagInfo tagInfo = new TagInfo();
-          tagInfo.setTagAgencyID(commonUtil.getStringFormatCell(currentRow.getCell(13,MissingCellPolicy.CREATE_NULL_AS_BLANK)));
-          tagInfo.setTagSerialNo(commonUtil.getStringFormatCell(currentRow.getCell(14,MissingCellPolicy.CREATE_NULL_AS_BLANK)));
-          tagInfo.setTagStatus(commonUtil.getStringFormatCell(currentRow.getCell(15,MissingCellPolicy.CREATE_NULL_AS_BLANK)));
+          tagInfo.setTagAgencyID(commonUtil.getStringFormatCell(currentRow.getCell(21,MissingCellPolicy.CREATE_NULL_AS_BLANK)));
+          tagInfo.setTagSerialNo(commonUtil.getStringFormatCell(currentRow.getCell(22,MissingCellPolicy.CREATE_NULL_AS_BLANK)));
+          tagInfo.setTagStatus(commonUtil.getStringFormatCell(currentRow.getCell(23,MissingCellPolicy.CREATE_NULL_AS_BLANK)));
           oriTranDet.setTagInfo(tagInfo);
           
-          String occupancyInd = commonUtil.getStringFormatCell(currentRow.getCell(16,MissingCellPolicy.CREATE_NULL_AS_BLANK));
+          String occupancyInd = commonUtil.getStringFormatCell(currentRow.getCell(24,MissingCellPolicy.CREATE_NULL_AS_BLANK));
           if(occupancyInd != null && !occupancyInd.isEmpty()) {
         	  oriTranDet.setOccupancyInd(occupancyInd);
           }
-          String vehicleClass = commonUtil.getStringFormatCell(currentRow.getCell(17,MissingCellPolicy.CREATE_NULL_AS_BLANK));
+          String vehicleClass = commonUtil.getStringFormatCell(currentRow.getCell(25,MissingCellPolicy.CREATE_NULL_AS_BLANK));
           if(vehicleClass != null && !vehicleClass.isEmpty()) {
         	  oriTranDet.setVehicleClass(vehicleClass);
           }
-          oriTranDet.setTollAmount(commonUtil.getStringFormatCell(currentRow.getCell(18,MissingCellPolicy.CREATE_NULL_AS_BLANK)));
+          oriTranDet.setTollAmount(commonUtil.getStringFormatCell(currentRow.getCell(26,MissingCellPolicy.CREATE_NULL_AS_BLANK)));
           
-          String discountPlanType = commonUtil.getStringFormatCell(currentRow.getCell(19,MissingCellPolicy.CREATE_NULL_AS_BLANK));
+          String discountPlanType = commonUtil.getStringFormatCell(currentRow.getCell(27,MissingCellPolicy.CREATE_NULL_AS_BLANK));
 			if (discountPlanType != null && !discountPlanType.isEmpty()) {
 				oriTranDet.setDiscountPlanType(discountPlanType);
 			}
           
-          String licPlateNo = commonUtil.getStringFormatCell(currentRow.getCell(22,MissingCellPolicy.CREATE_NULL_AS_BLANK));
+          String licPlateNo = commonUtil.getStringFormatCell(currentRow.getCell(30,MissingCellPolicy.CREATE_NULL_AS_BLANK));
          
           if(licPlateNo != null && !licPlateNo.isEmpty()) {
           	PlateInfo plateInfo = new PlateInfo();
-          	plateInfo.setPlateCountry(commonUtil.getStringFormatCell(currentRow.getCell(20,MissingCellPolicy.CREATE_NULL_AS_BLANK)));
-          	plateInfo.setPlateState(commonUtil.getStringFormatCell(currentRow.getCell(21,MissingCellPolicy.CREATE_NULL_AS_BLANK)));
-          	plateInfo.setPlateNumber(commonUtil.getStringFormatCell(currentRow.getCell(22,MissingCellPolicy.CREATE_NULL_AS_BLANK)));
-          	String plateType = commonUtil.getStringFormatCell(currentRow.getCell(23,MissingCellPolicy.CREATE_NULL_AS_BLANK));
+          	plateInfo.setPlateCountry(commonUtil.getStringFormatCell(currentRow.getCell(28,MissingCellPolicy.CREATE_NULL_AS_BLANK)));
+          	plateInfo.setPlateState(commonUtil.getStringFormatCell(currentRow.getCell(29,MissingCellPolicy.CREATE_NULL_AS_BLANK)));
+          	plateInfo.setPlateNumber(licPlateNo);
+          	String plateType = commonUtil.getStringFormatCell(currentRow.getCell(31,MissingCellPolicy.CREATE_NULL_AS_BLANK));
 				if (plateType != null && !plateType.isEmpty())
 					plateInfo.setPlateType(plateType);
 				oriTranDet.setPlateInfo(plateInfo);
           }
-          String vehicleClassAdj = commonUtil.getStringFormatCell(currentRow.getCell(24,MissingCellPolicy.CREATE_NULL_AS_BLANK));
+          String vehicleClassAdj = commonUtil.getStringFormatCell(currentRow.getCell(32,MissingCellPolicy.CREATE_NULL_AS_BLANK));
 			
           if (vehicleClassAdj != null && !vehicleClassAdj.isEmpty()) {
         	  oriTranDet.setVehicleClassAdj(vehicleClassAdj);
 			}
-          String systemMatchInd = commonUtil.getStringFormatCell(currentRow.getCell(25,MissingCellPolicy.CREATE_NULL_AS_BLANK));
+          String systemMatchInd = commonUtil.getStringFormatCell(currentRow.getCell(33,MissingCellPolicy.CREATE_NULL_AS_BLANK));
           if(systemMatchInd!= null && !systemMatchInd.isEmpty()) {
         	  oriTranDet.setSystemMatchInd(systemMatchInd);
           }
           
-          String spare = commonUtil.getStringFormatCell(currentRow.getCell(26,MissingCellPolicy.CREATE_NULL_AS_BLANK));
+          String spare = commonUtil.getStringFormatCell(currentRow.getCell(34,MissingCellPolicy.CREATE_NULL_AS_BLANK));
 			if (spare != null && !spare.isEmpty()) {
 				oriTranDet.setSpare1(spare);
 			}
-			spare = commonUtil.getStringFormatCell(currentRow.getCell(27,MissingCellPolicy.CREATE_NULL_AS_BLANK));
+			spare = commonUtil.getStringFormatCell(currentRow.getCell(35,MissingCellPolicy.CREATE_NULL_AS_BLANK));
 			if (spare != null && !spare.isEmpty()) {
 				oriTranDet.setSpare2(spare);
 			}
 			
-			spare = commonUtil.getStringFormatCell(currentRow.getCell(28,MissingCellPolicy.CREATE_NULL_AS_BLANK));
+			spare = commonUtil.getStringFormatCell(currentRow.getCell(36,MissingCellPolicy.CREATE_NULL_AS_BLANK));
 			if (spare != null && !spare.isEmpty()) {
 				oriTranDet.setSpare3(spare);
 			}
 			
-			spare = commonUtil.getStringFormatCell(currentRow.getCell(29,MissingCellPolicy.CREATE_NULL_AS_BLANK));
+			spare = commonUtil.getStringFormatCell(currentRow.getCell(37,MissingCellPolicy.CREATE_NULL_AS_BLANK));
 			if (spare != null && !spare.isEmpty()) {
 				oriTranDet.setSpare4(spare);
 			}
 			
-			spare = commonUtil.getStringFormatCell(currentRow.getCell(30,MissingCellPolicy.CREATE_NULL_AS_BLANK));
+			spare = commonUtil.getStringFormatCell(currentRow.getCell(38,MissingCellPolicy.CREATE_NULL_AS_BLANK));
 			if (spare != null && !spare.isEmpty()) {
 				oriTranDet.setSpare5(spare);
 			}
           
-			oriTranDet.setExitDateTimeTZ(commonUtil.getStringFormatCell(currentRow.getCell(31,MissingCellPolicy.CREATE_NULL_AS_BLANK)));
+			oriTranDet.setExitDateTimeTZ(commonUtil.getStringFormatCell(currentRow.getCell(39,MissingCellPolicy.CREATE_NULL_AS_BLANK)));
           
-          String entryTimeZone = commonUtil.getStringFormatCell(currentRow.getCell(32,MissingCellPolicy.CREATE_NULL_AS_BLANK));
+          String entryTimeZone = commonUtil.getStringFormatCell(currentRow.getCell(40,MissingCellPolicy.CREATE_NULL_AS_BLANK));
           if(entryTimeZone != null && !entryTimeZone.isEmpty()) {
         	  oriTranDet.setEntryDateTimeTZ(entryTimeZone);
           }

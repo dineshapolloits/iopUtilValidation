@@ -143,7 +143,7 @@ public class SCORRTemplateValidationExcelWriter {
 		dataRow.createCell(index++).setCellValue(orginalTran.getSpare5());
 		dataRow.createCell(index++).setCellValue(orginalTran.getExitDateTimeTZ());
 		dataRow.createCell(index).setCellValue(orginalTran.getEntryDateTimeTZ());
-		dataRow.createCell(44).setCellValue(scorrnTemp.getPostingDisposition());
+		dataRow.createCell(45).setCellValue(scorrnTemp.getPostingDisposition());
 		
 	
 		

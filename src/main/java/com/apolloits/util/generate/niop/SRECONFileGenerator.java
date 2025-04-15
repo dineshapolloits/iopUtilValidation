@@ -148,7 +148,7 @@ public class SRECONFileGenerator {
 
 		log.info("Inside ****************** excelToSRECONList()");
         try {
-       	
+       	String fileType = "STRAN";
           Iterator<Row> rows = sheet.iterator();
           reconRecordList = new ArrayList<>();
           int rowNumber = 0;
@@ -156,87 +156,21 @@ public class SRECONFileGenerator {
             Row currentRow = rows.next();
             // skip header
             if (rowNumber == 0) {
+            	String fieldValue = commonUtil.getStringFormatCell(currentRow.getCell(2,MissingCellPolicy.CREATE_NULL_AS_BLANK));
+            	log.info("fieldValue ::"+fieldValue);
+            	if(fieldValue.equals("Correction Date/Time")) {
+            		fileType = "SCORR";
+            	}
+            	log.info("fileType ::"+fileType);
               rowNumber++;
               continue;
             }
             ReconciliationRecord sreconRecord = new ReconciliationRecord();
-            //sreconRecord.setTxnDataSeqNo(commonUtil.getStringFormatCell(currentRow.getCell(0,MissingCellPolicy.CREATE_NULL_AS_BLANK)));
-            txnDataSeqNo = commonUtil.getStringFormatCell(currentRow.getCell(0,MissingCellPolicy.CREATE_NULL_AS_BLANK));
-            sreconRecord.setTxnReferenceID(commonUtil.getStringFormatCell(currentRow.getCell(2,MissingCellPolicy.CREATE_NULL_AS_BLANK)));
-            
-            String adjCount = commonUtil.getStringFormatCell(currentRow.getCell(33,MissingCellPolicy.CREATE_NULL_AS_BLANK));
-            if(adjCount!= null && !adjCount.isEmpty()) {
-            sreconRecord.setAdjustmentCount(adjCount);
+            if(fileType.equals("STRAN")) {
+            	setSTRANreconValue(sreconRecord,currentRow,validateParam);
             }else {
-            	sreconRecord.setAdjustmentCount("0");
+            	setSCORRreconValue(sreconRecord,currentRow,validateParam);
             }
-            
-            String resubmitCount = commonUtil.getStringFormatCell(currentRow.getCell(34,MissingCellPolicy.CREATE_NULL_AS_BLANK));
-			if (resubmitCount != null && !resubmitCount.isEmpty()) {
-				sreconRecord.setResubmitCount(resubmitCount);
-			} else {
-				sreconRecord.setResubmitCount("0");
-			}
-			
-			String reconHomeAgencyID =commonUtil.getStringFormatCell(currentRow.getCell(35,MissingCellPolicy.CREATE_NULL_AS_BLANK));
-            if (reconHomeAgencyID != null && !reconHomeAgencyID.isEmpty()) {
-				sreconRecord.setReconHomeAgencyID(reconHomeAgencyID);
-			}else {
-				sreconRecord.setReconHomeAgencyID(validateParam.getFromAgency());
-			}
-            
-            String homeAgencyTxnRefID = commonUtil.getStringFormatCell(currentRow.getCell(36,MissingCellPolicy.CREATE_NULL_AS_BLANK));
-			if (homeAgencyTxnRefID != null && !homeAgencyTxnRefID.isEmpty()) {
-				sreconRecord.setHomeAgencyTxnRefID(homeAgencyTxnRefID);
-			}
-			
-            sreconRecord.setPostingDisposition(commonUtil.getStringFormatCell(currentRow.getCell(37,MissingCellPolicy.CREATE_NULL_AS_BLANK)));
-            String discountPlanType = commonUtil.getStringFormatCell(currentRow.getCell(38,MissingCellPolicy.CREATE_NULL_AS_BLANK));
-			if (discountPlanType != null && !discountPlanType.isEmpty()) {
-				sreconRecord.setDiscountPlanType(discountPlanType);
-			}
-            sreconRecord.setPostedAmount(commonUtil.getStringFormatCell(currentRow.getCell(39,MissingCellPolicy.CREATE_NULL_AS_BLANK)));
-            sreconRecord.setPostedDateTime(commonUtil.getStringFormatCell(currentRow.getCell(40,MissingCellPolicy.CREATE_NULL_AS_BLANK)));
-            
-            String transFlatFee = commonUtil.getStringFormatCell(currentRow.getCell(41,MissingCellPolicy.CREATE_NULL_AS_BLANK));
-            
-			if (transFlatFee != null && !transFlatFee.isEmpty()) {
-				sreconRecord.setTransFlatFee(adjCount);
-			} else {
-				sreconRecord.setTransFlatFee("0");
-			}
-            String transPercentFee =commonUtil.getStringFormatCell(currentRow.getCell(42,MissingCellPolicy.CREATE_NULL_AS_BLANK));
-            
-			if (transPercentFee != null && !transPercentFee.isEmpty()) {
-				sreconRecord.setTransPercentFee(transPercentFee);
-			} else {
-				sreconRecord.setTransPercentFee("0");
-			}
-
-            String spare = commonUtil.getStringFormatCell(currentRow.getCell(43,MissingCellPolicy.CREATE_NULL_AS_BLANK));
-			if (spare != null && !spare.isEmpty()) {
-				sreconRecord.setSpare1(spare);
-			}
-			spare = commonUtil.getStringFormatCell(currentRow.getCell(44,MissingCellPolicy.CREATE_NULL_AS_BLANK));
-			if (spare != null && !spare.isEmpty()) {
-				sreconRecord.setSpare2(spare);
-			}
-			
-			spare = commonUtil.getStringFormatCell(currentRow.getCell(45,MissingCellPolicy.CREATE_NULL_AS_BLANK));
-			if (spare != null && !spare.isEmpty()) {
-				sreconRecord.setSpare3(spare);
-			}
-			
-			spare = commonUtil.getStringFormatCell(currentRow.getCell(46,MissingCellPolicy.CREATE_NULL_AS_BLANK));
-			if (spare != null && !spare.isEmpty()) {
-				sreconRecord.setSpare4(spare);
-			}
-			
-			spare = commonUtil.getStringFormatCell(currentRow.getCell(47,MissingCellPolicy.CREATE_NULL_AS_BLANK));
-			if (spare != null && !spare.isEmpty()) {
-				sreconRecord.setSpare5(spare);
-			}
-            
             reconRecordList.add(sreconRecord);
             System.out.println("tranRecord :: "+sreconRecord.toString());
           }
@@ -258,5 +192,192 @@ public class SRECONFileGenerator {
       
 		return reconRecordList;
 	
+	}
+
+	private void setSCORRreconValue(ReconciliationRecord sreconRecord, Row currentRow,
+			FileValidationParam validateParam) {
+
+
+		// sreconRecord.setTxnDataSeqNo(commonUtil.getStringFormatCell(currentRow.getCell(0,MissingCellPolicy.CREATE_NULL_AS_BLANK)));
+		txnDataSeqNo = commonUtil.getStringFormatCell(currentRow.getCell(0, MissingCellPolicy.CREATE_NULL_AS_BLANK));
+		sreconRecord.setTxnReferenceID(
+				commonUtil.getStringFormatCell(currentRow.getCell(10, MissingCellPolicy.CREATE_NULL_AS_BLANK)));
+
+		String adjCount = commonUtil
+				.getStringFormatCell(currentRow.getCell(41, MissingCellPolicy.CREATE_NULL_AS_BLANK));
+		if (adjCount != null && !adjCount.isEmpty()) {
+			sreconRecord.setAdjustmentCount(adjCount);
+		} else {
+			sreconRecord.setAdjustmentCount("0");
+		}
+
+		String resubmitCount = commonUtil
+				.getStringFormatCell(currentRow.getCell(42, MissingCellPolicy.CREATE_NULL_AS_BLANK));
+		if (resubmitCount != null && !resubmitCount.isEmpty()) {
+			sreconRecord.setResubmitCount(resubmitCount);
+		} else {
+			sreconRecord.setResubmitCount("0");
+		}
+
+		String reconHomeAgencyID = commonUtil
+				.getStringFormatCell(currentRow.getCell(43, MissingCellPolicy.CREATE_NULL_AS_BLANK));
+		if (reconHomeAgencyID != null && !reconHomeAgencyID.isEmpty()) {
+			sreconRecord.setReconHomeAgencyID(reconHomeAgencyID);
+		} else {
+			sreconRecord.setReconHomeAgencyID(validateParam.getFromAgency());
+		}
+
+		String homeAgencyTxnRefID = commonUtil
+				.getStringFormatCell(currentRow.getCell(44, MissingCellPolicy.CREATE_NULL_AS_BLANK));
+		if (homeAgencyTxnRefID != null && !homeAgencyTxnRefID.isEmpty()) {
+			sreconRecord.setHomeAgencyTxnRefID(homeAgencyTxnRefID);
+		}
+
+		sreconRecord.setPostingDisposition(
+				commonUtil.getStringFormatCell(currentRow.getCell(45, MissingCellPolicy.CREATE_NULL_AS_BLANK)));
+		String discountPlanType = commonUtil
+				.getStringFormatCell(currentRow.getCell(46, MissingCellPolicy.CREATE_NULL_AS_BLANK));
+		if (discountPlanType != null && !discountPlanType.isEmpty()) {
+			sreconRecord.setDiscountPlanType(discountPlanType);
+		}
+		sreconRecord.setPostedAmount(
+				commonUtil.getStringFormatCell(currentRow.getCell(47, MissingCellPolicy.CREATE_NULL_AS_BLANK)));
+		sreconRecord.setPostedDateTime(
+				commonUtil.getStringFormatCell(currentRow.getCell(48, MissingCellPolicy.CREATE_NULL_AS_BLANK)));
+
+		String transFlatFee = commonUtil
+				.getStringFormatCell(currentRow.getCell(49, MissingCellPolicy.CREATE_NULL_AS_BLANK));
+
+		if (transFlatFee != null && !transFlatFee.isEmpty()) {
+			sreconRecord.setTransFlatFee(adjCount);
+		} else {
+			sreconRecord.setTransFlatFee("0");
+		}
+		String transPercentFee = commonUtil
+				.getStringFormatCell(currentRow.getCell(50, MissingCellPolicy.CREATE_NULL_AS_BLANK));
+
+		if (transPercentFee != null && !transPercentFee.isEmpty()) {
+			sreconRecord.setTransPercentFee(transPercentFee);
+		} else {
+			sreconRecord.setTransPercentFee("0");
+		}
+
+		String spare = commonUtil.getStringFormatCell(currentRow.getCell(51, MissingCellPolicy.CREATE_NULL_AS_BLANK));
+		if (spare != null && !spare.isEmpty()) {
+			sreconRecord.setSpare1(spare);
+		}
+		spare = commonUtil.getStringFormatCell(currentRow.getCell(52, MissingCellPolicy.CREATE_NULL_AS_BLANK));
+		if (spare != null && !spare.isEmpty()) {
+			sreconRecord.setSpare2(spare);
+		}
+
+		spare = commonUtil.getStringFormatCell(currentRow.getCell(53, MissingCellPolicy.CREATE_NULL_AS_BLANK));
+		if (spare != null && !spare.isEmpty()) {
+			sreconRecord.setSpare3(spare);
+		}
+
+		spare = commonUtil.getStringFormatCell(currentRow.getCell(54, MissingCellPolicy.CREATE_NULL_AS_BLANK));
+		if (spare != null && !spare.isEmpty()) {
+			sreconRecord.setSpare4(spare);
+		}
+
+		spare = commonUtil.getStringFormatCell(currentRow.getCell(55, MissingCellPolicy.CREATE_NULL_AS_BLANK));
+		if (spare != null && !spare.isEmpty()) {
+			sreconRecord.setSpare5(spare);
+		}
+
+	}
+
+
+	private void setSTRANreconValue(ReconciliationRecord sreconRecord,Row currentRow,FileValidationParam validateParam) {
+
+		// sreconRecord.setTxnDataSeqNo(commonUtil.getStringFormatCell(currentRow.getCell(0,MissingCellPolicy.CREATE_NULL_AS_BLANK)));
+		txnDataSeqNo = commonUtil.getStringFormatCell(currentRow.getCell(0, MissingCellPolicy.CREATE_NULL_AS_BLANK));
+		sreconRecord.setTxnReferenceID(
+				commonUtil.getStringFormatCell(currentRow.getCell(2, MissingCellPolicy.CREATE_NULL_AS_BLANK)));
+
+		String adjCount = commonUtil
+				.getStringFormatCell(currentRow.getCell(33, MissingCellPolicy.CREATE_NULL_AS_BLANK));
+		if (adjCount != null && !adjCount.isEmpty()) {
+			sreconRecord.setAdjustmentCount(adjCount);
+		} else {
+			sreconRecord.setAdjustmentCount("0");
+		}
+
+		String resubmitCount = commonUtil
+				.getStringFormatCell(currentRow.getCell(34, MissingCellPolicy.CREATE_NULL_AS_BLANK));
+		if (resubmitCount != null && !resubmitCount.isEmpty()) {
+			sreconRecord.setResubmitCount(resubmitCount);
+		} else {
+			sreconRecord.setResubmitCount("0");
+		}
+
+		String reconHomeAgencyID = commonUtil
+				.getStringFormatCell(currentRow.getCell(35, MissingCellPolicy.CREATE_NULL_AS_BLANK));
+		if (reconHomeAgencyID != null && !reconHomeAgencyID.isEmpty()) {
+			sreconRecord.setReconHomeAgencyID(reconHomeAgencyID);
+		} else {
+			sreconRecord.setReconHomeAgencyID(validateParam.getFromAgency());
+		}
+
+		String homeAgencyTxnRefID = commonUtil
+				.getStringFormatCell(currentRow.getCell(36, MissingCellPolicy.CREATE_NULL_AS_BLANK));
+		if (homeAgencyTxnRefID != null && !homeAgencyTxnRefID.isEmpty()) {
+			sreconRecord.setHomeAgencyTxnRefID(homeAgencyTxnRefID);
+		}
+
+		sreconRecord.setPostingDisposition(
+				commonUtil.getStringFormatCell(currentRow.getCell(37, MissingCellPolicy.CREATE_NULL_AS_BLANK)));
+		String discountPlanType = commonUtil
+				.getStringFormatCell(currentRow.getCell(38, MissingCellPolicy.CREATE_NULL_AS_BLANK));
+		if (discountPlanType != null && !discountPlanType.isEmpty()) {
+			sreconRecord.setDiscountPlanType(discountPlanType);
+		}
+		sreconRecord.setPostedAmount(
+				commonUtil.getStringFormatCell(currentRow.getCell(39, MissingCellPolicy.CREATE_NULL_AS_BLANK)));
+		sreconRecord.setPostedDateTime(
+				commonUtil.getStringFormatCell(currentRow.getCell(40, MissingCellPolicy.CREATE_NULL_AS_BLANK)));
+
+		String transFlatFee = commonUtil
+				.getStringFormatCell(currentRow.getCell(41, MissingCellPolicy.CREATE_NULL_AS_BLANK));
+
+		if (transFlatFee != null && !transFlatFee.isEmpty()) {
+			sreconRecord.setTransFlatFee(adjCount);
+		} else {
+			sreconRecord.setTransFlatFee("0");
+		}
+		String transPercentFee = commonUtil
+				.getStringFormatCell(currentRow.getCell(42, MissingCellPolicy.CREATE_NULL_AS_BLANK));
+
+		if (transPercentFee != null && !transPercentFee.isEmpty()) {
+			sreconRecord.setTransPercentFee(transPercentFee);
+		} else {
+			sreconRecord.setTransPercentFee("0");
+		}
+
+		String spare = commonUtil.getStringFormatCell(currentRow.getCell(43, MissingCellPolicy.CREATE_NULL_AS_BLANK));
+		if (spare != null && !spare.isEmpty()) {
+			sreconRecord.setSpare1(spare);
+		}
+		spare = commonUtil.getStringFormatCell(currentRow.getCell(44, MissingCellPolicy.CREATE_NULL_AS_BLANK));
+		if (spare != null && !spare.isEmpty()) {
+			sreconRecord.setSpare2(spare);
+		}
+
+		spare = commonUtil.getStringFormatCell(currentRow.getCell(45, MissingCellPolicy.CREATE_NULL_AS_BLANK));
+		if (spare != null && !spare.isEmpty()) {
+			sreconRecord.setSpare3(spare);
+		}
+
+		spare = commonUtil.getStringFormatCell(currentRow.getCell(46, MissingCellPolicy.CREATE_NULL_AS_BLANK));
+		if (spare != null && !spare.isEmpty()) {
+			sreconRecord.setSpare4(spare);
+		}
+
+		spare = commonUtil.getStringFormatCell(currentRow.getCell(47, MissingCellPolicy.CREATE_NULL_AS_BLANK));
+		if (spare != null && !spare.isEmpty()) {
+			sreconRecord.setSpare5(spare);
+		}
+
 	}
 }

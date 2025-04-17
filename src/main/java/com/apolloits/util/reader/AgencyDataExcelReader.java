@@ -46,6 +46,7 @@ public class AgencyDataExcelReader {
 	private List<AgencyEntity> agList;
 	
 	private List<NiopAgencyEntity> niopAgList;
+	private List<AgencyEntity> ctocAgList;
 	
 	public static HashSet<String> agencyCode;
 	public static HashSet<String> tagAgencyCode;
@@ -64,13 +65,15 @@ public class AgencyDataExcelReader {
 	String AgencyListing_SHEET = "UtilityAgencyListing";
 	String UtilityParam_SHEET = "UtilityParam";
 	String PlateType_SHEET = "AppJ_PlateType_1_60";
-	
+	String ctocUtilityParam_SHEET = "Utility Param";
 	@Value("${excel.data}")
 	String dataPath;
 	
 	@Value("${excel.data.niop}")
 	String niopDataPath;
 	
+	@Value("${CTOCexcel.data}")
+	String ctocDataPath;
      //C:\Users\dselvaraj\git\iopUtilValidation\src\main\resources\Utlity Table.xlsx
      @PostConstruct
      public void init() throws IopTranslatorException {
@@ -99,7 +102,14 @@ public class AgencyDataExcelReader {
 					log.info("NIOP Number of sheets : " + niopWorkbook.getNumberOfSheets());
 					
 					excelToNiopAgencyList(niopWorkbook.getSheet(AgencyListing_SHEET));
-				 
+
+					log.info("Ctoc Excel data path location form property file ::"+ctocDataPath);
+					FileInputStream fis = new FileInputStream(ctocDataPath);
+					Workbook workBookCtoc = new XSSFWorkbook(fis);
+					log.info("Number of sheets CTOC: " + workBookCtoc.getNumberOfSheets());
+					excelToCtocAgencyList(workBookCtoc.getSheet(AgencyListing_SHEET),"CTOC");
+					workBookCtoc.close();
+					
 				} catch (IOException e) {
 					log.error("init exception in excel reader");
 					e.printStackTrace();
@@ -463,5 +473,110 @@ public class AgencyDataExcelReader {
     		 System.out.println("set agencyCode:: "+code.length() +"\t code ::"+code);
 		}
      }
-
+    public void excelToCtocAgencyList(Sheet sheet,String HUB) {
+   	 log.info("Inside ****************** excelToAgencyList():"+sheet);
+        try {
+       	
+          Iterator<Row> rows = sheet.iterator();
+          List<AgencyEntity> agList = new ArrayList<AgencyEntity>();
+          int rowNumber = 0;
+          while (rows.hasNext()) {
+            Row currentRow = rows.next();
+            // skip header
+            if (rowNumber == 0) {
+              rowNumber++;
+              continue;
+            }
+            Iterator<Cell> cellsInRow = currentRow.iterator();
+            AgencyEntity agency = new AgencyEntity();
+            int cellIdx = 0;
+            while (cellsInRow.hasNext()) {
+              Cell currentCell = cellsInRow.next();
+              switch (cellIdx) {
+              case 0:
+           	   agency.setHomeAgency((int) Math.round(currentCell.getNumericCellValue()));
+           	   System.out.println("case 0::"+currentCell.getNumericCellValue());
+                break;
+              case 1:
+                  agency.setAwayAgency((int) Math.round(currentCell.getNumericCellValue()));
+                  System.out.println("case 1::"+currentCell.getNumericCellValue());
+                break;
+              case 2:
+                  agency.setCSCID(currentCell.getStringCellValue());
+                  System.out.println("case 2::"+currentCell.getStringCellValue());
+                break;
+              case 3:
+                agency.setCSCName(currentCell.getStringCellValue());
+                System.out.println("case 3::"+currentCell.getStringCellValue());
+                break;
+              case 4:
+                  agency.setCSCAgencyShortName(currentCell.getStringCellValue());
+                  System.out.println("case 4::"+currentCell.getStringCellValue());
+                  break;
+              case 5:
+                  agency.setVersionNumber(currentCell.getStringCellValue());
+                  System.out.println("case 5::"+currentCell.getStringCellValue());
+                  break;
+              case 6:
+                  agency.setHomeAgencyID(currentCell.getStringCellValue());
+                  System.out.println("case 6::"+currentCell.getStringCellValue());
+                  break;
+              case 7:
+                  agency.setTagAgencyID(currentCell.getStringCellValue());
+                  System.out.println("case 7::"+currentCell.getStringCellValue());
+                  break;
+              case 8:
+                  agency.setTagSequenceStart(currentCell.getStringCellValue());
+                  System.out.println("case 8::"+currentCell.getStringCellValue());
+                  break;
+              case 9:
+                  agency.setTagSequenceEnd(currentCell.getStringCellValue());
+                  System.out.println("case 9::"+currentCell.getStringCellValue());
+                  break;
+              case 10:
+                  agency.setITAG((int) Math.round(currentCell.getNumericCellValue()));
+                  System.out.println("case 10::"+currentCell.getNumericCellValue());
+                  break;
+              case 11:
+                  agency.setICLP((int) Math.round(currentCell.getNumericCellValue()));
+                  System.out.println("case 11::"+currentCell.getNumericCellValue());
+                  break;
+              case 12:
+                  agency.setHubName(currentCell.getStringCellValue());
+                  System.out.println("case 12::"+currentCell.getStringCellValue());
+                  break;
+              case 13:
+                  agency.setHubId((int) Math.round(currentCell.getNumericCellValue()));
+                  System.out.println("case 13::"+currentCell.getNumericCellValue());
+                  break;
+              default:
+           	 //  System.out.println("Default:: ********************");
+                break;
+              }
+              cellIdx++;
+            }
+            if (HUB.equals("CTOC"))
+               agList.add(agency);
+            else
+           	 agList.add(agency);
+          }
+         
+          if(agList != null && agList.size()>0) {
+          dbLog.saveAgencyList(agList);
+          log.info("@@@@ Agency List loaded sucessfully:: ********************");
+          }else {
+       	   throw new IopTranslatorException("Agency data not loaded");
+          }
+         
+          if (HUB.equals("CTOC"))
+              this.ctocAgList = agList;
+          else
+       	   this.agList = agList;
+         
+          
+        }catch (Exception e) {
+       	log.error("Exception:: ******************** UtilityAgencyListing_SHEET");
+			e.printStackTrace();
+		}
+      }
 }

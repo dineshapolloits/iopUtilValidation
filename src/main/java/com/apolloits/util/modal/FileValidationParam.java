@@ -22,5 +22,5 @@ public class FileValidationParam {
 	
 	private Long bulkIdentifier;
 	
-	
+	private String fileSequence;
 }

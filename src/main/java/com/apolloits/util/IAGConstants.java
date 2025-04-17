@@ -1,6 +1,9 @@
 package com.apolloits.util;
 
 
+import java.util.Arrays;
+import java.util.List;
+
 import org.springframework.stereotype.Component;
 
 @Component
@@ -90,5 +93,35 @@ public class IAGConstants {
     public static final String HEADER_RECORD_TYPE ="Header";
     public static final String DETAIL_RECORD_TYPE ="Detail";
     public static final String FILE_RECORD_TYPE ="File";
+    
+    public static final String CTOC_FILE_TYPES = "tag,plt,tol,trc,pbp,prc,ack,cor,crc";
+    public static final String TAG_FILE_TYPE = "TAG";
+    public static final String PLT_FILE_TYPE = "PLT";
+    public static final String TOLL_FILE_TYPE = "TOL";
+    public static final String TOLL_RECON_FILE_TYPE = "TRC";
+    public static final String PAY_BY_PLATE_FILE_TYPE = "PBP";
+    public static final String PLATE_RECON_FILE_TYPE = "PRC";
+    public static final String COR_FILE_TYPE = "COR";
+    public static final String COR_RECON_FILE_TYPE = "CRC";
+    public static final String ACK_FILETYPE = "ACK";
+    public static final String YYYY_MM_DD = "yyyyMMdd";
+    public static final String HH_MM_SS = "HHmmss";
+    public static final String BATA_AGENCY = "at";
+    public static final String GGBHTD_AGENCY = "gg";
+    public static final String SANDAG_AGENCY = "sd";
+    public static final String  SR= "sr";
+    public static final String TCA_AGENCY = "tc";
+    public static final String CV = "cv";
+    public static final String LA_METRO_AGENCY = "la";
+    public static final String WR = "wr";
+    public static final String RCTC_AGENCY = "rc";
+    public static final String OCTA_AGENCY = "oc";
+    public static final String OD = "od";
+    public static final String WASHDOT_AGENCY = "wd";
+    public static final String UDOT_AGENCY = "ud";
+    public static final String POHR_AGENCY = "hr";
+   
+  //  public static final String[] AGENCY_CODES= {"at","gg","sd","sr","tc","cv","la","wr","rc","oc","od","wd","ud","hr"};
+    public static final List<String> AGENCY_CODES = Arrays.asList("at","gg","sd","sr","tc","cv","la","wr","rc","oc","od","wd","ud","hr");
     
 }

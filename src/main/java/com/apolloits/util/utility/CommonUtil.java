@@ -6,6 +6,7 @@ import static com.apolloits.util.IAGConstants.FILE_RECORD_TYPE;
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -18,6 +19,7 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.time.Instant;
 import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.time.ZoneOffset;
 //import java.time.ZonedDateTime;
 import java.time.ZonedDateTime;
@@ -1217,5 +1219,192 @@ private static AgencyDataExcelReader appConfig;
 			return null;
 		}
 	}
+	 public boolean validateTAGFileName(String fileName) {
+		 log.error("inputtagFile.getName()"+fileName);
+			if (fileName != null && fileName.length() == 24) {
+				String[] fileParams = fileName.split("[_.]");
+				 log.error("fileParams:"+fileParams[0]+":"+fileParams[1]+":"+fileParams[2]);
+				 System.out.println("fileParams[2]:::::::"+fileParams[2]);
+				//if(IAGConstants.AGENCY_CODES.contains(fileParams[0].substring(0,2)) && IAGConstants.AGENCY_CODES.contains(fileParams[1].substring(2,4)))
+				if ( IAGConstants.CTOC_FILE_TYPES.contains(fileParams[2]) ) {
+						//&& AgencyDataExcelReader.agencyCode.contains(fileParams[0])) {
+					
+					if(Integer.parseInt(fileParams[1].substring(0, 4))<fileStartYear) {
+						return false;
+					}
+					SimpleDateFormat dateFormat = new SimpleDateFormat(IAGConstants.YYYY_MM_DD);
+					dateFormat.setLenient(false);
+					SimpleDateFormat dateFormat1 = new SimpleDateFormat(IAGConstants.HH_MM_SS);
+					dateFormat1.setLenient(false);
+					try {
+						dateFormat.parse(fileParams[1].substring(0, 8).trim());
+						dateFormat1.parse(fileParams[1].substring(9, 15).trim());
+						  System.out.println("Returning true.");
+						return true;
+					} catch (ParseException pe) {
+						return false;
+					}
+					
+				}
+			} else 	if (fileName != null && fileName.length() == 45) {
+				String[] fileParams = fileName.split("[_.]"); //atsr_20250204_015555_srat_20250204_014627.trc
+				 log.error("fileParams:"+fileParams[0]+":"+fileParams[1]+":"+fileParams[2]+":"+fileParams[3]);
+				 if ( IAGConstants.CTOC_FILE_TYPES.contains(fileParams[4]) ) {
+						//&& AgencyDataExcelReader.agencyCode.contains(fileParams[0])) {
+					
+					if(Integer.parseInt(fileParams[1].substring(0, 4))<fileStartYear) {
+						return false;
+					}
+					SimpleDateFormat dateFormat = new SimpleDateFormat(IAGConstants.YYYY_MM_DD);
+					dateFormat.setLenient(false);
+					SimpleDateFormat dateFormat1 = new SimpleDateFormat(IAGConstants.HH_MM_SS);
+					dateFormat1.setLenient(false);
+					try {
+						dateFormat.parse(fileParams[1].substring(0, 8).trim());
+						dateFormat1.parse(fileParams[1].substring(9, 15).trim());
+						dateFormat.parse(fileParams[3].substring(0, 8).trim());
+						dateFormat1.parse(fileParams[3].substring(9, 15).trim());
+						  System.out.println("Returning true.");
+						return true;
+					} catch (ParseException pe) {
+						return false;
+					}
+					
+				}
+			}
+			return false;
+	 }
+	 public static boolean isValidDate(String dateStr) {         
+		 SimpleDateFormat sdf = new SimpleDateFormat("MM/dd/yyyy");      
+		 sdf.setLenient(false);  
+		 try {                    
+			 sdf.parse(dateStr);            
+			 return true;      
+			 } catch (ParseException e) 
+		 { return false; 
+		 }
+	 }
+	// Method to validate the actual date-time correctness (e.g., 2020-01-21T21:10:30-08:00)
+	    public static boolean validateUTCDateTime(String dateTime) {
+	        try {
+	        	if(dateTime.trim().isEmpty()) {
+	        		return true;
+	        	}
+	            // Use DateTimeFormatter for ISO offset date-time format (2020-01-21T21:10:30-08:00)
+	            DateTimeFormatter formatter = DateTimeFormatter.ISO_OFFSET_DATE_TIME;
+	            formatter.parse(dateTime);  // Try parsing the string
+	            return true;  // If parsing succeeds, return true
+	        } catch (DateTimeParseException e) {
+	            return false;  // If parsing fails, return false
+	        }
+	    }	 
+	    public static boolean isValidFormat(String dateStr) {         
+			 SimpleDateFormat sdf = new SimpleDateFormat("yyyy/MM/dd");      
+			 sdf.setLenient(false);  
+			 try {                    
+				 sdf.parse(dateStr);            
+				 return true;      
+				 } catch (ParseException e) 
+			 { return false; 
+			 }
+		 }
+	    public boolean validateACKFileName(String fileName) {
+	    	
+	    	log.error("inputtagFile.getName()"+fileName);
+	    	if (fileName != null && fileName.length() == 45) {
+	    		String[] fileParams = fileName.split("[_.]"); ////atsr_20250204T015555_srat_20250204T014627.ack
+	    		 if ( IAGConstants.CTOC_FILE_TYPES.contains(fileParams[4]) ) {
+	    				//&& AgencyDataExcelReader.agencyCode.contains(fileParams[0])) {
+	    			
+	    			if(Integer.parseInt(fileParams[1].substring(0, 4))<fileStartYear) {
+	    				return false;
+	    			}
+	    			
+	    			SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMdd'T'HHmmss");        
+	    			sdf.setLenient(false);  // Prevent lenient parsing
+	    			try {             // Attempt to parse the date           
+	    				sdf.parse(fileParams[1]);  
+	    				sdf.parse(fileParams[3]); 
+	    				return true;  // Date is valid       
+	    				} catch (ParseException e) { 
+	    					// Parsing failed, so the date format is incorrect
+	    					return false;
+	    				}
+	    			}
+	    	}
+	    	return false;	 
+	    }
+	    
+	    public static boolean hasLFLineEndings(String filePath) throws IOException {
+	        File file = new File(filePath);
+	        if (!file.exists() || !file.isFile()) {
+	            throw new IOException("File not found or is not a regular file.");
+	        }
+	 
+	        // Read the file byte by byte
+	        try (FileInputStream fis = new FileInputStream(file)) {
+	            int byteRead;
+	            boolean containsLF = false;
+	            while ((byteRead = fis.read()) != -1) {
+	                if (byteRead == '\n') {  // Check if the byte is LF
+	                    containsLF = true;
+	                    break;
+	                }
+	            }
+	            return containsLF;
+	        }
+	    }
+	    public static String convertUTCToDate(String inputDateTime) {
+	    	//String inputDateTime = "2025-03-17T10:02:30-07:00";
+	    	 System.out.println(" System.out.println(inputDateTime);:"+inputDateTime);
+	        ZonedDateTime zonedDateTime = ZonedDateTime.parse(inputDateTime, DateTimeFormatter.ISO_OFFSET_DATE_TIME);
+	        // Convert the ZonedDateTime to UTC by converting it to UTC (ZoneOffset.UTC)
+	        ZonedDateTime utcDateTime = zonedDateTime.withZoneSameInstant(ZoneOffset.UTC);
+	        // Format the UTC time into yyyymmddThhmmss format with 12-hour format (hh)
+	        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyyMMdd'T'HHmmss");//Need to be 'hh'
+	        String formattedDateTime = utcDateTime.format(formatter);
+	        // Output the result
+	        System.out.println("formattedDateTime:::::::::::::"+formattedDateTime);
+	        return formattedDateTime;
+	    }
+	public static Boolean compareUtcTimes(String createDate, String corrDate) {
+
+		DateTimeFormatter formatter = DateTimeFormatter.ISO_OFFSET_DATE_TIME;
+        ZonedDateTime zdt1 = ZonedDateTime.parse(createDate, formatter);
+        ZonedDateTime zdt2 = ZonedDateTime.parse(corrDate, formatter);
+        if (zdt1.isAfter(zdt2)) {
+        	return true;
+        } else if (zdt1.isBefore(zdt2)) {
+        	System.out.println("zdt1 is after zdt2"+zdt2);
+        	return false;
+        } else {
+        	return true;
+        }
+    }
+	public static String getCtocUTCDateandTime() {
+		try {
+			ZonedDateTime now = ZonedDateTime.now(ZoneId.of("America/Los_Angeles"));
+			DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ssXXX");
+			return now.format(formatter);
+		} catch (DateTimeParseException e) {
+			e.printStackTrace();
+			return null;
+		}
+	}
+	
+	public static String convertDatetoUTC(String input) {  // Parse the input string as UTC (no timezone provided, assuming UTC)
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyyMMdd'T'HHmmss");
+        LocalDateTime localDateTime = LocalDateTime.parse(input, formatter);
+ 
+        // Convert to UTC first (assumed UTC)
+        ZonedDateTime utcDateTime = localDateTime.atZone(ZoneId.of("UTC"));
+ 
+        // Convert UTC to America/Los_Angeles time zone
+        ZonedDateTime laDateTime = utcDateTime.withZoneSameInstant(ZoneId.of("America/Los_Angeles"));
+ 
+        // Return the formatted date-time as a string in the requested format
+        return laDateTime.format(DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ssXXX"));
+        }
+	
 	
 }

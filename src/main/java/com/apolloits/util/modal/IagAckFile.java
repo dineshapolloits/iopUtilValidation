@@ -15,4 +15,7 @@ public class IagAckFile{
     private String origFileName;
     private String returnCode;
 
+    //CTOC
+    private String recordType;
+    private String ackDate;
 }

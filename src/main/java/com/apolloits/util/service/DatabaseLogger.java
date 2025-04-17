@@ -73,7 +73,14 @@ public class DatabaseLogger {
 		}
 		return map;
 	}
-	
+	public Map<String, String> getCscAgencyIdandShortNamebymap(String name) {
+		List<AgencyEntity> agencyList = agencyRepo.findByHubName(name, Sort.by("CSCID").ascending());//(Sort.by(Sort.Direction.ASC, "CSCID"));
+		 Map<String, String> map = new LinkedHashMap<>();
+		 for (AgencyEntity agencyEntity : agencyList) {
+			 map.put(agencyEntity.getCSCID(), agencyEntity.getCSCID()+"-"+agencyEntity.getCSCAgencyShortName());
+		}
+		return map;
+	}
 	public Map<String, NiopAgencyEntity> getAllNiopCSCIdbyAgencyMap() {
 		List<NiopAgencyEntity> cscIdAgencyList =niopAgencyRepo.findAll();
 		//(r1, r2) -> r1

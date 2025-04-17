@@ -18,6 +18,7 @@ import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
+import org.apache.poi.ss.usermodel.Row.MissingCellPolicy;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -123,106 +124,84 @@ private List<TRCTemplate> excelToTolList(Sheet sheet) {
              rowNumber++;
              continue;
            }
-           Iterator<Cell> cellsInRow = currentRow.iterator();
+          // Iterator<Cell> cellsInRow = currentRow.iterator();
            TRCTemplate tolTemp = new TRCTemplate();
-           int cellIdx = 0;
-           while (cellsInRow.hasNext()) {
-               Cell currentCell = cellsInRow.next();
-               switch (cellIdx) {
-               case 0:
-              	 tolTemp.setSequence(commonUtil.getStringFormatCell(currentCell));
-              	   System.out.println("case 0::"+tolTemp.getSequence());
-                   break;
-               case 1:
-              	 tolTemp.setTagID(commonUtil.getStringFormatCell(currentCell));
-            	   System.out.println("case 1::"+tolTemp.getTagID());
-                 break;
-               case 2:
-             	  //ictxTemp.setEtcTrxSerialNo(commonUtil.getStringFormatCell(currentRow.getCell(1,MissingCellPolicy.CREATE_NULL_AS_BLANK)));
-              	 tolTemp.setTran(commonUtil.getStringFormatCell(currentCell));
-                   System.out.println("case 2::"+tolTemp.getTran());
-                   
-                 break;
-               case 3:
-              	 tolTemp.setTranAmount(commonUtil.getStringFormatCell(currentCell));
-                   System.out.println("case 3::"+tolTemp.getTranAmount());
-                 break;
-               case 4:
-              	 tolTemp.setEntryTranDate(commonUtil.getStringFormatCell(currentCell));
-                 System.out.println("case 4::"+tolTemp.getEntryTranDate());
-                 break;
-               case 5:
-              	 tolTemp.setEntryPlaza(commonUtil.getStringFormatCell(currentCell));
-                   System.out.println("case 5::"+tolTemp.getEntryPlaza());
-                   break;
-               case 6:
-              	 tolTemp.setEntryLane(commonUtil.getStringFormatCell(currentCell));
-                   System.out.println("case 6::"+tolTemp.getEntryLane());
-                   break;
-               case 7:
-              	 tolTemp.setExitTranDate(commonUtil.getStringFormatCell(currentCell));
-                   System.out.println("case 7::"+tolTemp.getExitTranDate());
-                   break;
-               case 8:
-              	 tolTemp.setExitPlaza(commonUtil.getStringFormatCell(currentCell));
-                   System.out.println("case 8::"+tolTemp.getExitPlaza());
-                   break;
-               case 9:
-              	 tolTemp.setExitLane(commonUtil.getStringFormatCell(currentCell));
-                   System.out.println("case 9::"+tolTemp.getExitLane());
-                   break;
-               case 10:
-              	 tolTemp.setAxleCount(commonUtil.getStringFormatCell(currentCell));
-                   System.out.println("case 10::"+tolTemp.getAxleCount());
-                   break;
-               case 11:
-              	 tolTemp.setOccupancy(commonUtil.getStringFormatCell(currentCell));
-                   System.out.println("case 11::"+tolTemp.getOccupancy());
-                   break;
-               case 12:
-              	 tolTemp.setProtocolType(commonUtil.getStringFormatCell(currentCell));
-                   System.out.println("case 12::"+tolTemp.getProtocolType());
-                   break;
-               case 13:
-                	 tolTemp.setVehicleType(commonUtil.getStringFormatCell(currentCell));
-                     System.out.println("case 13::"+tolTemp.getVehicleType());
-                     break;
-               case 14:
-              	 tolTemp.setWrTranFee(commonUtil.getStringFormatCell(currentCell));
-                   System.out.println("case 14::"+tolTemp.getWrTranFee());
-                   break;
-               case 15:
-              	 tolTemp.setWrFeeType(commonUtil.getStringFormatCell(currentCell));
-                   System.out.println("case 15::"+tolTemp.getWrFeeType());
-                   break;
-               case 16:
-                	 tolTemp.setGuarantee(commonUtil.getStringFormatCell(currentCell));
-                     System.out.println("case 15::"+tolTemp.getGuarantee());
-                     break;
-               case 17:
-              	 tolTemp.setPostAmt(commonUtil.getStringFormatCell(currentCell));
-                   System.out.println("case 15::"+tolTemp.getPostAmt());
-                   break;
-               case 18:
-                	 tolTemp.setResponseCode(commonUtil.getStringFormatCell(currentCell));
-                     System.out.println("case 18::"+tolTemp.getResponseCode());
-                     break;
-               case 19:
-                	 tolTemp.setNiopFee(commonUtil.getStringFormatCell(currentCell));
-                     System.out.println("case 19::"+tolTemp.getNiopFee());
-                     break;
-               case 20:
-              	 tolTemp.setOriginalFilename(commonUtil.getStringFormatCell(currentCell));
-                   System.out.println("case 20::"+tolTemp.getOriginalFilename());
-                   break; 
-               default:
-            	 //  System.out.println("Default:: ********************");
-                 break;
-               }
-               cellIdx++;
-              
-             }
-           trcTemplateList.add(tolTemp);
+           tolTemp.setSequence(commonUtil.getStringFormatCell(currentRow.getCell(0,MissingCellPolicy.CREATE_NULL_AS_BLANK)));
+        	 tolTemp.setTagID(commonUtil.getStringFormatCell(currentRow.getCell(1,MissingCellPolicy.CREATE_NULL_AS_BLANK)));
+      	 tolTemp.setTran(commonUtil.getStringFormatCell(currentRow.getCell(2,MissingCellPolicy.CREATE_NULL_AS_BLANK)));
+        	 tolTemp.setTranAmount(commonUtil.getStringFormatCell(currentRow.getCell(3,MissingCellPolicy.CREATE_NULL_AS_BLANK)));
+      	 tolTemp.setEntryTranDate(commonUtil.getStringFormatCell(currentRow.getCell(4,MissingCellPolicy.CREATE_NULL_AS_BLANK)));
+        	 tolTemp.setEntryPlaza(commonUtil.getStringFormatCell(currentRow.getCell(5,MissingCellPolicy.CREATE_NULL_AS_BLANK)));
+      	 tolTemp.setEntryLane(commonUtil.getStringFormatCell(currentRow.getCell(6,MissingCellPolicy.CREATE_NULL_AS_BLANK)));
+        	 tolTemp.setExitTranDate(commonUtil.getStringFormatCell(currentRow.getCell(7,MissingCellPolicy.CREATE_NULL_AS_BLANK)));
+      	 tolTemp.setExitPlaza(commonUtil.getStringFormatCell(currentRow.getCell(8,MissingCellPolicy.CREATE_NULL_AS_BLANK)));
+        	 tolTemp.setExitLane(commonUtil.getStringFormatCell(currentRow.getCell(9,MissingCellPolicy.CREATE_NULL_AS_BLANK)));
+      	 tolTemp.setAxleCount(commonUtil.getStringFormatCell(currentRow.getCell(10,MissingCellPolicy.CREATE_NULL_AS_BLANK)));
+        	 tolTemp.setOccupancy(commonUtil.getStringFormatCell(currentRow.getCell(11,MissingCellPolicy.CREATE_NULL_AS_BLANK)));
+      	 tolTemp.setProtocolType(commonUtil.getStringFormatCell(currentRow.getCell(12,MissingCellPolicy.CREATE_NULL_AS_BLANK)));
+          	 tolTemp.setVehicleType(commonUtil.getStringFormatCell(currentRow.getCell(13,MissingCellPolicy.CREATE_NULL_AS_BLANK)));
+    	 tolTemp.setWrTranFee(commonUtil.getStringFormatCell(currentRow.getCell(14,MissingCellPolicy.CREATE_NULL_AS_BLANK)));
+      	 tolTemp.setWrFeeType(commonUtil.getStringFormatCell(currentRow.getCell(15,MissingCellPolicy.CREATE_NULL_AS_BLANK)));
+          	 tolTemp.setGuarantee(commonUtil.getStringFormatCell(currentRow.getCell(16,MissingCellPolicy.CREATE_NULL_AS_BLANK)));
+      	 tolTemp.setPostAmt(commonUtil.getStringFormatCell(currentRow.getCell(17,MissingCellPolicy.CREATE_NULL_AS_BLANK)));
+          	 tolTemp.setResponseCode(commonUtil.getStringFormatCell(currentRow.getCell(18,MissingCellPolicy.CREATE_NULL_AS_BLANK)));
+        	 tolTemp.setNiopFee(commonUtil.getStringFormatCell(currentRow.getCell(19,MissingCellPolicy.CREATE_NULL_AS_BLANK)));
+        	 tolTemp.setOriginalFilename(commonUtil.getStringFormatCell(currentRow.getCell(20,MissingCellPolicy.CREATE_NULL_AS_BLANK)));
+           
+				/*
+				 * int cellIdx = 0; while (cellsInRow.hasNext()) { Cell currentCell =
+				 * cellsInRow.next(); switch (cellIdx) { case 0:
+				 * tolTemp.setSequence(commonUtil.getStringFormatCell(currentCell));
+				 * System.out.println("case 0::"+tolTemp.getSequence()); break; case 1:
+				 * tolTemp.setTagID(commonUtil.getStringFormatCell(currentCell));
+				 * System.out.println("case 1::"+tolTemp.getTagID()); break; case 2:
+				 * //ictxTemp.setEtcTrxSerialNo(commonUtil.getStringFormatCell(currentRow.
+				 * getCell(1,MissingCellPolicy.CREATE_NULL_AS_BLANK)));
+				 * tolTemp.setTran(commonUtil.getStringFormatCell(currentCell));
+				 * System.out.println("case 2::"+tolTemp.getTran());
+				 * 
+				 * break; case 3:
+				 * tolTemp.setTranAmount(commonUtil.getStringFormatCell(currentCell));
+				 * System.out.println("case 3::"+tolTemp.getTranAmount()); break; case 4:
+				 * tolTemp.setEntryTranDate(commonUtil.getStringFormatCell(currentCell));
+				 * System.out.println("case 4::"+tolTemp.getEntryTranDate()); break; case 5:
+				 * tolTemp.setEntryPlaza(commonUtil.getStringFormatCell(currentCell));
+				 * System.out.println("case 5::"+tolTemp.getEntryPlaza()); break; case 6:
+				 * tolTemp.setEntryLane(commonUtil.getStringFormatCell(currentCell));
+				 * System.out.println("case 6::"+tolTemp.getEntryLane()); break; case 7:
+				 * tolTemp.setExitTranDate(commonUtil.getStringFormatCell(currentCell));
+				 * System.out.println("case 7::"+tolTemp.getExitTranDate()); break; case 8:
+				 * tolTemp.setExitPlaza(commonUtil.getStringFormatCell(currentCell));
+				 * System.out.println("case 8::"+tolTemp.getExitPlaza()); break; case 9:
+				 * tolTemp.setExitLane(commonUtil.getStringFormatCell(currentCell));
+				 * System.out.println("case 9::"+tolTemp.getExitLane()); break; case 10:
+				 * tolTemp.setAxleCount(commonUtil.getStringFormatCell(currentCell));
+				 * System.out.println("case 10::"+tolTemp.getAxleCount()); break; case 11:
+				 * tolTemp.setOccupancy(commonUtil.getStringFormatCell(currentCell));
+				 * System.out.println("case 11::"+tolTemp.getOccupancy()); break; case 12:
+				 * tolTemp.setProtocolType(commonUtil.getStringFormatCell(currentCell));
+				 * System.out.println("case 12::"+tolTemp.getProtocolType()); break; case 13:
+				 * tolTemp.setVehicleType(commonUtil.getStringFormatCell(currentCell));
+				 * System.out.println("case 13::"+tolTemp.getVehicleType()); break; case 14:
+				 * tolTemp.setWrTranFee(commonUtil.getStringFormatCell(currentCell));
+				 * System.out.println("case 14::"+tolTemp.getWrTranFee()); break; case 15:
+				 * tolTemp.setWrFeeType(commonUtil.getStringFormatCell(currentCell));
+				 * System.out.println("case 15::"+tolTemp.getWrFeeType()); break; case 16:
+				 * tolTemp.setGuarantee(commonUtil.getStringFormatCell(currentCell));
+				 * System.out.println("case 15::"+tolTemp.getGuarantee()); break; case 17:
+				 * tolTemp.setPostAmt(commonUtil.getStringFormatCell(currentCell));
+				 * System.out.println("case 15::"+tolTemp.getPostAmt()); break; case 18:
+				 * tolTemp.setResponseCode(commonUtil.getStringFormatCell(currentCell));
+				 * System.out.println("case 18::"+tolTemp.getResponseCode()); break; case 19:
+				 * tolTemp.setNiopFee(commonUtil.getStringFormatCell(currentCell));
+				 * System.out.println("case 19::"+tolTemp.getNiopFee()); break; case 20:
+				 * tolTemp.setOriginalFilename(commonUtil.getStringFormatCell(currentCell));
+				 * System.out.println("case 20::"+tolTemp.getOriginalFilename()); break;
+				 * default: // System.out.println("Default:: ********************"); break; }
+				 * cellIdx++;
+				 * 
+				 * }
+				 */           trcTemplateList.add(tolTemp);
            System.out.println(tolTemp.toString());
          }
         

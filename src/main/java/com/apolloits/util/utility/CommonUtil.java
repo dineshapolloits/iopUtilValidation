@@ -1063,11 +1063,14 @@ private static AgencyDataExcelReader appConfig;
 				  validateParam.setResponseMsg("From agency code should be 4 digit");
 				  return false;
 			}else {
-				if(!AgencyDataExcelReader.agencyCode.contains(validateParam.getFromAgency())) {
-	        		 log.error("From Agency code not available. Please check agency Configuration");
-	        		 validateParam.setResponseMsg("From Agency code not available. Please check agency Configuration");
-	        		 return false;
-	        	 }
+				/*
+				 * if(!AgencyDataExcelReader.agencyCode.contains(validateParam.getFromAgency()))
+				 * {
+				 * log.error("From Agency code not available. Please check agency Configuration"
+				 * ); validateParam.
+				 * setResponseMsg("From Agency code not available. Please check agency Configuration"
+				 * ); return false; }
+				 */
 				
 			}
 			
@@ -1077,11 +1080,13 @@ private static AgencyDataExcelReader appConfig;
 				  validateParam.setResponseMsg("To agency code should be 4 digit");
 				  return false;
 			}else {
-				if(!AgencyDataExcelReader.agencyCode.contains(validateParam.getToAgency())) {
-	        		 log.error("To Agency code not available. Please check agency Configuration");
-	        		 validateParam.setResponseMsg("To Agency code not available. Please check agency Configuration");
-	        		 return false;
-	        	 }
+				/*
+				 * if(!AgencyDataExcelReader.agencyCode.contains(validateParam.getToAgency())) {
+				 * log.error("To Agency code not available. Please check agency Configuration");
+				 * validateParam.
+				 * setResponseMsg("To Agency code not available. Please check agency Configuration"
+				 * ); return false; }
+				 */
 			}
 		 
 		return true;

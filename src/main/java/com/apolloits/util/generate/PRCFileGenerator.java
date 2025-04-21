@@ -77,30 +77,23 @@ public boolean prcGenenerate(FileValidationParam validateParam) throws IOExcepti
 		if (!commonUtil.validateParameter(validateParam)) {
 			return false;
 		}
-		
 		prcTemplateList = getTolTemplateExcel(validateParam);
 		String Header = generateTolHeader(validateParam,prcTemplateList,shortFromAgency, shortToAgency);
-		log.info("Tol Header :: " + Header);
+		log.info("PRC Header :: " + Header);
 		writeDetails(validateParam,Header,prcTemplateList,shortFromAgency, shortToAgency);
 		String filePath = validateParam.getOutputFilePath() + File.separator + filename;
-		//String zipFilename = commonUtil.moveToZipFile(filePath,validateParam);
-		log.info("Tol file name :: "+filePath);
+		log.info("PRC file name :: "+filePath);
 		validateParam.setResponseMsg("PRC file created ::\t "+filePath);
 		return true;
 	}
 private List<PRCTemplate> getTolTemplateExcel(FileValidationParam validateParam) {
-		//ictxTemplateList = new ArrayList<>();
-		//String TYPE = "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet";
 		String PRC_SHEET = "PRC";
-		//InputStream inputStream;
 		try {
 			log.info("Excel data path localtion form getInputFilePath ::"+validateParam.getInputFilePath());
 			FileInputStream is = new FileInputStream(validateParam.getInputFilePath());
 			Workbook workbook = new XSSFWorkbook(is);
 			log.info("Number of sheets : " + workbook.getNumberOfSheets());
-
 			prcTemplateList = excelToTolList(workbook.getSheet(PRC_SHEET));
-
 		} catch (Exception e) {
 			validateParam.setResponseMsg("File not generated Please check input excel data");
 			e.printStackTrace();
@@ -124,9 +117,7 @@ private List<PRCTemplate> excelToTolList(Sheet sheet) {
              rowNumber++;
              continue;
            }
-          // Iterator<Cell> cellsInRow = currentRow.iterator();
            PRCTemplate tolTemp = new PRCTemplate();
-           
            tolTemp.setSequence(commonUtil.getStringFormatCell(currentRow.getCell(0,MissingCellPolicy.CREATE_NULL_AS_BLANK)));
         	 tolTemp.setLicensePlate(commonUtil.getStringFormatCell(currentRow.getCell(1,MissingCellPolicy.CREATE_NULL_AS_BLANK)));
       	 tolTemp.setTran(commonUtil.getStringFormatCell(currentRow.getCell(2,MissingCellPolicy.CREATE_NULL_AS_BLANK)));
@@ -147,73 +138,20 @@ private List<PRCTemplate> excelToTolList(Sheet sheet) {
           	 tolTemp.setNiopFee(commonUtil.getStringFormatCell(currentRow.getCell(17,MissingCellPolicy.CREATE_NULL_AS_BLANK)));
           	 tolTemp.setOriginalFilename(commonUtil.getStringFormatCell(currentRow.getCell(18,MissingCellPolicy.CREATE_NULL_AS_BLANK)));
         	 
-				/*
-				 * int cellIdx = 0; while (cellsInRow.hasNext()) { Cell currentCell =
-				 * cellsInRow.next(); switch (cellIdx) { case 0:
-				 * tolTemp.setSequence(commonUtil.getStringFormatCell(currentCell));
-				 * System.out.println("case 0::"+tolTemp.getSequence()); break; case 1:
-				 * tolTemp.setLicensePlate(commonUtil.getStringFormatCell(currentCell));
-				 * System.out.println("case 1::"+tolTemp.getLicensePlate()); break; case 2:
-				 * //ictxTemp.setEtcTrxSerialNo(commonUtil.getStringFormatCell(currentRow.
-				 * getCell(1,MissingCellPolicy.CREATE_NULL_AS_BLANK)));
-				 * tolTemp.setTran(commonUtil.getStringFormatCell(currentCell));
-				 * System.out.println("case 2::"+tolTemp.getTran());
-				 * 
-				 * break; case 3:
-				 * //ictxTemp.setEtcTrxSerialNo(commonUtil.getStringFormatCell(currentRow.
-				 * getCell(1,MissingCellPolicy.CREATE_NULL_AS_BLANK)));
-				 * tolTemp.setState(commonUtil.getStringFormatCell(currentCell));
-				 * System.out.println("case 2::"+tolTemp.getState());
-				 * 
-				 * break; case 4:
-				 * tolTemp.setTranAmount(commonUtil.getStringFormatCell(currentCell));
-				 * System.out.println("case 4::"+tolTemp.getTranAmount()); break; case 5:
-				 * tolTemp.setEntryTranDate(commonUtil.getStringFormatCell(currentCell));
-				 * System.out.println("case 5::"+tolTemp.getEntryTranDate()); break; case 6:
-				 * tolTemp.setEntryPlaza(commonUtil.getStringFormatCell(currentCell));
-				 * System.out.println("case 6::"+tolTemp.getEntryPlaza()); break; case 7:
-				 * tolTemp.setEntryLane(commonUtil.getStringFormatCell(currentCell));
-				 * System.out.println("case 6::"+tolTemp.getEntryLane()); break; case 8:
-				 * tolTemp.setExitTranDate(commonUtil.getStringFormatCell(currentCell));
-				 * System.out.println("case 7::"+tolTemp.getExitTranDate()); break; case 9:
-				 * tolTemp.setExitPlaza(commonUtil.getStringFormatCell(currentCell));
-				 * System.out.println("case 8::"+tolTemp.getExitPlaza()); break; case 10:
-				 * tolTemp.setExitLane(commonUtil.getStringFormatCell(currentCell));
-				 * System.out.println("case 10::"+tolTemp.getExitLane()); break; case 11:
-				 * tolTemp.setAxleCount(commonUtil.getStringFormatCell(currentCell));
-				 * System.out.println("case 11::"+tolTemp.getAxleCount()); break;
-				 * 
-				 * case 12: tolTemp.setLpType(commonUtil.getStringFormatCell(currentCell));
-				 * System.out.println("case 12::"+tolTemp.getLpType()); break; case 13:
-				 * tolTemp.setWrTranFee(commonUtil.getStringFormatCell(currentCell));
-				 * System.out.println("case 13::"+tolTemp.getWrTranFee()); break; case 14:
-				 * tolTemp.setWrFeeType(commonUtil.getStringFormatCell(currentCell));
-				 * System.out.println("case 14::"+tolTemp.getWrFeeType()); break; case 15:
-				 * tolTemp.setPostAmt(commonUtil.getStringFormatCell(currentCell));
-				 * System.out.println("case 15::"+tolTemp.getPostAmt()); break; case 16:
-				 * tolTemp.setResponseCode(commonUtil.getStringFormatCell(currentCell));
-				 * System.out.println("case 16::"+tolTemp.getResponseCode()); break; case 17:
-				 * tolTemp.setNiopFee(commonUtil.getStringFormatCell(currentCell));
-				 * System.out.println("case 17::"+tolTemp.getNiopFee()); break; case 18:
-				 * tolTemp.setOriginalFilename(commonUtil.getStringFormatCell(currentCell));
-				 * System.out.println("case 18::"+tolTemp.getOriginalFilename()); break;
-				 * default: // System.out.println("Default:: ********************"); break; }
-				 * cellIdx++;
-				 * 
-				 * }
-				 */   prcTemplateList.add(tolTemp);
+				
+				  prcTemplateList.add(tolTemp);
            System.out.println(tolTemp.toString());
          }
         
          if(prcTemplateList != null && prcTemplateList.size()>0) {
        	  System.out.println("tolTemplateList ::"+prcTemplateList);
-         log.info("@@@@ TOL input data  loaded sucessfully:: ******************** ::"+prcTemplateList.size());
+         log.info("@@@@ PRC input data  loaded sucessfully:: ******************** ::"+prcTemplateList.size());
          }else {
-      	   throw new IopTranslatorException("TOL input data not loaded");
+      	   throw new IopTranslatorException("PRC input data not loaded");
          }
          
        }catch (Exception e) {
-      	log.error("Exception:: ******************** TOL Sheet");
+      	log.error("Exception:: ******************** PRC Sheet");
 			e.printStackTrace();
 		}
      
@@ -223,21 +161,12 @@ private List<PRCTemplate> excelToTolList(Sheet sheet) {
 private String generateTolHeader(FileValidationParam validateParam,List<PRCTemplate> tolTempList, String fromAgnecy, String toAgency) {
 
 	fileCreateDateandTime = getUTCDateandTime();
-	
-	// 0108_202503061430460800.ITAG
-	// rcsr_2025-03-06T14:48:16-08:00.tag
-	// validateParam.getFromAgency() +"_"+
-	// fileCreateDateandTime.replaceAll("[-T:Z]",
-	// "")+IAGConstants.ITAG_FILE_EXTENSION;
 	fileCreateDateandTime = validateParam.getFileDate()
 			+ fileCreateDateandTime.substring(fileCreateDateandTime.indexOf("T"), fileCreateDateandTime.length());
 	String fileCreateDateandTimeCurrent = getUTCDateandTime();
 	filename = fromAgnecy + toAgency + "_" + fileCreateDateandTime.replaceAll("[-:]", "").substring(0, 15) + 
 			"_"+tolTempList.get(0).getOriginalFilename().substring(0, 20)+".prc";
-		//	"_"+toAgency +fromAgnecy+"_"+fileCreateDateandTimeCurrent.replaceAll("[-:]", "").substring(0, 15)+".prc";
-
-	//filename = fromAgnecy + toAgency + "_" + fileCreateDateandTime.replaceAll("[-:]", "").substring(0, 15) + ".prc";
-
+	String createUTCdate = CommonUtil.convertDatetoUTC(filename.substring(5,20));
 	StringBuilder tagHeader = new StringBuilder();
 	System.out.println("filename:::" + filename);
 
@@ -247,7 +176,7 @@ private String generateTolHeader(FileValidationParam validateParam,List<PRCTempl
 	tagHeader.append(validateParam.getFileDate().replaceAll("-", "/") + ','); // BUSINESS DAY
 	tagHeader.append(fromAgnecy.toUpperCase() + ','); // SOURCE
 	tagHeader.append(toAgency.toUpperCase() + ','); // DESTINATION
-	tagHeader.append(CommonUtil.formatStringLeftPad(fileCreateDateandTime, 25, ' ') + ','); // CREATE DATE
+	tagHeader.append(CommonUtil.formatStringLeftPad(createUTCdate, 25, ' ') + ','); // CREATE DATE
 	tagHeader.append("REV A2.1.1"); // VERSION
 	System.out.println("tagHeader.toString()" + tagHeader.toString());
 	System.out.println("tagHeader.toString():::" + tagHeader.toString());
@@ -264,12 +193,10 @@ private void writeDetails(FileValidationParam validateParam, String header,List<
 		writer.write(header);
 		writer.write(System.lineSeparator());
 		System.out.print("Writing record raw... ");
-		
 		for (PRCTemplate trcTemplate : trcTempList) {
 			writer.write(setTolDetailValues(trcTemplate,validateParam,detailAmt));
 			writer.write(System.lineSeparator());
 		}
-		
 		String trailer = generateTolTrailer(validateParam, shortFromAgency, shortToAgency,detailAmt,trcTempList);
 		writer.write(trailer);
 		writer.write("\n");
@@ -335,7 +262,6 @@ private String generateTolTrailer(FileValidationParam validateParam, String from
 	tagTrailer.append(validateParam.getFileDate().replaceAll("-", "/") + ',');
 	tagTrailer.append(CommonUtil.formatStringLeftPad(String.valueOf(tolTempList.size()), 6, '0')+',' );
 	DecimalFormat df = new DecimalFormat("#.00");
-	//df.format(detailAmt);
 	tagTrailer.append(CommonUtil.formatStringLeftPad(String.valueOf(df.format(detailAmt)), 10, '0')+',');
 	tagTrailer.append(CommonUtil.formatStringLeftPad(String.valueOf(acceptedCount), 6, '0')+','); //Accepted Count
 	tagTrailer.append(CommonUtil.formatStringLeftPad(String.valueOf(acceptedAmt), 10, '0')); //Accepted Amt

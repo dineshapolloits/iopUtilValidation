@@ -75,13 +75,11 @@ System.out.println(
 		if (!commonUtil.validateParameter(validateParam)) {
 			return false;
 		}
-		
 		pbpTemplateList = getTolTemplateExcel(validateParam);
 		String Header = generateTolHeader(validateParam,pbpTemplateList,shortFromAgency, shortToAgency);
 		log.info("Tol Header :: " + Header);
 		writeDetails(validateParam,Header,pbpTemplateList,shortFromAgency, shortToAgency);
 		String filePath = validateParam.getOutputFilePath() + File.separator + filename;
-		//String zipFilename = commonUtil.moveToZipFile(filePath,validateParam);
 		File file = new File(filePath);
 		if(file.length()==0) {
 			validateParam.setResponseMsg("PBP file not created. Please check the input data ");
@@ -93,32 +91,24 @@ System.out.println(
 		return true;
 	}
 private List<PBPTemplate> getTolTemplateExcel(FileValidationParam validateParam) {
-		//ictxTemplateList = new ArrayList<>();
-		//String TYPE = "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet";
 		String PBP_SHEET = "pbp";
-		//InputStream inputStream;
-
 		try {
 			log.info("Excel data path localtion form getInputFilePath ::"+validateParam.getInputFilePath());
 			FileInputStream is = new FileInputStream(validateParam.getInputFilePath());
 			Workbook workbook = new XSSFWorkbook(is);
 			log.info("Number of sheets : " + workbook.getNumberOfSheets());
-
 			pbpTemplateList = excelToTolList(workbook.getSheet(PBP_SHEET));
-
 		} catch (Exception e) {
 			validateParam.setResponseMsg("File not generated Please check input excel data");
 			e.printStackTrace();
 			return pbpTemplateList = new ArrayList<>();
 		}
-
 		return pbpTemplateList;
 	}
 private List<PBPTemplate> excelToTolList(Sheet sheet) {
 
   	 log.info("Inside ****************** excelToTolList()");
        try {
-      	
          Iterator<Row> rows = sheet.iterator();
          pbpTemplateList = new ArrayList<>();
          int rowNumber = 0;
@@ -129,7 +119,6 @@ private List<PBPTemplate> excelToTolList(Sheet sheet) {
              rowNumber++;
              continue;
            }
-         //  Iterator<Cell> cellsInRow = currentRow.iterator();
            PBPTemplate tolTemp = new PBPTemplate();
            
            tolTemp.setSequence(commonUtil.getStringFormatCell(currentRow.getCell(0,MissingCellPolicy.CREATE_NULL_AS_BLANK)));
@@ -149,96 +138,38 @@ private List<PBPTemplate> excelToTolList(Sheet sheet) {
       	 tolTemp.setWrTranFee(commonUtil.getStringFormatCell(currentRow.getCell(14,MissingCellPolicy.CREATE_NULL_AS_BLANK)));
       	 tolTemp.setWrFeeType(commonUtil.getStringFormatCell(currentRow.getCell(15,MissingCellPolicy.CREATE_NULL_AS_BLANK)));
       	 tolTemp.setGuarantee(commonUtil.getStringFormatCell(currentRow.getCell(16,MissingCellPolicy.CREATE_NULL_AS_BLANK)));
-			/*
-			 * int cellIdx = 0; while (cellsInRow.hasNext()) { Cell currentCell =
-			 * cellsInRow.next(); switch (cellIdx) { case 0:
-			 * tolTemp.setSequence(commonUtil.getStringFormatCell(currentCell));
-			 * System.out.println("case 0::"+tolTemp.getSequence()); break; case 1:
-			 * tolTemp.setLicensePlate(commonUtil.getStringFormatCell(currentCell));
-			 * System.out.println("case 1::"+tolTemp.getLicensePlate()); break; case 2:
-			 * //ictxTemp.setEtcTrxSerialNo(commonUtil.getStringFormatCell(currentRow.
-			 * getCell(1,MissingCellPolicy.CREATE_NULL_AS_BLANK)));
-			 * tolTemp.setTran(commonUtil.getStringFormatCell(currentCell));
-			 * System.out.println("case 2::"+tolTemp.getTran());
-			 * 
-			 * break; case 3:
-			 * //ictxTemp.setEtcTrxSerialNo(commonUtil.getStringFormatCell(currentRow.
-			 * getCell(1,MissingCellPolicy.CREATE_NULL_AS_BLANK)));
-			 * tolTemp.setState(commonUtil.getStringFormatCell(currentCell));
-			 * System.out.println("case 2::"+tolTemp.getState());
-			 * 
-			 * break; case 4:
-			 * tolTemp.setTranAmount(commonUtil.getStringFormatCell(currentCell));
-			 * System.out.println("case 4::"+tolTemp.getTranAmount()); break; case 5:
-			 * tolTemp.setEntryTranDate(commonUtil.getStringFormatCell(currentCell));
-			 * System.out.println("case 5::"+tolTemp.getEntryTranDate()); break; case 6:
-			 * tolTemp.setEntryPlaza(commonUtil.getStringFormatCell(currentCell));
-			 * System.out.println("case 6::"+tolTemp.getEntryPlaza()); break; case 7:
-			 * tolTemp.setEntryLane(commonUtil.getStringFormatCell(currentCell));
-			 * System.out.println("case 6::"+tolTemp.getEntryLane()); break; case 8:
-			 * tolTemp.setExitTranDate(commonUtil.getStringFormatCell(currentCell));
-			 * System.out.println("case 7::"+tolTemp.getExitTranDate()); break; case 9:
-			 * tolTemp.setExitPlaza(commonUtil.getStringFormatCell(currentCell));
-			 * System.out.println("case 8::"+tolTemp.getExitPlaza()); break; case 10:
-			 * tolTemp.setExitLane(commonUtil.getStringFormatCell(currentCell));
-			 * System.out.println("case 10::"+tolTemp.getExitLane()); break; case 11:
-			 * tolTemp.setAxleCount(commonUtil.getStringFormatCell(currentCell));
-			 * System.out.println("case 11::"+tolTemp.getAxleCount()); break;
-			 * 
-			 * case 12: tolTemp.setVehicleType(commonUtil.getStringFormatCell(currentCell));
-			 * System.out.println("case 12::"+tolTemp.getVehicleType()); break; case 13:
-			 * tolTemp.setLpType(commonUtil.getStringFormatCell(currentCell));
-			 * System.out.println("case 13::"+tolTemp.getLpType()); break; case 14:
-			 * tolTemp.setWrTranFee(commonUtil.getStringFormatCell(currentCell));
-			 * System.out.println("case 14::"+tolTemp.getWrTranFee()); break; case 15:
-			 * tolTemp.setWrFeeType(commonUtil.getStringFormatCell(currentCell));
-			 * System.out.println("case 15::"+tolTemp.getWrFeeType()); break; case 16:
-			 * tolTemp.setGuarantee(commonUtil.getStringFormatCell(currentCell));
-			 * System.out.println("case 16::"+tolTemp.getGuarantee()); break; default: //
-			 * System.out.println("Default:: ********************"); break; } cellIdx++;
-			 * 
-			 * }
-			 */         
       	 	pbpTemplateList.add(tolTemp);
            System.out.println(tolTemp.toString());
          }
-        
          if(pbpTemplateList != null && pbpTemplateList.size()>0) {
        	  System.out.println("tolTemplateList ::"+pbpTemplateList);
-         log.info("@@@@ TOL input data  loaded sucessfully:: ******************** ::"+pbpTemplateList.size());
+         log.info("@@@@ PBP input data  loaded sucessfully:: ******************** ::"+pbpTemplateList.size());
          }else {
-      	   throw new IopTranslatorException("TOL input data not loaded");
+      	   throw new IopTranslatorException("PBP input data not loaded");
          }
-         
        }catch (Exception e) {
-      	log.error("Exception:: ******************** TOL Sheet");
+      	log.error("Exception:: ******************** PBP Sheet");
 			e.printStackTrace();
 		}
-     
 		return pbpTemplateList;
-	
 }
 private String generateTolHeader(FileValidationParam validateParam,List<PBPTemplate> tolTempList, String fromAgnecy, String toAgency) {
 
 	fileCreateDateandTime = getUTCDateandTime();
-	//2025-04-10T13:31:08-07:00
 	System.out.println("fileCreateDateandTime::::" + fileCreateDateandTime);
-	
 	fileCreateDateandTime = validateParam.getFileDate()
 			+ fileCreateDateandTime.substring(fileCreateDateandTime.indexOf("T"), fileCreateDateandTime.length());
 	filename = fromAgnecy + toAgency + "_" + fileCreateDateandTime.replaceAll("[-:]", "").substring(0, 15) + ".pbp";
-
+	String createUTCdate = CommonUtil.convertDatetoUTC(filename.substring(5,20));
 	StringBuilder tagHeader = new StringBuilder();
-	//atoc_20250410T133108.pbp
 	System.out.println("filename:::" + filename);
-
 	tagHeader.append("#HEADER,");
 	tagHeader.append("PAYBYPLATE,");
 	tagHeader.append(CommonUtil.formatStringLeftPad(String.valueOf(tolTempList.get(0).getSequence()),6,'0')+','); // SEQUENCE
 	tagHeader.append(validateParam.getFileDate().replaceAll("-", "/") + ','); // BUSINESS DAY
 	tagHeader.append(fromAgnecy.toUpperCase() + ','); // SOURCE
 	tagHeader.append(toAgency.toUpperCase() + ','); // DESTINATION
-	tagHeader.append(CommonUtil.formatStringLeftPad(fileCreateDateandTime, 25, ' ') + ','); // CREATE DATE
+	tagHeader.append(CommonUtil.formatStringLeftPad(createUTCdate, 25, ' ') + ','); // CREATE DATE
 	tagHeader.append("REV A2.1.1"); // VERSION
 	System.out.println("tagHeader.toString()" + tagHeader.toString());
 	System.out.println("tagHeader.toString():::" + tagHeader.toString());
@@ -260,7 +191,6 @@ private void writeDetails(FileValidationParam validateParam, String header,List<
 			writer.write(setTolDetailValues(pbpTemplate,validateParam,detailAmt));
 			writer.write(System.lineSeparator());
 		}
-		
 		String trailer = generateTolTrailer(validateParam, shortFromAgency, shortToAgency,detailAmt,pbpTempList);
 		writer.write(trailer);
 		writer.write("\n");
@@ -304,13 +234,10 @@ private String setTolDetailValues(PBPTemplate tolTemplate,FileValidationParam va
 	double WrTranFee = Double.parseDouble(tolTemplate.getWrTranFee());
 	WrTranFee = WrTranFee/100;
 	tolDetail.append(CommonUtil.formatStringLeftPad(String.format("%.2f", WrTranFee),8,'0')+',');//WR TRAN FEE
-	
-		//tolDetail.append(CommonUtil.formatStringLeftPad(tolTemplate.getWrTranFee(),8,'0')+',');//WR TRAN FEE
 	tolDetail.append(CommonUtil.formatStringLeftPad(tolTemplate.getWrFeeType(),1,'0')+',');//WR FEE TYPE
 	tolDetail.append(CommonUtil.formatStringLeftPad(tolTemplate.getGuarantee(),1,' '));//GUARANTEE
 	double toll=Double.parseDouble(tolTemplate.getTranAmount());
 	this.detailAmt = detailAmt+toll;
-	
 	System.out.println("detailAmt last:::::::"+detailAmt);
 	return tolDetail.toString();
 }
@@ -322,10 +249,8 @@ private String generateTolTrailer(FileValidationParam validateParam, String from
 	tagTrailer.append(validateParam.getFileDate().replaceAll("-", "/") + ',');
 	tagTrailer.append(CommonUtil.formatStringLeftPad(String.valueOf(tolTempList.size()), 6, '0')+',' );
 	DecimalFormat df = new DecimalFormat("#.00");
-	//df.format(detailAmt);
 	double tranFee = detailAmt/100;//Double.parseDouble(detailAmt);
 	tagTrailer.append(CommonUtil.formatStringLeftPad(String.format("%.2f", tranFee),10,'0'));
-	//tagTrailer.append(CommonUtil.formatStringLeftPad(String.valueOf(df.format(detailAmt)), 10, '0'));
 	System.out.println("tagTrailer::::" + tagTrailer);
 	return tagTrailer.toString();
 }

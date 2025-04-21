@@ -98,7 +98,7 @@ public class TAGFileGenerator {
 			//	validateParam.getFromAgency() +"_"+ fileCreateDateandTime.replaceAll("[-T:Z]", "")+IAGConstants.ITAG_FILE_EXTENSION;
 		fileCreateDateandTime = validateParam.getFileDate()+fileCreateDateandTime.substring(fileCreateDateandTime.indexOf("T"),fileCreateDateandTime.length());
 		filename =  fromAgnecy+toAgency+"_"+fileCreateDateandTime.replaceAll("[-:]", "").substring(0,15)+".tag";
-		
+		String createUTCdate = CommonUtil.convertDatetoUTC(filename.substring(5,20));
 		StringBuilder tagHeader = new StringBuilder();
 		System.out.println("filename:::"+filename);
 		
@@ -109,7 +109,7 @@ public class TAGFileGenerator {
 		tagHeader.append(validateParam.getFileDate().replaceAll("-", "/")+','); //BUSINESS DAY
 		tagHeader.append(fromAgnecy.toUpperCase()+','); //SOURCE
 		tagHeader.append(toAgency.toUpperCase()+','); //DESTINATION
-		tagHeader.append(CommonUtil.formatStringLeftPad(fileCreateDateandTime,25,' ')+','); // CREATE DATE
+		tagHeader.append(CommonUtil.formatStringLeftPad(createUTCdate,25,' ')+','); // CREATE DATE
 		tagHeader.append("REV A2.1.1"); //VERSION
 		System.out.println("tagHeader.toString()"+tagHeader.toString());
 		return tagHeader.toString();

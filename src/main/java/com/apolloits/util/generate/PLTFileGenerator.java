@@ -78,11 +78,9 @@ public class PLTFileGenerator {
 			writer = new FileWriter(filePath, true);
 			System.out.print("Writing record raw... ");
 			writeDetails(validateParam, Header, writer, trailer);
-
 			log.info("PLT  file name :: " + filePath);
 			validateParam.setResponseMsg("PLT file created ::\t " + filePath);
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
 			validateParam.setResponseMsg("PLT file creation issue. Please check logs");
 			log.error("PLT file creation issue. Please check logs");
 			e.printStackTrace();
@@ -95,18 +93,12 @@ public class PLTFileGenerator {
 
 		fileCreateDateandTime = getUTCDateandTime();
 		System.out.println("fileCreateDateandTime::::" + fileCreateDateandTime);
-		// 0108_202503061430460800.ITAG
-		// rcsr_2025-03-06T14:48:16-08:00.tag
-		// validateParam.getFromAgency() +"_"+
-		// fileCreateDateandTime.replaceAll("[-T:Z]",
-		// "")+IAGConstants.ITAG_FILE_EXTENSION;
 		fileCreateDateandTime = validateParam.getFileDate()
 				+ fileCreateDateandTime.substring(fileCreateDateandTime.indexOf("T"), fileCreateDateandTime.length());
 		filename = fromAgnecy + toAgency + "_" + fileCreateDateandTime.replaceAll("[-:]", "").substring(0, 15) + ".plt";
-
+		String createUTCdate = CommonUtil.convertDatetoUTC(filename.substring(5,20));
 		StringBuilder tagHeader = new StringBuilder();
 		System.out.println("filename:::" + filename);
-
 		tagHeader.append("#HEADER,");
 		tagHeader.append("PLATES,");
 		tagHeader.append("INIT,");
@@ -114,7 +106,7 @@ public class PLTFileGenerator {
 		tagHeader.append(validateParam.getFileDate().replaceAll("-", "/") + ','); // BUSINESS DAY
 		tagHeader.append(fromAgnecy.toUpperCase() + ','); // SOURCE
 		tagHeader.append(toAgency.toUpperCase() + ','); // DESTINATION
-		tagHeader.append(CommonUtil.formatStringLeftPad(fileCreateDateandTime, 25, ' ') + ','); // CREATE DATE
+		tagHeader.append(CommonUtil.formatStringLeftPad(createUTCdate, 25, ' ') + ','); // CREATE DATE
 		tagHeader.append("REV A2.1.1"); // VERSION
 		System.out.println("tagHeader.toString()" + tagHeader.toString());
 		return tagHeader.toString();

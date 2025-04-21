@@ -81,17 +81,12 @@ public boolean corGenenerate(FileValidationParam validateParam) throws IOExcepti
 		log.info("COR Header :: " + Header);
 		writeDetails(validateParam,Header,corTemplateList,shortFromAgency, shortToAgency);
 		String filePath = validateParam.getOutputFilePath() + File.separator + filename;
-		//String zipFilename = commonUtil.moveToZipFile(filePath,validateParam);
 		log.info("COR file name :: "+filePath);
 		validateParam.setResponseMsg("COR file created ::\t "+filePath);
 		return true;
 	}
 private List<CORTemplate> getCORTemplateExcel(FileValidationParam validateParam) {
-		//ictxTemplateList = new ArrayList<>();
-		//String TYPE = "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet";
 		String TOL_SHEET = "COR";
-		//InputStream inputStream;
-
 		try {
 			log.info("Excel data path localtion form getInputFilePath ::"+validateParam.getInputFilePath());
 			FileInputStream is = new FileInputStream(validateParam.getInputFilePath());
@@ -169,114 +164,6 @@ private List<CORTemplate> excelToTolList(Sheet sheet) {
     	 tolTemp.setCorrTranFee(commonUtil.getStringFormatCell(currentRow.getCell(41,MissingCellPolicy.CREATE_NULL_AS_BLANK)));
     	 tolTemp.setCorrTranFeeType(commonUtil.getStringFormatCell(currentRow.getCell(42,MissingCellPolicy.CREATE_NULL_AS_BLANK)));
     	 
-			/*
-			 * int cellIdx = 0; while (cellsInRow.hasNext()) { Cell currentCell =
-			 * cellsInRow.next(); switch (cellIdx) { case 0:
-			 * tolTemp.setSequence(commonUtil.getStringFormatCell(currentCell));
-			 * System.out.println("case 0::"+tolTemp.getSequence()); break; case 1:
-			 * tolTemp.setCorrectionDate(commonUtil.getStringFormatCell(currentCell));
-			 * System.out.println("case 1::"+tolTemp.getCorrectionDate()); break; case 2:
-			 * //ictxTemp.setEtcTrxSerialNo(commonUtil.getStringFormatCell(currentRow.
-			 * getCell(1,MissingCellPolicy.CREATE_NULL_AS_BLANK)));
-			 * tolTemp.setCorrectionReason(commonUtil.getStringFormatCell(currentCell));
-			 * System.out.println("case 2::"+tolTemp.getCorrectionReason());
-			 * 
-			 * break; case 3:
-			 * tolTemp.setResubmitReason(commonUtil.getStringFormatCell(currentCell));
-			 * System.out.println("case 3::"+tolTemp.getResubmitReason()); break; case 4:
-			 * tolTemp.setCorrectionCount(commonUtil.getStringFormatCell(currentCell));
-			 * System.out.println("case 4::"+tolTemp.getCorrectionCount()); break; case 5:
-			 * tolTemp.setResubmitCount(commonUtil.getStringFormatCell(currentCell));
-			 * System.out.println("case 5::"+tolTemp.getResubmitCount()); break; case 6:
-			 * tolTemp.setHomeAgencySequence(commonUtil.getStringFormatCell(currentCell));
-			 * System.out.println("case 6::"+tolTemp.getHomeAgencySequence()); break; case
-			 * 7: tolTemp.setOriginalTagId(commonUtil.getStringFormatCell(currentCell));
-			 * System.out.println("case 7::"+tolTemp.getOriginalTagId()); break; case 8:
-			 * tolTemp.setOriginalLicensePlate(commonUtil.getStringFormatCell(currentCell));
-			 * System.out.println("case 8::"+tolTemp.getOriginalLicensePlate()); break; case
-			 * 9: tolTemp.setOriginalState(commonUtil.getStringFormatCell(currentCell));
-			 * System.out.println("case 9::"+tolTemp.getOriginalState()); break; case 10:
-			 * tolTemp.setOriginalTran(commonUtil.getStringFormatCell(currentCell));
-			 * System.out.println("case 10::"+tolTemp.getOriginalTran()); break; case 11:
-			 * tolTemp.setOriginalTranAmount(commonUtil.getStringFormatCell(currentCell));
-			 * System.out.println("case 11::"+tolTemp.getOriginalTranAmount()); break; case
-			 * 12:
-			 * tolTemp.setOriginalEntryTranDate(commonUtil.getStringFormatCell(currentCell))
-			 * ; System.out.println("case 12::"+tolTemp.getOriginalEntryTranDate()); break;
-			 * case 13:
-			 * tolTemp.setOriginalEntryPlaza(commonUtil.getStringFormatCell(currentCell));
-			 * System.out.println("case 13::"+tolTemp.getOriginalEntryPlaza()); break; case
-			 * 14:
-			 * tolTemp.setOriginalEntryLane(commonUtil.getStringFormatCell(currentCell));
-			 * System.out.println("case 14::"+tolTemp.getOriginalEntryLane()); break; case
-			 * 15:
-			 * tolTemp.setOriginalExitTranDate(commonUtil.getStringFormatCell(currentCell));
-			 * System.out.println("case 15::"+tolTemp.getOriginalExitTranDate()); break;
-			 * case 16:
-			 * tolTemp.setOriginalExitPlaza(commonUtil.getStringFormatCell(currentCell));
-			 * System.out.println("case 16::"+tolTemp.getOriginalExitPlaza()); break;
-			 * 
-			 * case 17:
-			 * tolTemp.setOriginalExitLane(commonUtil.getStringFormatCell(currentCell));
-			 * System.out.println("case 17::"+tolTemp.getOriginalExitLane()); break; case
-			 * 18:
-			 * tolTemp.setOriginalAxleCount(commonUtil.getStringFormatCell(currentCell));
-			 * System.out.println("case 18::"+tolTemp.getOriginalAxleCount()); break; case
-			 * 19:
-			 * tolTemp.setOriginalOccupancy(commonUtil.getStringFormatCell(currentCell));
-			 * System.out.println("case 19::"+tolTemp.getOriginalOccupancy()); break; case
-			 * 20:
-			 * tolTemp.setOriginalProtocolType(commonUtil.getStringFormatCell(currentCell));
-			 * System.out.println("case 20::"+tolTemp.getOriginalProtocolType()); break;
-			 * case 21:
-			 * tolTemp.setOriginalvehicleType(commonUtil.getStringFormatCell(currentCell));
-			 * System.out.println("case 21::"+tolTemp.getOriginalvehicleType()); break; case
-			 * 22: tolTemp.setOriginalLPtype(commonUtil.getStringFormatCell(currentCell));
-			 * System.out.println("case 22::"+tolTemp.getOriginalLPtype()); break; case 23:
-			 * tolTemp.setOriginalTranFee(commonUtil.getStringFormatCell(currentCell));
-			 * System.out.println("case 23::"+tolTemp.getOriginalTranFee()); break; case 24:
-			 * tolTemp.setOriginalTranFeeType(commonUtil.getStringFormatCell(currentCell));
-			 * System.out.println("case 24::"+tolTemp.getOriginalTranFeeType()); break; case
-			 * 25: tolTemp.setCorrTagId(commonUtil.getStringFormatCell(currentCell));
-			 * System.out.println("case 25::"+tolTemp.getCorrTagId()); break; case 26:
-			 * tolTemp.setCorrLicensePlate(commonUtil.getStringFormatCell(currentCell));
-			 * System.out.println("case 26::"+tolTemp.getCorrLicensePlate()); break; case
-			 * 27: tolTemp.setCorrState(commonUtil.getStringFormatCell(currentCell));
-			 * System.out.println("case 27::"+tolTemp.getCorrState()); break; case 28:
-			 * tolTemp.setCorrTran(commonUtil.getStringFormatCell(currentCell));
-			 * System.out.println("case 28::"+tolTemp.getCorrTran()); break; case 29:
-			 * tolTemp.setCorrTranAmount(commonUtil.getStringFormatCell(currentCell));
-			 * System.out.println("case 29::"+tolTemp.getCorrTranAmount()); break; case 30:
-			 * tolTemp.setCorrEntryTranDate(commonUtil.getStringFormatCell(currentCell));
-			 * System.out.println("case 30::"+tolTemp.getCorrEntryTranDate()); break; case
-			 * 31: tolTemp.setCorrEntryPlaza(commonUtil.getStringFormatCell(currentCell));
-			 * System.out.println("case 31::"+tolTemp.getCorrEntryPlaza()); break; case 32:
-			 * tolTemp.setCorrEntryLane(commonUtil.getStringFormatCell(currentCell));
-			 * System.out.println("case 32::"+tolTemp.getCorrEntryLane()); break; case 33:
-			 * tolTemp.setCorrExitTranDate(commonUtil.getStringFormatCell(currentCell));
-			 * System.out.println("case 33::"+tolTemp.getCorrExitTranDate()); break; case
-			 * 34: tolTemp.setCorrExitPlaza(commonUtil.getStringFormatCell(currentCell));
-			 * System.out.println("case 34::"+tolTemp.getCorrExitPlaza()); break; case 35:
-			 * tolTemp.setCorrExitLane(commonUtil.getStringFormatCell(currentCell));
-			 * System.out.println("case 35::"+tolTemp.getCorrExitLane()); break; case 36:
-			 * tolTemp.setCorrAxleCount(commonUtil.getStringFormatCell(currentCell));
-			 * System.out.println("case 36::"+tolTemp.getCorrAxleCount()); break; case 37:
-			 * tolTemp.setCorrOccupancy(commonUtil.getStringFormatCell(currentCell));
-			 * System.out.println("case 37::"+tolTemp.getCorrOccupancy()); break; case 38:
-			 * tolTemp.setCorrProtocolType(commonUtil.getStringFormatCell(currentCell));
-			 * System.out.println("case 38::"+tolTemp.getCorrProtocolType()); break; case
-			 * 39: tolTemp.setCorrvehicleType(commonUtil.getStringFormatCell(currentCell));
-			 * System.out.println("case 39::"+tolTemp.getCorrvehicleType()); break; case 40:
-			 * tolTemp.setCorrLPtype(commonUtil.getStringFormatCell(currentCell));
-			 * System.out.println("case 40::"+tolTemp.getCorrLPtype()); break; case 41:
-			 * tolTemp.setCorrTranFee(commonUtil.getStringFormatCell(currentCell));
-			 * System.out.println("case 41::"+tolTemp.getCorrTranFee()); break; case 42:
-			 * tolTemp.setCorrTranFeeType(commonUtil.getStringFormatCell(currentCell));
-			 * System.out.println("case 41::"+tolTemp.getCorrTranFeeType()); break; default:
-			 * // System.out.println("Default:: ********************"); break; } cellIdx++;
-			 * 
-			 * }
-			 */
            corTemplateList.add(tolTemp);
            System.out.println(tolTemp.toString());
          }
@@ -299,16 +186,10 @@ private List<CORTemplate> excelToTolList(Sheet sheet) {
 private String generateTolHeader(FileValidationParam validateParam,List<CORTemplate> tolTempList, String fromAgnecy, String toAgency) {
 
 	fileCreateDateandTime = getUTCDateandTime();
-	System.out.println("fileCreateDateandTime::::" + fileCreateDateandTime);
-	// 0108_202503061430460800.ITAG
-	// rcsr_2025-03-06T14:48:16-08:00.tag
-	// validateParam.getFromAgency() +"_"+
-	// fileCreateDateandTime.replaceAll("[-T:Z]",
-	// "")+IAGConstants.ITAG_FILE_EXTENSION;
 	fileCreateDateandTime = validateParam.getFileDate()
 			+ fileCreateDateandTime.substring(fileCreateDateandTime.indexOf("T"), fileCreateDateandTime.length());
 	filename = fromAgnecy + toAgency + "_" + fileCreateDateandTime.replaceAll("[-:]", "").substring(0, 15) + ".cor";
-
+	String createUTCdate = CommonUtil.convertDatetoUTC(filename.substring(5,20));
 	StringBuilder tagHeader = new StringBuilder();
 	System.out.println("filename:::" + filename);
 
@@ -318,7 +199,7 @@ private String generateTolHeader(FileValidationParam validateParam,List<CORTempl
 	tagHeader.append(validateParam.getFileDate().replaceAll("-", "/") + ','); // BUSINESS DAY
 	tagHeader.append(fromAgnecy.toUpperCase() + ','); // SOURCE
 	tagHeader.append(toAgency.toUpperCase() + ','); // DESTINATION
-	tagHeader.append(CommonUtil.formatStringLeftPad(fileCreateDateandTime, 25, ' ') + ','); // CREATE DATE
+	tagHeader.append(CommonUtil.formatStringLeftPad(createUTCdate, 25, ' ') + ','); // CREATE DATE
 	tagHeader.append("REV A2.1.1"); // VERSION
 	System.out.println("tagHeader.toString()" + tagHeader.toString());
 	System.out.println("tagHeader.toString():::" + tagHeader.toString());
@@ -378,9 +259,6 @@ private String setTolDetailValues(CORTemplate corTemplate,FileValidationParam va
 	double tranAmount = Double.parseDouble(corTemplate.getOriginalTranAmount());
 	tranAmount = tranAmount/100;
 	tolDetail.append(CommonUtil.formatStringLeftPad(String.format("%.2f", tranAmount),8,'0')+',');//ORIGINAL TRAN amount
-	
-	//tolDetail.append(CommonUtil.formatStringLeftPad(corTemplate.getOriginalTranAmount(),8,' ')+',');//ORIGINAL TRAN amount
-	
 	if(corTemplate.getOriginalEntryTranDate().equalsIgnoreCase("null") || corTemplate.getOriginalEntryTranDate().isEmpty() || corTemplate.getOriginalEntryTranDate().isBlank())
 		tolDetail.append(CommonUtil.formatStringLeftPad("",25,' ')+',');//ENTRY TRAN DATE
 	else tolDetail.append(CommonUtil.formatStringLeftPad(corTemplate.getOriginalEntryTranDate(),25,' ')+',');//ENTRY TRAN DATE
@@ -401,8 +279,6 @@ private String setTolDetailValues(CORTemplate corTemplate,FileValidationParam va
 	double tranFee = Double.parseDouble(corTemplate.getOriginalTranFee());
 	tranFee = tranFee/100;
 	tolDetail.append(CommonUtil.formatStringLeftPad(String.format("%.2f", tranFee),8,'0')+',');//ORIGINAL TRAN FEE
-	
-	//tolDetail.append(CommonUtil.formatStringLeftPad(corTemplate.getOriginalTranFee(),8,'0')+',');//ORIGINAL TRAN FEE
 	tolDetail.append(CommonUtil.formatStringLeftPad(corTemplate.getOriginalTranFeeType(),1,'0')+',');//ORIGINAL TRAN FEE TYPE
 	
 	if(corTemplate.getCorrTagId().equalsIgnoreCase("null") || corTemplate.getCorrTagId().isEmpty() || corTemplate.getCorrTagId().isBlank())
@@ -421,8 +297,6 @@ private String setTolDetailValues(CORTemplate corTemplate,FileValidationParam va
 	double tranAmountCor = Double.parseDouble(corTemplate.getCorrTranAmount());
 	tranAmountCor = tranAmountCor/100;
 	tolDetail.append(CommonUtil.formatStringLeftPad(String.format("%.2f", tranAmountCor),8,'0')+',');//ORIGINAL TRAN amount
-	
-//	tolDetail.append(CommonUtil.formatStringLeftPad(corTemplate.getCorrTranAmount(),8,' ')+',');//CORR TRAN amount
 	
 	if(corTemplate.getCorrEntryTranDate().equalsIgnoreCase("null") || corTemplate.getCorrEntryTranDate().isEmpty() || corTemplate.getCorrEntryTranDate().isBlank())
 		tolDetail.append(CommonUtil.formatStringLeftPad("",25,' ')+',');//ENTRY TRAN DATE
@@ -448,8 +322,6 @@ private String setTolDetailValues(CORTemplate corTemplate,FileValidationParam va
 	double corrTranFee = Double.parseDouble(corTemplate.getCorrTranFee());
 	corrTranFee = corrTranFee/100;
 	tolDetail.append(CommonUtil.formatStringLeftPad(String.format("%.2f", corrTranFee),8,'0')+',');//CORR TRAN FEE
-	
-	//tolDetail.append(CommonUtil.formatStringLeftPad(corTemplate.getCorrTranFee(),8,'0')+',');//ORIGINAL TRAN 
 	tolDetail.append(CommonUtil.formatStringLeftPad(corTemplate.getCorrTranFeeType(),1,'0'));//ORIGINAL TRAN FEE TYPE
 	double toll=Double.parseDouble(corTemplate.getCorrTranAmount());
 	this.detailAmt = detailAmt+toll;
@@ -465,12 +337,8 @@ private String generateCorTrailer(FileValidationParam validateParam, String from
 	tagTrailer.append(validateParam.getFileDate().replaceAll("-", "/") + ',');
 	tagTrailer.append(CommonUtil.formatStringLeftPad(String.valueOf(tolTempList.size()), 6, '0')+',' );
 	DecimalFormat df = new DecimalFormat("#.00");
-	//df.format(detailAmt);
 	double tranFee = detailAmt/100;//Double.parseDouble(detailAmt);
 	tagTrailer.append(CommonUtil.formatStringLeftPad(String.format("%.2f", tranFee),10,'0'));
-	//tolDetail.append(CommonUtil.formatStringLeftPad(String.format("%.2f", tranFee),8,'0')+',');//ORIGINAL TRAN FEE
-	
-	//tagTrailer.append(CommonUtil.formatStringLeftPad(String.valueOf(df.format(detailAmt)), 10, '0'));
 	System.out.println("tagTrailer::::" + tagTrailer);
 	return tagTrailer.toString();
 }

@@ -79,11 +79,11 @@ public boolean trcGenenerate(FileValidationParam validateParam) throws IOExcepti
 		
 		trcTemplateList = getTolTemplateExcel(validateParam);
 		String Header = generateTolHeader(validateParam,trcTemplateList,shortFromAgency, shortToAgency);
-		log.info("Tol Header :: " + Header);
+		log.info("TRC Header :: " + Header);
 		writeDetails(validateParam,Header,trcTemplateList,shortFromAgency, shortToAgency);
 		String filePath = validateParam.getOutputFilePath() + File.separator + filename;
 		//String zipFilename = commonUtil.moveToZipFile(filePath,validateParam);
-		log.info("Tol file name :: "+filePath);
+		log.info("TRC file name :: "+filePath);
 		validateParam.setResponseMsg("TRC file created ::\t "+filePath);
 		return true;
 	}
@@ -235,7 +235,7 @@ private String generateTolHeader(FileValidationParam validateParam,List<TRCTempl
 	filename = fromAgnecy + toAgency + "_" + fileCreateDateandTime.replaceAll("[-:]", "").substring(0, 15) + 
 			"_"+tolTempList.get(0).getOriginalFilename().substring(0,20)+".trc";
 			//"_"+toAgency +fromAgnecy+"_"+fileCreateDateandTimeCurrent.replaceAll("[-:]", "").substring(0, 15)+".trc";
-
+	String createUTCdate = CommonUtil.convertDatetoUTC(filename.substring(5,20));
 	StringBuilder tagHeader = new StringBuilder();
 	System.out.println("filename:::" + filename);
 
@@ -245,7 +245,7 @@ private String generateTolHeader(FileValidationParam validateParam,List<TRCTempl
 	tagHeader.append(validateParam.getFileDate().replaceAll("-", "/") + ','); // BUSINESS DAY
 	tagHeader.append(fromAgnecy.toUpperCase() + ','); // SOURCE
 	tagHeader.append(toAgency.toUpperCase() + ','); // DESTINATION
-	tagHeader.append(CommonUtil.formatStringLeftPad(fileCreateDateandTime, 25, ' ') + ','); // CREATE DATE
+	tagHeader.append(CommonUtil.formatStringLeftPad(createUTCdate, 25, ' ') + ','); // CREATE DATE
 	tagHeader.append("REV A2.1.1"); // VERSION
 	System.out.println("tagHeader.toString()" + tagHeader.toString());
 	System.out.println("tagHeader.toString():::" + tagHeader.toString());

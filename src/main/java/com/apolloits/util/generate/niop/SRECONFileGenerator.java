@@ -117,8 +117,8 @@ public class SRECONFileGenerator {
 		reconHeader.setSubmissionType(NIOPConstants.SRECON_FILE_TYPE);
 		reconHeader.setSubmissionDateTime(fileCreateDateandTime);
 		reconHeader.setSsiopHubID(agEntity.getHubId().toString());
-		reconHeader.setAwayAgencyID(validateParam.getFromAgency());
-		reconHeader.setHomeAgencyID(validateParam.getToAgency());
+		reconHeader.setAwayAgencyID(validateParam.getToAgency());
+		reconHeader.setHomeAgencyID(validateParam.getFromAgency());
 		reconHeader.setTxnDataSeqNo(txnDataSeqNo);
 		reconHeader.setRecordCount(String.valueOf(reconRecordList.size()));
 		
@@ -249,7 +249,7 @@ public class SRECONFileGenerator {
 				.getStringFormatCell(currentRow.getCell(49, MissingCellPolicy.CREATE_NULL_AS_BLANK));
 
 		if (transFlatFee != null && !transFlatFee.isEmpty()) {
-			sreconRecord.setTransFlatFee(adjCount);
+			sreconRecord.setTransFlatFee(transFlatFee);
 		} else {
 			sreconRecord.setTransFlatFee("0");
 		}

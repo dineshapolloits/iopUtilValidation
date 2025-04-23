@@ -73,11 +73,15 @@ public class NIOPACKFileDetailValidation {
 		//Original submission Type
 		String[] filenameSplit = fileName.split("[_.]");
 		String fileType ="";
+		String fileDateTime ="";
 		if(fileName.length() == 46) {
 			fileType = "STVL";
+			fileDateTime = filenameSplit[4];
 		}else {
 			fileType = filenameSplit[7];
+			fileDateTime = filenameSplit[5];
 		}
+		System.out.println("################fileDateTime ::"+fileDateTime);
 		String originalSubmissionType =ackFile.getOriginalSubmissionType();
 		if(originalSubmissionType == null || !originalSubmissionType.equals(fileType)) {
 			addErrorMsg(DETAIL_RECORD_TYPE,"Original submission Type"," Invalid Original submission Type   \t ::"+originalSubmissionType);
@@ -90,6 +94,13 @@ public class NIOPACKFileDetailValidation {
 			addErrorMsg(DETAIL_RECORD_TYPE,"Original Submission Date/Time"," Invalid Original Submission Date/Time   \t ::"+ackFile.getOriginalSubmissionDateTime());
         	log.error("Invalid Original Submission Date/Time   \t ::"+ackFile.getOriginalSubmissionDateTime());
         	invalidRecord = false;
+		}else {
+			//file name date&time and OrigSubmissionDateTime match
+			if(!fileDateTime.equals(ackFile.getOriginalSubmissionDateTime().replaceAll("[TZ:-]", ""))) {
+				addErrorMsg(DETAIL_RECORD_TYPE,"Original Submission Date/Time","  Original Submission Date/Time and File Date/Time not matched   \t ::"+ackFile.getOriginalSubmissionDateTime());
+	        	log.error("Original Submission Date/Time and File Date/Time not matched   \t ::"+ackFile.getOriginalSubmissionDateTime());
+	        	invalidRecord = false;
+			}
 		}
 		
 		//NIOP Hub ID 
@@ -124,6 +135,7 @@ public class NIOPACKFileDetailValidation {
         	invalidRecord = false;
 		}
 		
+		
 		return invalidRecord;
 	}
 
@@ -153,7 +165,9 @@ public class NIOPACKFileDetailValidation {
 				fileNameValidationFlag = true;
 			}
 		}
-		validateParam.setResponseMsg("File name validation failed");
+		if(!fileNameValidationFlag) {
+			validateParam.setResponseMsg("File name validation failed");
+		}
 		return fileNameValidationFlag;
 	}
 
@@ -174,7 +188,9 @@ public class NIOPACKFileDetailValidation {
 			}
 			
 		}
-		validateParam.setResponseMsg("File name validation failed");
+		if(!fileNameValidationFlag) {
+			validateParam.setResponseMsg("File name validation failed");
+		}
 		return fileNameValidationFlag;
 	}
 	private void addErrorMsg(String fileType,String fieldName,String errorMsg) {
